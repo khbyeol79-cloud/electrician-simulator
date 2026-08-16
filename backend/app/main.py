@@ -9,10 +9,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .api.health import router as health_router
+from .api.problems import router as problems_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
 from .core.logging_config import configure_logging
 from .database import SQLiteDatabase
+from .repositories import AnswerRepository, ProblemRepository
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -30,6 +32,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         except Exception:
             app.state.database_ready = False
             logger.exception("데이터베이스 초기화 실패")
+        try:
+            repository = ProblemRepository(
+                app_settings.paths.problems_dir,
+                app_settings.paths.bundle_root / "schemas",
+            )
+            statistics = repository.reload()
+            app.state.problem_repository = repository
+            app.state.answer_repository = AnswerRepository(repository)
+            logger.info(
+                "문제 저장소 준비 | loaded=%s excluded=%s warnings=%s",
+                statistics.loaded,
+                statistics.excluded,
+                statistics.warnings,
+            )
+        except Exception:
+            app.state.problem_repository = None
+            app.state.answer_repository = None
+            logger.exception("문제 저장소 초기화 실패")
         yield
         logger.info("애플리케이션 종료")
 
@@ -41,6 +61,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = app_settings
     app.state.database = database
     app.state.database_ready = False
+    app.state.problem_repository = None
+    app.state.answer_repository = None
     app.add_exception_handler(Exception, unhandled_exception_handler)
 
     if app_settings.allowed_origins:
@@ -53,6 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
 
     app.include_router(health_router)
+    app.include_router(problems_router)
     static_root = app_settings.resolved_static_dir.resolve()
 
     @app.get("/{full_path:path}", include_in_schema=False)
@@ -97,4 +120,3 @@ if __name__ == "__main__":
         port=current_settings.port,
         reload=current_settings.debug,
     )
-

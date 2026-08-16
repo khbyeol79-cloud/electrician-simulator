@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "answer.schema.json",
+  "title": "Private Answer Definition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "problem_id", "answer_version", "verification",
+    "socket_pin_answers", "required_connections", "expected_nets",
+    "allowed_alternatives", "forbidden_connections", "wire_color_rules",
+    "operation_tests"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "problem_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
+    },
+    "answer_version": { "type": "integer", "minimum": 1 },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "verified_by", "verified_at", "notes"],
+      "properties": {
+        "status": { "enum": ["unverified", "reviewed", "verified"] },
+        "verified_by": { "type": ["string", "null"], "maxLength": 120 },
+        "verified_at": {
+          "anyOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "notes": { "type": ["string", "null"], "maxLength": 2000 }
+      }
+    },
+    "socket_pin_answers": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "required_connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connection" }
+    },
+    "expected_nets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/net" }
+    },
+    "allowed_alternatives": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": true }
+    },
+    "forbidden_connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connectionPair" }
+    },
+    "wire_color_rules": { "$ref": "#/$defs/wireColors" },
+    "operation_tests": {
+      "type": "array",
+      "items": { "type": "object", "additionalProperties": true }
+    }
+  },
+  "$defs": {
+    "terminalId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$",
+      "maxLength": 80
+    },
+    "connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connection_id", "from", "to", "wire_color"],
+      "properties": {
+        "connection_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+        "from": { "$ref": "#/$defs/terminalId" },
+        "to": { "$ref": "#/$defs/terminalId" },
+        "wire_color": { "enum": ["brown", "black", "gray", "green", "yellow"] }
+      }
+    },
+    "connectionPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "$ref": "#/$defs/terminalId" },
+        "to": { "$ref": "#/$defs/terminalId" }
+      }
+    },
+    "net": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["net_id", "terminals"],
+      "properties": {
+        "net_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+        "terminals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/terminalId" },
+          "minItems": 2,
+          "uniqueItems": true
+        }
+      }
+    },
+    "wireColors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["L1", "L2", "L3", "PE", "control"],
+      "properties": {
+        "L1": { "const": "brown" },
+        "L2": { "const": "black" },
+        "L3": { "const": "gray" },
+        "PE": { "const": "green" },
+        "control": { "const": "yellow" }
+      }
+    }
+  }
+}
+

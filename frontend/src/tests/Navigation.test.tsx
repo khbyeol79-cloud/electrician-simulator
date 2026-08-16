@@ -1,19 +1,19 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, expect, it, vi } from 'vitest'
 import App from '../App'
+import { installApiMock } from './mockApi'
 
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+  window.localStorage.clear()
+})
 
 it('switches between all four stages', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-    ok: true,
-    json: async () => ({
-      status: 'ok', app_name: 'test', version: '0.1.0', mode: 'web',
-      database_ready: true, problems_path_ready: true,
-    }),
-  }))
+  installApiMock()
   const user = userEvent.setup()
   render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
 

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.json",
+  "title": "Problem Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "problem_id", "title", "version", "problem_type",
+    "status", "difficulty", "estimated_minutes", "tags", "source", "files"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "problem_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "version": { "type": "integer", "minimum": 1 },
+    "problem_type": {
+      "enum": ["official", "reconstructed", "variant", "practice", "original"]
+    },
+    "status": { "enum": ["draft", "reviewed", "verified"] },
+    "difficulty": { "enum": ["beginner", "intermediate", "advanced"] },
+    "estimated_minutes": { "type": "integer", "minimum": 1, "maximum": 600 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 40 },
+      "uniqueItems": true,
+      "maxItems": 20
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "name", "reference", "verified_date"],
+      "properties": {
+        "type": {
+          "enum": ["official", "reconstructed", "variant", "practice", "original"]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "reference": { "type": ["string", "null"], "maxLength": 500 },
+        "verified_date": {
+          "anyOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem", "answer", "schematic"],
+      "properties": {
+        "problem": { "$ref": "#/$defs/safeRelativePath" },
+        "answer": { "$ref": "#/$defs/safeRelativePath" },
+        "schematic": { "$ref": "#/$defs/safeRelativePath" }
+      }
+    }
+  },
+  "$defs": {
+    "safeRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))[^\\u0000]+$"
+    }
+  }
+}
+

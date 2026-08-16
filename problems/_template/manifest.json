@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "replace_with_unique_id",
+  "title": "새 문제 제목",
+  "version": 1,
+  "problem_type": "original",
+  "status": "draft",
+  "difficulty": "beginner",
+  "estimated_minutes": 30,
+  "tags": [],
+  "source": {
+    "type": "original",
+    "name": "작성자와 출처를 입력하세요",
+    "reference": null,
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg"
+  }
+}
+

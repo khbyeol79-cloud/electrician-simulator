@@ -47,9 +47,11 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; color: #071d3b; background: #ffcc4b; border-radius: 8px; font-size: 22px; }
 .brand-block h1 { margin: 0 0 2px; font-size: 19px; letter-spacing: -.3px; }
 .brand-block p { margin: 0; color: #aebfd6; font-size: 11px; }
-.header-problem { padding-left: 20px; border-left: 1px solid rgba(255,255,255,.14); }
+.header-problem { padding: 7px 10px 7px 20px; border-left: 1px solid rgba(255,255,255,.14); color: #fff; background: transparent; text-align: left; border-radius: 0 5px 5px 0; }
+.header-problem:hover { background: rgba(255,255,255,.07); }
 .header-problem span { display: block; font-size: 10px; color: #9fb3cf; margin-bottom: 3px; }
 .header-problem strong { font-size: 13px; font-weight: 600; }
+.header-problem small { display: block; margin-top: 3px; color: #92add0; font-size: 9px; }
 .header-actions { display: flex; align-items: center; gap: 7px; }
 .header-actions button { padding: 8px 10px; border-radius: 5px; color: #e9f1fc; background: rgba(255,255,255,.08); font-size: 12px; }
 .header-actions button:hover:not(:disabled) { background: rgba(255,255,255,.16); }
@@ -73,6 +75,10 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .problem-summary span { display: block; color: var(--blue-600); font-size: 10px; font-weight: 800; margin-bottom: 6px; }
 .problem-summary strong { font-size: 12px; }
 .problem-summary p { color: var(--muted); font-size: 10px; line-height: 1.55; margin: 7px 0 0; }
+.problem-summary dl { display: grid; gap: 5px; margin: 10px 0 0; font-size: 9px; }
+.problem-summary dl div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid #edf1f5; padding-bottom: 4px; }
+.problem-summary dt { color: #7a899f; }
+.problem-summary dd { margin: 0; color: #31435d; font-weight: 700; text-align: right; }
 
 .main-content { min-width: 0; min-height: 0; position: relative; padding: 16px; background: #e9eff6; }
 .workspace-page { height: 100%; min-height: 0; display: grid; grid-template-rows: 66px minmax(0, 1fr); border: 1px solid #d4deea; border-radius: 7px; overflow: hidden; background: #fff; box-shadow: 0 4px 16px rgba(27, 49, 78, .07); }
@@ -103,9 +109,38 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .fatal-error { min-height: 100vh; display: grid; place-content: center; text-align: center; background: #eef3f8; }
 .fatal-error button { justify-self: center; padding: 10px 18px; border-radius: 5px; color: #fff; background: var(--blue-600); }
 
+.problem-dialog-backdrop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 30px; background: rgba(4, 18, 38, .62); backdrop-filter: blur(2px); }
+.problem-dialog { width: min(860px, calc(100vw - 70px)); max-height: min(760px, calc(100vh - 70px)); display: grid; grid-template-rows: auto auto minmax(0, 1fr); overflow: hidden; border: 1px solid #b9c9dc; border-radius: 8px; background: #f6f9fc; box-shadow: 0 24px 70px rgba(0, 16, 40, .35); }
+.problem-dialog > header { display: flex; justify-content: space-between; align-items: center; padding: 17px 20px; color: #fff; background: var(--navy-900); }
+.problem-dialog > header span { color: #9fb7d7; font-size: 10px; font-weight: 800; }
+.problem-dialog > header h2 { margin: 3px 0 0; font-size: 19px; }
+.problem-dialog > header > div:last-child { display: flex; gap: 7px; }
+.secondary-button, .close-button { height: 34px; border-radius: 4px; color: #fff; background: rgba(255,255,255,.12); }
+.secondary-button { padding: 0 12px; font-size: 11px; }
+.close-button { width: 34px; font-size: 22px; }
+.secondary-button:hover, .close-button:hover { background: rgba(255,255,255,.2); }
+.problem-error { margin: 14px 16px 0; padding: 11px 13px; color: #9a2727; border: 1px solid #efc5c5; border-left: 4px solid var(--red); background: #fff3f3; font-size: 12px; }
+.problem-empty { margin: 25px; padding: 45px 20px; text-align: center; color: #697a91; border: 1px dashed #becbda; background: #fff; }
+.problem-empty strong { display: block; margin-bottom: 7px; color: #33465f; }
+.problem-empty p { margin: 0; font-size: 11px; }
+.problem-list { min-height: 0; overflow: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; padding: 16px; }
+.problem-card { min-height: 176px; display: flex; flex-direction: column; align-items: stretch; padding: 15px; text-align: left; color: #23334a; border: 1px solid #d4deea; border-radius: 7px; background: #fff; transition: 140ms ease; }
+.problem-card:hover:not(:disabled) { transform: translateY(-2px); border-color: #7ea9e9; box-shadow: 0 7px 18px rgba(30, 75, 135, .12); }
+.problem-card.selected { border: 2px solid var(--blue-600); background: #f7faff; }
+.problem-card-heading { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.problem-status, .problem-type, .warning-count { padding: 4px 6px; border-radius: 3px; font-size: 9px; font-weight: 800; }
+.problem-status.draft { color: #915500; background: #fff0d1; }
+.problem-status.reviewed { color: #1556ae; background: #e5efff; }
+.problem-status.verified { color: #08733e; background: #dcf5e8; }
+.problem-type { color: #465872; background: #ebf0f6; }
+.warning-count { margin-left: auto; color: #a15300; background: #fff1dc; }
+.problem-card > strong { font-size: 15px; }
+.problem-card > small { margin-top: 5px; color: #7a899f; font-size: 10px; }
+.problem-card-meta { display: flex; gap: 12px; margin-top: 14px; color: #50647f; font-size: 10px; }
+.problem-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 12px; color: #2869bd; font-size: 9px; }
+
 @media (max-width: 1280px) {
   .app-header { grid-template-columns: 430px 1fr auto; }
   .header-actions button:nth-of-type(n+3) { display: none; }
   .app-body { grid-template-columns: 220px minmax(0, 1fr); }
 }
-

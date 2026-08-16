@@ -1,9 +1,13 @@
+import type { PublicProblemDetail } from '../api/client'
+
 type HeaderProps = {
   mode?: 'desktop' | 'web'
   onRefresh: () => void
+  selectedProblem?: PublicProblemDetail
+  onOpenProblems: () => void
 }
 
-export function Header({ mode, onRefresh }: HeaderProps) {
+export function Header({ mode, onRefresh, selectedProblem, onOpenProblems }: HeaderProps) {
   return (
     <header className="app-header">
       <div className="brand-block">
@@ -13,10 +17,11 @@ export function Header({ mode, onRefresh }: HeaderProps) {
           <p>실기 시험 대비 학습 시스템</p>
         </div>
       </div>
-      <div className="header-problem">
+      <button type="button" className="header-problem" onClick={onOpenProblems}>
         <span>현재 문제</span>
-        <strong>문제가 선택되지 않았습니다</strong>
-      </div>
+        <strong>{selectedProblem?.title ?? '문제가 선택되지 않았습니다'}</strong>
+        <small>{selectedProblem ? `${selectedProblem.problem_id} · 문제 변경` : '문제 선택하기'}</small>
+      </button>
       <div className="header-actions">
         <span className="mode-badge">{mode === 'desktop' ? '데스크톱' : '웹'}</span>
         <button type="button" onClick={onRefresh}>새로고침</button>
@@ -27,4 +32,3 @@ export function Header({ mode, onRefresh }: HeaderProps) {
     </header>
   )
 }
-

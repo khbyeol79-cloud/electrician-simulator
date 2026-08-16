@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "replace_with_unique_id",
+  "description": "문제 설명을 입력하세요.",
+  "instructions": ["문제 지시사항을 입력하세요."],
+  "learning_objectives": [],
+  "power_supply": {
+    "system": "3P3W_AC_220V",
+    "voltage": 220,
+    "frequency": 60,
+    "wire_colors": {
+      "L1": "brown",
+      "L2": "black",
+      "L3": "gray",
+      "PE": "green",
+      "control": "yellow"
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "format": "svg",
+    "view_box": "0 0 1200 700"
+  },
+  "board": { "layout_id": "standard_two_motor_v1" },
+  "available_devices": [],
+  "circuit": { "devices": [], "terminals": [], "contacts": [], "coils": [] },
+  "socket_questions": []
+}
+

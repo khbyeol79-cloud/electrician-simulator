@@ -1,39 +1,69 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from '../App'
+import { installApiMock, problemDetail } from './mockApi'
 
-const health = {
-  status: 'ok',
-  app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.1.0',
-}
-const appInfo = {
-  app_name: health.app_name,
-  version: '0.1.0',
-  mode: 'web',
-  database_ready: true,
-  problems_path_ready: true,
-}
-
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+  window.localStorage.clear()
+})
 
 describe('App', () => {
   it('renders Korean shell and server status', async () => {
-    vi.stubGlobal('fetch', vi.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => health })
-      .mockResolvedValueOnce({ ok: true, json: async () => appInfo }))
-
+    installApiMock()
     render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
+
     expect(screen.getByRole('heading', { name: '전기기능사 시퀀스 결선 시뮬레이터' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '회로도 분석', level: 2 })).toBeInTheDocument()
     await waitFor(() => expect(screen.getAllByText('준비됨')).toHaveLength(2))
   })
 
-  it('shows a recoverable API error', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('연결 실패')))
+  it('selects a problem and updates the header and sidebar', async () => {
+    installApiMock()
+    const user = userEvent.setup()
     render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
-    expect(await screen.findByRole('alert')).toHaveTextContent('서버 연결을 확인해 주세요.')
-    expect(screen.getByRole('button', { name: '다시 연결' })).toBeEnabled()
+
+    await user.click(screen.getByRole('button', { name: /현재 문제/ }))
+    expect(await screen.findByRole('dialog', { name: '문제 선택' })).toBeInTheDocument()
+    expect(screen.getByText('작성 중')).toBeInTheDocument()
+    expect(screen.getByText('경고 1')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /기본 자기유지 회로 구조 연습/ }))
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /현재 문제.*기본 자기유지 회로 구조 연습/ })).toBeInTheDocument()
+    })
+    expect(screen.getByText('3P3W_AC_220V')).toBeInTheDocument()
+    expect(screen.getByText(/문제 데이터가 정상적으로 불러와졌습니다/)).toBeInTheDocument()
+    expect(window.localStorage.getItem('electrician.selectedProblemId')).toBe('practice_001')
+  })
+
+  it('restores the last selected problem', async () => {
+    window.localStorage.setItem('electrician.selectedProblemId', problemDetail.problem_id)
+    installApiMock()
+    render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
+
+    expect(await screen.findByRole('button', { name: /현재 문제.*기본 자기유지 회로 구조 연습/ })).toBeInTheDocument()
+  })
+
+  it('shows an empty problem list state', async () => {
+    installApiMock({ problems: [] })
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
+    await user.click(screen.getByRole('button', { name: /현재 문제/ }))
+    expect(await screen.findByText('사용할 수 있는 문제가 없습니다.')).toBeInTheDocument()
+  })
+
+  it('shows a recoverable API error', async () => {
+    installApiMock({ failProblems: true })
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
+    await user.click(screen.getByRole('button', { name: /현재 문제/ }))
+    const dialog = await screen.findByRole('dialog', { name: '문제 선택' })
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('문제 목록을 불러올 수 없습니다')
+    expect(within(dialog).getByRole('button', { name: '새로고침' })).toBeEnabled()
   })
 })

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "practice_001",
+  "description": "문제 패키지와 화면 연결을 확인하기 위한 자체 제작 구조 예제입니다. 실제 시험 답안으로 사용하지 마십시오.",
+  "instructions": [
+    "문제 정보가 화면에 정상적으로 표시되는지 확인하십시오.",
+    "이 문제의 실제 회로 상호작용은 다음 개발 단계에서 구현됩니다."
+  ],
+  "learning_objectives": ["문제 패키지 구조 이해", "문제 선택 기능 확인"],
+  "power_supply": {
+    "system": "3P3W_AC_220V",
+    "voltage": 220,
+    "frequency": 60,
+    "wire_colors": {
+      "L1": "brown",
+      "L2": "black",
+      "L3": "gray",
+      "PE": "green",
+      "control": "yellow"
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "format": "svg",
+    "view_box": "0 0 1200 700"
+  },
+  "board": { "layout_id": "standard_two_motor_v1" },
+  "available_devices": [],
+  "circuit": {
+    "devices": [],
+    "terminals": [],
+    "contacts": [],
+    "coils": []
+  },
+  "socket_questions": []
+}
+

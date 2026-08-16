@@ -1,6 +1,6 @@
 # 전기기능사 시퀀스 결선 시뮬레이터
 
-Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 저장소는 1단계 기반 구현으로, 공통 UI·FastAPI·SQLite·pywebview 실행 구조까지 포함합니다.
+Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 2단계로, 공통 실행 기반과 문제·답안 패키지 관리 기능까지 포함합니다.
 
 ## 현재 구현된 기능
 
@@ -13,6 +13,12 @@ Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화�
 - 웹/LAN 확장이 가능한 실행 설정
 - 회전 로그와 한국어 오류 화면
 - Python 및 프런트엔드 자동 테스트
+- 문제·답안 JSON 분리와 JSON Schema 검증
+- 손상된 문제와 중복 ID 자동 제외
+- 문제 목록·공개 상세·새로고침 API
+- 문제 선택 창, 상태 배지와 마지막 선택 복원
+- 내부 전용 답안 저장소와 일반 API 정답 노출 방지
+- 복사용 문제 템플릿과 구조 확인용 샘플 문제
 
 실제 회로도, 8P·12P 소켓, 결선, 채점 및 동작시험은 아직 구현되지 않았습니다.
 
@@ -115,6 +121,8 @@ backend/    FastAPI, SQLite, 추후 회로 엔진
 frontend/   React 공통 UI
 desktop/    pywebview 실행기와 로컬 서버 생명주기
 problems/   문제·답안 패키지
+schemas/    문제·답안 JSON Schema
+tools/      문제 패키지 검증 명령
 scripts/    Windows 설치·실행·테스트 스크립트
 ```
 
@@ -122,12 +130,15 @@ scripts/    Windows 설치·실행·테스트 스크립트
 
 - `GET /api/health`: 서버와 버전 상태
 - `GET /api/app-info`: 실행 모드, DB와 문제 폴더 준비 상태
+- `GET /api/problems`: 유효한 문제 목록
+- `GET /api/problems/{problem_id}`: 공개 문제 상세
+- `POST /api/problems/reload`: 문제 폴더 다시 검색
 
 API 응답에는 답안 데이터나 로컬 절대경로를 포함하지 않습니다.
 
 ## 문제 데이터
 
-문제마다 다음 구조를 사용할 예정입니다.
+문제마다 다음 구조를 사용합니다.
 
 ```text
 problems/problem_001/
@@ -138,7 +149,12 @@ problems/problem_001/
 └─ assets/
 ```
 
-2단계에서 JSON Schema, 문제 검색 저장소, 답안 분리 서비스와 검증 명령을 구현합니다.
+작성법은 `docs/problem-management.md`에서 확인할 수 있습니다. 문제 검증 명령은 다음과 같습니다.
+
+```powershell
+.venv\Scripts\python.exe -m tools.validate_problem problems\practice_001
+.venv\Scripts\python.exe -m tools.validate_problem --all
+```
 
 ## Windows 문제 해결
 
@@ -158,7 +174,7 @@ py -3 --version
 
 ### Node.js를 찾을 수 없는 경우
 
-Node.js 20 이상을 설치한 후 새 명령 프롬프트를 열어 다시 실행합니다.
+일반 실행에는 Node.js가 필요하지 않습니다. 프런트엔드를 수정하고 `-RebuildFrontend` 옵션을 사용할 때만 Node.js 20 이상을 설치합니다.
 
 ### 데스크톱 창이 열리지 않는 경우
 
@@ -174,11 +190,9 @@ Microsoft Edge WebView2 Runtime 설치 상태와 다음 로그를 확인합니�
 
 ## 다음 개발 단계
 
-2단계에서는 다음 항목을 구현합니다.
+3단계에서는 다음 항목을 구현합니다.
 
-- `manifest.json`, `problem.json`, `answer.json` 스키마
-- 문제 상태 `draft`, `reviewed`, `verified`
-- 문제 검색 및 목록 API
-- 정답 데이터의 일반 API 노출 방지
-- 문제 패키지 검증 명령
-- 샘플 문제와 문제 템플릿
+- 장치·소켓·단자·접점·코일의 엄격한 도메인 모델
+- 8P 및 12P 소켓 핀 규격
+- 단자 ID와 회로 요소 참조 무결성 검사
+- 시퀀스 회로 SVG 데이터 연결 기반

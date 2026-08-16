@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "practice_001",
+  "answer_version": 1,
+  "verification": {
+    "status": "unverified",
+    "verified_by": null,
+    "verified_at": null,
+    "notes": "구조 확인용 문제이므로 실제 정답은 아직 입력하지 않았습니다."
+  },
+  "socket_pin_answers": {},
+  "required_connections": [],
+  "expected_nets": [],
+  "allowed_alternatives": [],
+  "forbidden_connections": [],
+  "wire_color_rules": {
+    "L1": "brown",
+    "L2": "black",
+    "L3": "gray",
+    "PE": "green",
+    "control": "yellow"
+  },
+  "operation_tests": []
+}
+

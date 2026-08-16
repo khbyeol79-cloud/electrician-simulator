@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import type { PublicProblemDetail } from '../api/client'
 
 const stages = [
   { number: 1, path: '/circuit', label: '회로도 분석', detail: '접점과 소켓번호 확인' },
@@ -7,7 +8,10 @@ const stages = [
   { number: 4, path: '/operation', label: '동작시험', detail: '완성 회로 작동 확인' },
 ]
 
-export function StageNavigation() {
+const statusLabels = { draft: '작성 중', reviewed: '검토됨', verified: '검증 완료' }
+const difficultyLabels = { beginner: '초급', intermediate: '중급', advanced: '고급' }
+
+export function StageNavigation({ problem }: { problem?: PublicProblemDetail }) {
   return (
     <aside className="stage-sidebar" aria-label="실습 단계">
       <div className="stage-title">
@@ -31,10 +35,19 @@ export function StageNavigation() {
       </nav>
       <div className="problem-summary">
         <span>문제 정보</span>
-        <strong>선택된 문제가 없습니다</strong>
-        <p>2단계에서 문제·답안 패키지를 연결합니다.</p>
+        <strong>{problem?.title ?? '선택된 문제가 없습니다'}</strong>
+        {problem ? (
+          <dl>
+            <div><dt>ID</dt><dd>{problem.problem_id}</dd></div>
+            <div><dt>상태</dt><dd>{statusLabels[problem.status]}</dd></div>
+            <div><dt>난이도</dt><dd>{difficultyLabels[problem.difficulty]}</dd></div>
+            <div><dt>시간</dt><dd>{problem.estimated_minutes}분</dd></div>
+            <div><dt>전원</dt><dd>{problem.power_supply.system}</dd></div>
+          </dl>
+        ) : (
+          <p>상단의 현재 문제 영역에서 문제를 선택하세요.</p>
+        )}
       </div>
     </aside>
   )
 }
-

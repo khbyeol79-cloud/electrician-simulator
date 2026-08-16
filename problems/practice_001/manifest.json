@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "practice_001",
+  "title": "기본 자기유지 회로 구조 연습",
+  "version": 1,
+  "problem_type": "practice",
+  "status": "draft",
+  "difficulty": "beginner",
+  "estimated_minutes": 30,
+  "tags": ["자기유지", "전자접촉기", "구조확인용"],
+  "source": {
+    "type": "original",
+    "name": "자체 제작 구조 확인용 예제",
+    "reference": null,
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg"
+  }
+}
+
