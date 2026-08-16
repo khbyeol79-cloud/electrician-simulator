@@ -153,13 +153,13 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
         <section><span className="panel-kicker">현재 작업</span><h3>{selectedConnection ? `${selectedConnection.from} → ${selectedConnection.to}` : selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요'}</h3><p>시작 단자와 종료 단자를 차례로 클릭하거나 드래그하여 연결합니다. 새 전선은 노란색으로 생성됩니다.</p>{selectedConnection && mode === 'summary' && <dl className="summary-connection-detail"><div><dt>연결 단자 1</dt><dd>{selectedConnection.from}</dd></div><div><dt>연결 단자 2</dt><dd>{selectedConnection.to}</dd></div></dl>}{selectedConnection && <label className="wire-color-select">물리 전선 색상<select value={selectedConnection.wire_color} onChange={(event) => changeWireColor(event.target.value as WiringConnection['wire_color'])}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section>
         <section className="virtual-warning"><strong>가상 학습 데이터</strong><p>이 문제는 배선 기능 확인용이며 실제 시험 정답이 아닙니다.</p></section>
         <section><span className="panel-kicker">결선 상태</span><dl><div><dt>표시 모드</dt><dd>{mode === 'graphic' ? '그래픽' : '요약'}</dd></div><div><dt>연결 수</dt><dd>{connections.length}</dd></div><div><dt>경로 방식</dt><dd>직교·빈 통로 우선</dd></div></dl>{notice && <div className="submission-notice" role="alert">{notice}</div>}{result && <div className={`wiring-result ${result.overall_correct ? 'correct' : result.gradable ? 'wrong' : 'warning'}`}><strong>{result.message}</strong><span>정상 {result.correct_count}/{result.required_count}</span>{result.gradable && <span>누락 {result.missing_connections.length} · 추가 {result.extra_connections.length} · 금지 {result.forbidden_connections.length}</span>}</div>}<button className="submit-circuit" onClick={() => void submit()}>결선 제출</button></section>
+        <section><span className="panel-kicker">경로 규칙</span><p>같은 수평 통로의 단자는 최단거리로 직접 연결하고, 서로 다른 수평 통로로 이동할 때만 좌우 외곽 통로를 사용합니다.</p></section>
         <section className="circuit-reference-panel" aria-label="회로도 분석 참고">
           <div className="circuit-reference-header"><div><span className="panel-kicker">1단계 참고</span><h3>회로도 분석 결과</h3></div><strong>{analyzedQuestionCount} / {problem.socket_questions.length} 입력</strong></div>
           {referenceDiagram && <CircuitDiagram key={`${problem.problem_id}-reference`} diagram={referenceDiagram} questions={problem.socket_questions} selectedQuestionId={null} draft={circuitDraft} readOnly compact ariaLabel="회로도 분석 참고창" onSelect={() => undefined} onClear={() => undefined} />}
           {analyzedQuestionCount === 0 && <p className="circuit-reference-empty">1단계에서 입력한 소켓번호가 아직 없습니다.</p>}
-          <p className="circuit-reference-note">입력한 번호를 읽기 전용으로 표시합니다. 버튼과 마우스 휠로 확대·축소하고 회로도를 드래그해 이동할 수 있습니다.</p>
+          <p className="circuit-reference-note">입력한 번호를 읽기 전용으로 표시합니다. 버튼과 마우스 휠로 빠르게 확대·축소하고 회로도를 드래그해 이동할 수 있습니다.</p>
         </section>
-        <section><span className="panel-kicker">경로 규칙</span><p>같은 수평 통로의 단자는 최단거리로 직접 연결하고, 서로 다른 수평 통로로 이동할 때만 좌우 외곽 통로를 사용합니다.</p></section>
       </aside>
     </div>}
   </section>

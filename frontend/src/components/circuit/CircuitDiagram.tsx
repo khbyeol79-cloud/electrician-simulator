@@ -62,12 +62,13 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
   draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
   readOnly?: boolean; compact?: boolean; ariaLabel?: string
 }) {
-  const viewport = useSvgViewport()
+  const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4 } : undefined)
+  const zoomStep = compact ? 0.3 : 0.15
   const questionMap = Object.fromEntries(questions.map((question) => [question.question_id, question]))
   return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}`}>
     <div className="diagram-toolbar" aria-label={compact ? '참고 회로도 보기 도구' : '회로도 보기 도구'}>
-      <button type="button" onClick={() => viewport.zoomBy(0.15)} aria-label="확대">＋</button>
-      <button type="button" onClick={() => viewport.zoomBy(-0.15)} aria-label="축소">－</button>
+      <button type="button" onClick={() => viewport.zoomBy(zoomStep)} aria-label="확대">＋</button>
+      <button type="button" onClick={() => viewport.zoomBy(-zoomStep)} aria-label="축소">－</button>
       <button type="button" onClick={viewport.fit}>화면 맞춤</button>
       <button type="button" onClick={viewport.reset}>100%</button>
       <span>{Math.round(viewport.zoom * 100)}%</span>

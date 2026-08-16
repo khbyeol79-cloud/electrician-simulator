@@ -29,7 +29,7 @@ describe('제어함 결선', () => {
 
     const toolbar = screen.getByLabelText('참고 회로도 보기 도구')
     await user.click(within(toolbar).getByRole('button', { name: '확대' }))
-    expect(within(toolbar).getByText('115%')).toBeInTheDocument()
+    expect(within(toolbar).getByText('130%')).toBeInTheDocument()
     await user.click(within(toolbar).getByRole('button', { name: '화면 맞춤' }))
     expect(within(toolbar).getByText('82%')).toBeInTheDocument()
   })

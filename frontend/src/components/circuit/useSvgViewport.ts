@@ -1,15 +1,22 @@
 import { useCallback, useRef, useState } from 'react'
 
-export function useSvgViewport() {
+type SvgViewportOptions = {
+  minZoom?: number
+  maxZoom?: number
+  wheelStep?: number
+  panSpeed?: number
+  fitZoom?: number
+}
+
+export function useSvgViewport({ minZoom = 0.65, maxZoom = 2.5, wheelStep = 0.1, panSpeed = 1, fitZoom = 0.82 }: SvgViewportOptions = {}) {
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const drag = useRef<{ pointerId: number; x: number; y: number; moved: boolean } | undefined>(undefined)
   const lastDragMoved = useRef(false)
 
-  const clamp = (value: number) => Math.min(2.5, Math.max(0.65, value))
-  const zoomBy = useCallback((delta: number) => setZoom((value) => clamp(value + delta)), [])
+  const zoomBy = useCallback((delta: number) => setZoom((value) => Math.min(maxZoom, Math.max(minZoom, value + delta))), [maxZoom, minZoom])
   const reset = useCallback(() => { setZoom(1); setPan({ x: 0, y: 0 }) }, [])
-  const fit = useCallback(() => { setZoom(0.82); setPan({ x: 140, y: 70 }) }, [])
+  const fit = useCallback(() => { setZoom(fitZoom); setPan({ x: 140, y: 70 }) }, [fitZoom])
 
   const pointerDown = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
     const target = event.target as EventTarget & { closest?: (selector: string) => Element | null }
@@ -22,10 +29,10 @@ export function useSvgViewport() {
     const dx = event.clientX - drag.current.x
     const dy = event.clientY - drag.current.y
     if (Math.abs(dx) + Math.abs(dy) > 3) drag.current.moved = true
-    setPan((value) => ({ x: value.x + dx / zoom, y: value.y + dy / zoom }))
+    setPan((value) => ({ x: value.x + (dx / zoom) * panSpeed, y: value.y + (dy / zoom) * panSpeed }))
     drag.current.x = event.clientX
     drag.current.y = event.clientY
-  }, [zoom])
+  }, [panSpeed, zoom])
   const pointerUp = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
     const currentDrag = drag.current
     if (currentDrag && currentDrag.pointerId === event.pointerId) {
@@ -35,8 +42,8 @@ export function useSvgViewport() {
   }, [])
   const wheel = useCallback((event: React.WheelEvent<SVGSVGElement>) => {
     event.preventDefault()
-    zoomBy(event.deltaY < 0 ? 0.1 : -0.1)
-  }, [zoomBy])
+    zoomBy(event.deltaY < 0 ? wheelStep : -wheelStep)
+  }, [wheelStep, zoomBy])
 
   const consumeDragClick = useCallback(() => {
     const moved = lastDragMoved.current
