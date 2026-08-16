@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
-import { buildTerminalSummary, deviceSummaryColor } from '../features/wiring/components/WiringBoard'
+import { buildTerminalSummary, deviceSummaryColor, summaryLabelY } from '../features/wiring/components/WiringBoard'
 import { routeConnection } from '../features/wiring/engine/orthogonalRouter'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
@@ -103,6 +103,18 @@ describe('제어함 결선', () => {
   it('assigns distinct summary colors to the nine control devices', () => {
     const ids = ['MCCB', 'EOCR', 'F', 'X1', 'X2', 'T2', 'MC1', 'MC2', 'T1']
     expect(new Set(ids.map(deviceSummaryColor))).toHaveLength(ids.length)
+  })
+
+  it('alternates adjacent summary labels between two vertical tiers', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const mc2 = board.items.find((item) => item.item_id === 'MC2')!
+    const topPins = mc2.pins.filter((pin) => pin.side === 'top')
+    expect(summaryLabelY(topPins[0], 0)).toBe(482)
+    expect(summaryLabelY(topPins[1], 1)).toBe(455)
+    expect(summaryLabelY(topPins[2], 2)).toBe(482)
+    const bottomPins = mc2.pins.filter((pin) => pin.side === 'bottom')
+    expect(summaryLabelY(bottomPins[0], 0)).toBe(701)
+    expect(summaryLabelY(bottomPins[1], 1)).toBe(728)
   })
 
   it('restores draft, submits feedback and prevents duplicate connection', async () => {
