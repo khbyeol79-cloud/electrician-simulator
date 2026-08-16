@@ -56,7 +56,7 @@ function isFacingAcrossRows(start: BoardPin, end: BoardPin) {
   return false
 }
 
-function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin, lane: number) {
+function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin) {
   const minY = Math.min(start.y, end.y)
   const maxY = Math.max(start.y, end.y)
   const midpoint = (minY + maxY) / 2
@@ -66,9 +66,10 @@ function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin, 
     .filter(({ center }) => center > minY && center < maxY)
     .sort((left, right) => Math.abs(left.center - midpoint) - Math.abs(right.center - midpoint))
   if (!channels.length) return midpoint
-  const { channel, center } = channels[0]
-  const halfLane = Math.max(0, channel.height / 2 - 4)
-  return center + Math.min(lane, halfLane)
+  const { channel } = channels[0]
+  const safeTop = channel.y + 4
+  const safeBottom = channel.y + channel.height - 4
+  return Math.max(safeTop, Math.min(midpoint, safeBottom))
 }
 
 function outerRoute(board: BoardDefinition, start: BoardPin, end: BoardPin, startExit: DiagramPoint, endExit: DiagramPoint, lane: number) {
@@ -101,7 +102,7 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   // 마주 보는 단자 사이에 빈 행간 통로가 있으면 가장 짧은 직각 경로를 우선한다.
   const facingAcrossRows = isFacingAcrossRows(start.pin, end.pin)
   if (facingAcrossRows) {
-    const channelY = directChannelY(board, start.pin, end.pin, lane)
+    const channelY = directChannelY(board, start.pin, end.pin)
     candidates.push(compact([startPoint, { x: start.pin.x, y: channelY }, { x: end.pin.x, y: channelY }, endPoint]))
   }
 

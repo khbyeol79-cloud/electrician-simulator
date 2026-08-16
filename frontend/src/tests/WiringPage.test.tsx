@@ -55,10 +55,18 @@ describe('제어함 결선', () => {
     })
     expect(route.points).toEqual([
       { x: 812.5, y: 370 },
-      { x: 812.5, y: 442.5 },
-      { x: 845, y: 442.5 },
+      { x: 812.5, y: 435 },
+      { x: 845, y: 435 },
       { x: 845, y: 500 },
     ])
+  })
+
+  it('does not push a later direct connection below the center of the socket gap', () => {
+    const route = routeConnection(trainingBoardData as unknown as BoardDefinition, {
+      from: 'X1-1', to: 'MC2-5', wire_color: 'yellow', pair_display_color: '#2563eb',
+    }, 4)
+    expect(route.points[1].y).toBe(435)
+    expect(route.points[2].y).toBe(435)
   })
 
   it('uses an outer route only when a device blocks the direct row gap', () => {
