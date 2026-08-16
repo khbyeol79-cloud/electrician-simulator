@@ -95,8 +95,9 @@ function laneForPin(lanes: HorizontalLane[], pin: BoardPin) {
     .sort((left, right) => Math.abs(left.routeY - pin.y) - Math.abs(right.routeY - pin.y))[0]
 }
 
-function laneY(lane: HorizontalLane) {
-  return lane.routeY
+function laneY(lane: HorizontalLane, laneIndex: number) {
+  const bundleOffsets = [0, -3, 3, -6, 6]
+  return lane.routeY + bundleOffsets[laneIndex % bundleOffsets.length]
 }
 
 function outerXs(board: BoardDefinition, laneIndex: number) {
@@ -136,8 +137,8 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   const startLane = laneForPin(lanes, start.pin)
   const endLane = laneForPin(lanes, end.pin)
   if (!startLane || !endLane) throw new Error('단자와 연결할 배선 통로를 찾을 수 없습니다.')
-  const startY = laneY(startLane)
-  const endY = laneY(endLane)
+  const startY = laneY(startLane, laneIndex)
+  const endY = laneY(endLane, laneIndex)
 
   let candidates: DiagramPoint[][]
   if (startLane.channel_id === endLane.channel_id) {

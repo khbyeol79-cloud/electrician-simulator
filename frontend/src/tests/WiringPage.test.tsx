@@ -65,12 +65,17 @@ describe('제어함 결선', () => {
     ])
   })
 
-  it('does not push a later direct connection below the center of the socket gap', () => {
-    const route = routeConnection(trainingBoardData as unknown as BoardDefinition, {
+  it('keeps bundled direct connections within six units of the corridor center', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const route = routeConnection(board, {
       from: 'X1-1', to: 'MC2-5', wire_color: 'yellow', pair_display_color: '#2563eb',
     }, 4)
-    expect(route.points[1].y).toBe(435)
-    expect(route.points[2].y).toBe(435)
+    expect(route.points[1].y).toBe(441)
+    expect(route.points[2].y).toBe(441)
+    const upperBundleRoute = routeConnection(board, {
+      from: 'X1-1', to: 'MC2-5', wire_color: 'yellow', pair_display_color: '#2563eb',
+    }, 3)
+    expect(upperBundleRoute.points[1].y).toBe(429)
   })
 
   it('connects MCCB-L2 to TB5-13 directly along their shared top corridor', () => {
@@ -116,9 +121,23 @@ describe('제어함 결선', () => {
     expect(summary.get('MC1-4')).toEqual({ other: 'X1-1', slot: '1', color: deviceSummaryColor('X1'), connectionIndex: 0 })
   })
 
-  it('assigns distinct summary colors to the nine control devices', () => {
-    const ids = ['MCCB', 'EOCR', 'F', 'X1', 'X2', 'T2', 'MC1', 'MC2', 'T1']
+  it('assigns distinct summary colors including T1, TB5 and TB6', () => {
+    const ids = ['MCCB', 'EOCR', 'F', 'X1', 'X2', 'T2', 'MC1', 'MC2', 'T1', 'TB5', 'TB6']
     expect(new Set(ids.map(deviceSummaryColor))).toHaveLength(ids.length)
+  })
+
+  it('creates every new wire in yellow and lets the user change its color', async () => {
+    installApiMock()
+    const user = userEvent.setup()
+    render(<WiringPage problem={trainingDetail} />)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
+    await user.click(screen.getByRole('button', { name: 'MC1-4 단자' }))
+    const wire = screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })
+    expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#e0a500' })
+    await user.click(wire)
+    await user.selectOptions(screen.getByLabelText('물리 전선 색상'), 'black')
+    expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#171b22' })
   })
 
   it('keeps compact summary labels at the original position and shows only slot numbers', () => {

@@ -84,12 +84,12 @@ export const wiringBoard = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.5.5',
+  version: '0.5.6',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.5.5',
+  version: '0.5.6',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,

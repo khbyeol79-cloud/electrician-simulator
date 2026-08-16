@@ -13,9 +13,9 @@ export const DEVICE_SUMMARY_COLORS: Record<string, string> = {
   T2: '#2563eb',
   MC1: '#7c3aed',
   MC2: '#db2777',
-  T1: '#475569',
-  TB5: '#64748b',
-  TB6: '#64748b',
+  T1: '#334155',
+  TB5: '#0f766e',
+  TB6: '#92400e',
 }
 
 export function deviceSummaryColor(itemId: string) {
@@ -77,7 +77,7 @@ export function WiringBoard({ board, connections, mode, selectedPin, selectedWir
         <rect className="board-background" x="4" y="4" width={board.width - 8} height={board.height - 8} rx="8" />
         <g className="routing-channel-layer">{board.routing_channels.map((channel) => <rect key={channel.channel_id} className={channel.channel_type} x={channel.x} y={channel.y} width={channel.width} height={channel.height} />)}</g>
         <g className="board-item-layer">{board.items.map((item) => <ItemBody key={item.item_id} item={item} />)}</g>
-        {mode === 'graphic' && <g className="wire-layer">{routed.map((wire, index) => <g key={`${wire.from}|${wire.to}`} className={`board-wire${selectedWire === index ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(index) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(index) } }}><polyline points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} style={{ stroke: wireColors[wire.wire_color] }} /><polyline className="wire-hit" points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} /></g>)}</g>}
+        {mode === 'graphic' && <g className="wire-layer">{routed.map((wire, index) => { const points = wire.points.map((point) => `${point.x},${point.y}`).join(' '); return <g key={`${wire.from}|${wire.to}`} className={`board-wire${selectedWire === index ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(index) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(index) } }}><polyline className="wire-depth" points={points} /><polyline className="wire-visible" points={points} style={{ stroke: wireColors[wire.wire_color] }} /><polyline className="wire-hit" points={points} /></g> })}</g>}
         <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => { const pinSummary = mode === 'summary' ? summary.get(pin.terminal_id) : undefined; return <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={pinSummary} summarySelected={pinSummary?.connectionIndex === selectedWire} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} onSummarySelect={onWireSelect} /> }))}</g>
         <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={item.label_area.x + 11} cy={item.label_area.y + item.label_area.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
       </g>
