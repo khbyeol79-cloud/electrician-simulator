@@ -13,5 +13,8 @@ def test_database_initialization_is_idempotent(tmp_path):
         version = connection.execute(
             "SELECT value FROM app_meta WHERE key='schema_version'"
         ).fetchone()["value"]
-    assert version == "1"
+    assert version == "2"
 
+    with database.connect() as connection:
+        tables = {row["name"] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert {"circuit_attempts", "circuit_attempt_responses"}.issubset(tables)

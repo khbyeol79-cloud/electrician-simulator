@@ -37,9 +37,9 @@ describe('App', () => {
       expect(screen.getByRole('button', { name: /현재 문제.*기본 자기유지 회로 구조 연습/ })).toBeInTheDocument()
     })
     expect(screen.getByText('3P3W_AC_220V')).toBeInTheDocument()
-    expect(await screen.findByText('✓ 참조 무결성 정상')).toBeInTheDocument()
-    expect(screen.getByLabelText('상단 6 5 4 3')).toBeInTheDocument()
-    expect(screen.getByLabelText('하단 7 8 1 2')).toBeInTheDocument()
+    expect(await screen.findByRole('img', { name: '시퀀스 회로도' })).toBeInTheDocument()
+    expect(screen.getByText('상단 6 5 4 3')).toBeInTheDocument()
+    expect(screen.getByText('하단 7 8 1 2')).toBeInTheDocument()
     expect(window.localStorage.getItem('electrician.selectedProblemId')).toBe('practice_001')
   })
 

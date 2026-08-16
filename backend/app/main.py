@@ -10,6 +10,7 @@ from fastapi.responses import FileResponse
 
 from .api.health import router as health_router
 from .api.catalog import router as catalog_router
+from .api.circuit_analysis import router as circuit_analysis_router
 from .api.problems import router as problems_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
@@ -78,6 +79,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(catalog_router)
+    app.include_router(circuit_analysis_router)
     app.include_router(problems_router)
     static_root = app_settings.resolved_static_dir.resolve()
 

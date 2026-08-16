@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from .answer_definition import AnswerDefinition
 from .problem_definition import ProblemDefinition
 from .problem_manifest import Difficulty, ProblemManifest, ProblemStatus, ProblemType
+from .schematic_diagram import SchematicDiagram
 
 
 class ProblemValidationIssue(BaseModel):
@@ -29,6 +30,7 @@ class ProblemValidationResult(BaseModel):
     manifest: ProblemManifest | None = None
     problem: ProblemDefinition | None = None
     answer: AnswerDefinition | None = None
+    diagram: SchematicDiagram | None = None
 
     @property
     def is_valid(self) -> bool:
@@ -46,6 +48,7 @@ class ProblemPackage(BaseModel):
     manifest: ProblemManifest
     problem: ProblemDefinition
     answer: AnswerDefinition
+    diagram: SchematicDiagram
     warnings: list[ProblemValidationIssue] = Field(default_factory=list)
 
 

@@ -17,7 +17,7 @@
   "files": {
     "problem": "problem.json",
     "answer": "answer.json",
-    "schematic": "schematic.svg"
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json"
   }
 }
-

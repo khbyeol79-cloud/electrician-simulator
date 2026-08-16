@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "training_socket_demo_001",
+  "answer_version": 1,
+  "verification": {
+    "status": "reviewed",
+    "verified_by": "가상 데이터 자동 테스트",
+    "verified_at": "2026-08-16T00:00:00+09:00",
+    "notes": "실제 기기 번호가 아닌 프로그램 기능 확인용 가상 정답입니다."
+  },
+  "socket_pin_answers": { "SQ-VR1-C1": { "upper": 6, "lower": 3 } },
+  "required_connections": [],
+  "expected_nets": [],
+  "allowed_alternatives": [],
+  "forbidden_connections": [],
+  "wire_color_rules": { "L1": "brown", "L2": "black", "L3": "gray", "PE": "green", "control": "yellow" },
+  "operation_tests": []
+}

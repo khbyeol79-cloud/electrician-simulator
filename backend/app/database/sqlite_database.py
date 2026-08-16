@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
 
 
 class SQLiteDatabase:
@@ -43,6 +43,29 @@ class SQLiteDatabase:
                     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     UNIQUE(profile_id, problem_id, stage)
                 );
+
+                CREATE TABLE IF NOT EXISTS circuit_attempts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    problem_id TEXT NOT NULL,
+                    problem_version INTEGER NOT NULL,
+                    answer_version INTEGER NOT NULL,
+                    submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    answered_count INTEGER NOT NULL,
+                    total_count INTEGER NOT NULL,
+                    correct_count INTEGER NOT NULL,
+                    overall_correct INTEGER,
+                    gradable INTEGER NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS circuit_attempt_responses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    attempt_id INTEGER NOT NULL,
+                    question_id TEXT NOT NULL,
+                    slot_id TEXT NOT NULL,
+                    selected_pin INTEGER NOT NULL,
+                    is_correct INTEGER,
+                    FOREIGN KEY(attempt_id) REFERENCES circuit_attempts(id) ON DELETE CASCADE
+                );
                 """
             )
             connection.execute(
@@ -60,7 +83,6 @@ class SQLiteDatabase:
                     "SELECT name FROM sqlite_master WHERE type='table'"
                 ).fetchall()
             names = {row["name"] for row in rows}
-            return {"app_meta", "user_settings", "learning_progress"}.issubset(names)
+            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses"}.issubset(names)
         except sqlite3.Error:
             return False
-

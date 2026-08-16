@@ -13,9 +13,11 @@ from app.domain import (
     ProblemManifest,
     ProblemValidationIssue,
     ProblemValidationResult,
+    SchematicDiagram,
 )
 from app.services.catalog_service import CatalogService
 from app.services.circuit_reference_validator import CircuitReferenceValidator
+from app.services.diagram_reference_validator import DiagramReferenceValidator
 
 
 MAX_JSON_BYTES = 2 * 1024 * 1024
@@ -29,10 +31,12 @@ class ProblemPackageValidator:
             catalog_dir or self.schemas_dir.parent / "catalog", self.schemas_dir
         )
         self.circuit_validator = CircuitReferenceValidator(self.catalog)
+        self.diagram_validator = DiagramReferenceValidator()
         self._schemas = {
             "manifest.json": self._read_schema("manifest.schema.json"),
             "problem.json": self._read_schema("problem.schema.json"),
             "answer.json": self._read_schema("answer.schema.json"),
+            "diagram.json": self._read_schema("diagram.schema.json"),
         }
 
     def _read_schema(self, name: str) -> dict[str, Any]:
@@ -169,6 +173,7 @@ class ProblemPackageValidator:
         manifest: ProblemManifest | None = None
         problem: ProblemDefinition | None = None
         answer: AnswerDefinition | None = None
+        diagram: SchematicDiagram | None = None
 
         if manifest_data and self._validate_schema(
             manifest_data, "manifest.json", issues, manifest_data.get("problem_id")
@@ -208,6 +213,9 @@ class ProblemPackageValidator:
         answer_data = self._load_json(
             package_dir, manifest.files.answer, issues, problem_id
         )
+        diagram_data = self._load_json(
+            package_dir, manifest.files.diagram, issues, problem_id
+        )
 
         if problem_data and self._validate_schema(
             problem_data, "problem.json", issues, problem_id
@@ -232,6 +240,19 @@ class ProblemPackageValidator:
                     self._issue(
                         "error", "pydantic_error", str(exc),
                         file="answer.json", problem_id=problem_id
+                    )
+                )
+
+        if diagram_data and self._validate_schema(
+            diagram_data, "diagram.json", issues, problem_id
+        ):
+            try:
+                diagram = SchematicDiagram.model_validate(diagram_data)
+            except ValidationError as exc:
+                issues.append(
+                    self._issue(
+                        "error", "pydantic_error", str(exc),
+                        file=manifest.files.diagram, problem_id=problem_id
                     )
                 )
 
@@ -332,6 +353,8 @@ class ProblemPackageValidator:
 
         if problem and answer:
             issues.extend(self.circuit_validator.validate(problem, answer))
+        if problem and diagram:
+            issues.extend(self.diagram_validator.validate(problem, diagram))
 
         return ProblemValidationResult(
             package_dir=package_dir,
@@ -339,4 +362,5 @@ class ProblemPackageValidator:
             manifest=manifest,
             problem=problem,
             answer=answer,
+            diagram=diagram,
         )

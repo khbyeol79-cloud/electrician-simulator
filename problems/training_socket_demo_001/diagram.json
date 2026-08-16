@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "view_box": { "x": 0, "y": 0, "width": 1600, "height": 900 },
+  "sections": [
+    { "section_id": "power", "label": "주회로", "bounds": { "x": 20, "y": 20, "width": 430, "height": 820 } },
+    { "section_id": "control", "label": "제어회로", "bounds": { "x": 470, "y": 20, "width": 1110, "height": 820 } }
+  ],
+  "elements": [
+    { "element_id": "power_title", "element_type": "power_label", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 65, "y": 80, "width": 120, "height": 40, "orientation": "horizontal", "label": "3상 전원", "interactive": false },
+    { "element_id": "label_l1", "element_type": "power_label", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 100, "y": 120, "width": 40, "height": 30, "orientation": "horizontal", "label": "L1", "interactive": false },
+    { "element_id": "label_l2", "element_type": "power_label", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 190, "y": 120, "width": 40, "height": 30, "orientation": "horizontal", "label": "L2", "interactive": false },
+    { "element_id": "label_l3", "element_type": "power_label", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 280, "y": 120, "width": 40, "height": 30, "orientation": "horizontal", "label": "L3", "interactive": false },
+    { "element_id": "label_pe", "element_type": "power_label", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 370, "y": 120, "width": 40, "height": 30, "orientation": "horizontal", "label": "PE", "interactive": false },
+    { "element_id": "virtual_mccb", "element_type": "mccb", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 140, "y": 250, "width": 130, "height": 80, "orientation": "vertical", "label": "가상 MCCB", "interactive": false },
+    { "element_id": "virtual_motor", "element_type": "motor", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 165, "y": 650, "width": 90, "height": 90, "orientation": "vertical", "label": "가상 M1", "interactive": false },
+    { "element_id": "control_title", "element_type": "power_label", "section_id": "control", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 520, "y": 80, "width": 190, "height": 40, "orientation": "horizontal", "label": "가상 제어전원", "interactive": false },
+    { "element_id": "diagram_vr1_c1", "element_type": "contact_no", "section_id": "control", "circuit_ref_type": "contact", "circuit_ref_id": "VR1-C1", "question_id": "SQ-VR1-C1", "x": 820, "y": 270, "width": 80, "height": 100, "orientation": "vertical", "label": "VR1", "interactive": true },
+    { "element_id": "diagram_vr1_coil", "element_type": "coil", "section_id": "control", "circuit_ref_type": "coil", "circuit_ref_id": "VR1-COIL", "question_id": null, "x": 810, "y": 650, "width": 100, "height": 70, "orientation": "horizontal", "label": "VR1", "interactive": false },
+    { "element_id": "virtual_lamp", "element_type": "indicator_lamp", "section_id": "control", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 1120, "y": 650, "width": 70, "height": 70, "orientation": "horizontal", "label": "가상 GL", "interactive": false }
+  ],
+  "conductors": [
+    { "conductor_id": "p_l1", "section_id": "power", "points": [ { "x": 120, "y": 140 }, { "x": 120, "y": 650 } ], "line_style": "power_l1", "junctions": [] },
+    { "conductor_id": "p_l2", "section_id": "power", "points": [ { "x": 210, "y": 140 }, { "x": 210, "y": 650 } ], "line_style": "power_l2", "junctions": [] },
+    { "conductor_id": "p_l3", "section_id": "power", "points": [ { "x": 300, "y": 140 }, { "x": 300, "y": 650 } ], "line_style": "power_l3", "junctions": [] },
+    { "conductor_id": "p_pe", "section_id": "power", "points": [ { "x": 390, "y": 140 }, { "x": 390, "y": 740 } ], "line_style": "protective_earth", "junctions": [] },
+    { "conductor_id": "control_top", "section_id": "control", "points": [ { "x": 540, "y": 150 }, { "x": 1500, "y": 150 } ], "line_style": "control", "junctions": [ { "x": 860, "y": 150 }, { "x": 1155, "y": 150 } ] },
+    { "conductor_id": "control_bottom", "section_id": "control", "points": [ { "x": 540, "y": 780 }, { "x": 1500, "y": 780 } ], "line_style": "neutral", "junctions": [ { "x": 860, "y": 780 }, { "x": 1155, "y": 780 } ] },
+    { "conductor_id": "branch_vr1_top", "section_id": "control", "points": [ { "x": 860, "y": 150 }, { "x": 860, "y": 270 } ], "line_style": "control", "junctions": [] },
+    { "conductor_id": "branch_vr1_mid", "section_id": "control", "points": [ { "x": 860, "y": 370 }, { "x": 860, "y": 650 } ], "line_style": "control", "junctions": [] },
+    { "conductor_id": "branch_vr1_bottom", "section_id": "control", "points": [ { "x": 860, "y": 720 }, { "x": 860, "y": 780 } ], "line_style": "control", "junctions": [] },
+    { "conductor_id": "branch_lamp", "section_id": "control", "points": [ { "x": 1155, "y": 150 }, { "x": 1155, "y": 650 } ], "line_style": "control", "junctions": [] },
+    { "conductor_id": "branch_lamp_bottom", "section_id": "control", "points": [ { "x": 1155, "y": 720 }, { "x": 1155, "y": 780 } ], "line_style": "control", "junctions": [] }
+  ]
+}

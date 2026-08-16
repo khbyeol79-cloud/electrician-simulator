@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "training_socket_demo_001",
+  "title": "가상 소켓번호 입력 기능 확인",
+  "version": 1,
+  "problem_type": "practice",
+  "status": "reviewed",
+  "difficulty": "beginner",
+  "estimated_minutes": 10,
+  "tags": ["가상회로", "소켓번호", "기능확인"],
+  "source": {
+    "type": "original",
+    "name": "프로그램 기능 확인용 가상 데이터",
+    "reference": "실제 전기기능사 시험 정답이 아님",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json"
+  }
+}

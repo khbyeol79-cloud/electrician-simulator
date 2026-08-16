@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "view_box": { "x": 0, "y": 0, "width": 1600, "height": 900 },
+  "sections": [
+    { "section_id": "power", "label": "주회로", "bounds": { "x": 20, "y": 20, "width": 430, "height": 820 } },
+    { "section_id": "control", "label": "제어회로", "bounds": { "x": 470, "y": 20, "width": 1110, "height": 820 } }
+  ],
+  "elements": [],
+  "conductors": []
+}

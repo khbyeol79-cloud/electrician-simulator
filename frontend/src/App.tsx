@@ -100,6 +100,11 @@ export default function App() {
         onRefresh={refresh}
         selectedProblem={selectedProblem}
         onOpenProblems={() => setProblemDialogOpen(true)}
+        onReset={() => {
+          if (!selectedProblem) return
+          window.localStorage.removeItem(`electrician.circuitDraft.${selectedProblem.problem_id}.v${selectedProblem.version}`)
+          window.dispatchEvent(new CustomEvent('electrician:reset-circuit'))
+        }}
       />
       <div className="app-body">
         <StageNavigation problem={selectedProblem} />

@@ -43,8 +43,20 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   schematic: { file: string; format: string; view_box: string }
   board: { layout_id: string }
   available_devices: Record<string, unknown>[]
-  circuit: Record<string, unknown>
-  socket_questions: Record<string, unknown>[]
+  circuit: CircuitDefinition
+  socket_questions: SocketQuestion[]
+}
+
+export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null }
+export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed' }
+export type CircuitCoil = { coil_id: string; owner_device_id: string }
+export type CircuitDefinition = {
+  schema_version: '1.0'; definition_status: 'structure_only' | 'functional'
+  devices: CircuitDevice[]; terminals: Record<string, unknown>[]; contacts: CircuitContact[]; coils: CircuitCoil[]
+}
+export type SocketQuestion = {
+  question_id: string; target_element_type: 'contact' | 'coil'; target_element_id: string; display_label: string
+  answer_slots: { slot_id: string; position: 'above' | 'below' | 'left' | 'right' }[]
 }
 
 export type SocketType = {
@@ -67,6 +79,31 @@ export type CircuitSummary = {
   reference_integrity: 'valid'
   warning_count: number
   definition_status: 'structure_only' | 'functional'
+}
+
+export type DiagramPoint = { x: number; y: number }
+export type DiagramElement = {
+  element_id: string; element_type: string; section_id: string
+  circuit_ref_type: 'device' | 'terminal' | 'contact' | 'coil' | null
+  circuit_ref_id: string | null; question_id: string | null
+  x: number; y: number; width: number; height: number
+  orientation: 'horizontal' | 'vertical'; label: string; interactive: boolean
+}
+export type SchematicDiagram = {
+  schema_version: '1.0'
+  view_box: { x: number; y: number; width: number; height: number }
+  sections: { section_id: string; label: string; bounds: { x: number; y: number; width: number; height: number } }[]
+  elements: DiagramElement[]
+  conductors: { conductor_id: string; section_id: string; points: DiagramPoint[]; line_style: string; junctions: DiagramPoint[] }[]
+}
+export type CircuitAttemptResult = {
+  attempt_id: number | null; gradable: boolean; overall_correct: boolean | null
+  answered_count: number; total_count: number; correct_count: number; message: string
+  results: { question_id: string; correct: boolean; slot_results: Record<string, boolean> }[]
+}
+export type CircuitProgress = {
+  problem_id: string; attempt_count: number; last_submitted_at: string | null
+  last_overall_correct: boolean | null; last_correct_count: number; total_count: number
 }
 
 export type ReloadStatistics = {
@@ -105,6 +142,27 @@ export function getSocketTypes(signal?: AbortSignal) {
 
 export function getCircuitSummary(problemId: string, signal?: AbortSignal) {
   return getJson<CircuitSummary>(`/api/problems/${encodeURIComponent(problemId)}/circuit-summary`, signal)
+}
+
+export function getDiagram(problemId: string, signal?: AbortSignal) {
+  return getJson<SchematicDiagram>(`/api/problems/${encodeURIComponent(problemId)}/diagram`, signal)
+}
+
+export function getCircuitProgress(problemId: string, signal?: AbortSignal) {
+  return getJson<CircuitProgress>(`/api/problems/${encodeURIComponent(problemId)}/circuit-progress`, signal)
+}
+
+export async function submitCircuitAttempt(problemId: string, problemVersion: number, responses: Record<string, Record<string, number>>) {
+  const response = await fetch(`/api/problems/${encodeURIComponent(problemId)}/circuit-attempts/submit`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ problem_version: problemVersion, responses }),
+  })
+  if (!response.ok) {
+    const payload = await response.json().catch(() => undefined) as { detail?: { message?: string } | string } | undefined
+    const message = typeof payload?.detail === 'object' ? payload.detail.message : payload?.detail
+    throw new Error(message || `채점 서버 오류 (${response.status})`)
+  }
+  return response.json() as Promise<CircuitAttemptResult>
 }
 
 export async function reloadProblemCatalog() {

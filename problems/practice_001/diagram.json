@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "view_box": { "x": 0, "y": 0, "width": 1600, "height": 900 },
+  "sections": [
+    { "section_id": "power", "label": "주회로", "bounds": { "x": 20, "y": 20, "width": 430, "height": 820 } },
+    { "section_id": "control", "label": "제어회로", "bounds": { "x": 470, "y": 20, "width": 1110, "height": 820 } }
+  ],
+  "elements": [
+    { "element_id": "power_note", "element_type": "text", "section_id": "power", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 100, "y": 340, "width": 270, "height": 80, "orientation": "horizontal", "label": "구조 확인용 주회로", "interactive": false },
+    { "element_id": "control_note", "element_type": "text", "section_id": "control", "circuit_ref_type": null, "circuit_ref_id": null, "question_id": null, "x": 760, "y": 340, "width": 500, "height": 80, "orientation": "horizontal", "label": "미검증 문제 · 채점 불가", "interactive": false }
+  ],
+  "conductors": []
+}

@@ -65,7 +65,7 @@ class ProblemRepository:
                 )
 
             self._issues.extend(result.issues)
-            if not result.is_valid or not (result.manifest and result.problem and result.answer):
+            if not result.is_valid or not (result.manifest and result.problem and result.answer and result.diagram):
                 self._excluded += 1
                 for issue in result.issues:
                     self._logger.warning(
@@ -82,6 +82,7 @@ class ProblemRepository:
                 manifest=result.manifest,
                 problem=result.problem,
                 answer=result.answer,
+                diagram=result.diagram,
                 warnings=[issue for issue in result.issues if issue.severity == "warning"],
             )
             self._packages[package.manifest.problem_id] = package
@@ -128,12 +129,16 @@ class ProblemRepository:
             board=problem.board.model_dump(mode="json"),
             available_devices=problem.available_devices,
             circuit=problem.circuit.model_dump(mode="json"),
-            socket_questions=problem.socket_questions,
+            socket_questions=[question.model_dump(mode="json") for question in problem.socket_questions],
             warning_count=len(package.warnings),
         )
 
     def _get_package_internal(self, problem_id: str) -> ProblemPackage | None:
         return self._packages.get(problem_id)
+
+    def get_diagram(self, problem_id: str):
+        package = self._packages.get(problem_id)
+        return package.diagram if package else None
 
     def get_circuit_summary(self, problem_id: str) -> CircuitSummary | None:
         package = self._packages.get(problem_id)

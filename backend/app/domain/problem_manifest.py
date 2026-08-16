@@ -26,6 +26,7 @@ class ProblemFiles(BaseModel):
     problem: str
     answer: str
     schematic: str
+    diagram: str
 
 
 class ProblemManifest(BaseModel):
@@ -42,4 +43,3 @@ class ProblemManifest(BaseModel):
     tags: list[str] = Field(default_factory=list, max_length=20)
     source: ProblemSource
     files: ProblemFiles
-

@@ -5,9 +5,10 @@ type HeaderProps = {
   onRefresh: () => void
   selectedProblem?: PublicProblemDetail
   onOpenProblems: () => void
+  onReset: () => void
 }
 
-export function Header({ mode, onRefresh, selectedProblem, onOpenProblems }: HeaderProps) {
+export function Header({ mode, onRefresh, selectedProblem, onOpenProblems, onReset }: HeaderProps) {
   return (
     <header className="app-header">
       <div className="brand-block">
@@ -25,7 +26,7 @@ export function Header({ mode, onRefresh, selectedProblem, onOpenProblems }: Hea
       <div className="header-actions">
         <span className="mode-badge">{mode === 'desktop' ? '데스크톱' : '웹'}</span>
         <button type="button" onClick={onRefresh}>새로고침</button>
-        <button type="button" disabled>초기화</button>
+        <button type="button" onClick={onReset} disabled={!selectedProblem}>초기화</button>
         <button type="button" disabled>설정</button>
         <button type="button" disabled>도움말</button>
       </div>

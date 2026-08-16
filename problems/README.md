@@ -9,11 +9,13 @@ problems/problem_001/
 ├─ manifest.json
 ├─ problem.json
 ├─ answer.json
+├─ diagram.json
 ├─ schematic.svg
 └─ assets/
 ```
 
 `answer.json`은 사용자 화면이나 일반 조회 API에 직접 노출하지 않습니다.
+`diagram.json`은 접점 선택용 구조화 SVG 배치 데이터입니다.
 장치와 소켓 유형은 `catalog` 폴더의 공통 정의를 ID로 참조합니다.
 
 검증 명령:

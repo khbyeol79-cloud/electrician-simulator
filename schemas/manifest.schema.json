@@ -51,11 +51,12 @@
     "files": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["problem", "answer", "schematic"],
+      "required": ["problem", "answer", "schematic", "diagram"],
       "properties": {
         "problem": { "$ref": "#/$defs/safeRelativePath" },
         "answer": { "$ref": "#/$defs/safeRelativePath" },
-        "schematic": { "$ref": "#/$defs/safeRelativePath" }
+        "schematic": { "$ref": "#/$defs/safeRelativePath" },
+        "diagram": { "$ref": "#/$defs/safeRelativePath" }
       }
     }
   },
@@ -68,4 +69,3 @@
     }
   }
 }
-

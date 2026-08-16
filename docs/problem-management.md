@@ -9,6 +9,7 @@ problems/problem_001/
 ├─ manifest.json
 ├─ problem.json
 ├─ answer.json
+├─ diagram.json
 ├─ schematic.svg
 └─ assets/
 ```
@@ -16,6 +17,7 @@ problems/problem_001/
 - `manifest.json`: 문제 목록과 상태
 - `problem.json`: 사용자에게 공개되는 설명과 회로 정보
 - `answer.json`: 내부 채점용 정답
+- `diagram.json`: 데이터 기반 SVG 회로도 배치
 - `schematic.svg`: 회로도
 - `assets`: 문제 전용 이미지
 
@@ -28,6 +30,7 @@ problems/problem_001/
 5. `problem.json`에 공개 문제 설명과 지시사항을 작성합니다.
    장치·단자·접점·코일 작성 규칙은 `docs/circuit-data-model.md`를 확인합니다.
 6. `schematic.svg`를 자체 제작 또는 사용 권한이 있는 회로도로 교체합니다.
+   실제 상호작용 회로도는 `diagram.json`에 작성하며 세부 규칙은 `docs/schematic-diagram.md`를 확인합니다.
 7. `answer.json`에 정답을 별도로 작성합니다.
 8. 아래 검증 명령을 실행합니다.
 9. 회로와 정답을 검토한 뒤 상태를 변경합니다.
