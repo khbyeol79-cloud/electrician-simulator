@@ -4,7 +4,7 @@
   "description": "프로그램의 접점 선택과 소켓번호 입력·채점을 확인하기 위한 가상 회로입니다. 실제 전기기능사 시험 정답으로 사용하지 마십시오.",
   "instructions": ["제어회로의 VR1 접점을 선택하십시오.", "위쪽과 아래쪽 소켓번호를 선택한 뒤 제출하십시오."],
   "learning_objectives": ["SVG 회로 요소 선택", "8P 가상 소켓번호 입력", "채점 결과 확인"],
-  "power_supply": { "system": "3P3W_AC_220V", "voltage": 220, "frequency": 60, "wire_colors": { "L1": "brown", "L2": "black", "L3": "gray", "PE": "green", "control": "yellow" } },
+  "power_supply": { "system": "3P3W_AC_220V", "voltage": 220, "frequency": 60, "wire_colors": { "L1": "brown", "L2": "black", "L3": "gray", "control": "yellow" } },
   "schematic": { "file": "schematic.svg", "format": "svg", "view_box": "0 0 1600 900" },
   "board": { "layout_id": "virtual_training_board_v1" },
   "available_devices": [],

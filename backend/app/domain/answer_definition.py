@@ -23,7 +23,7 @@ class RequiredConnection(BaseModel):
     connection_id: str
     from_terminal: str = Field(alias="from")
     to: str
-    wire_color: Literal["brown", "black", "gray", "green", "yellow"]
+    wire_color: Literal["brown", "black", "gray", "yellow"]
 
 
 class ExpectedNet(BaseModel):

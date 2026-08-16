@@ -34,7 +34,7 @@ export const problemDetail: PublicProblemDetail = {
     system: '3P3W_AC_220V',
     voltage: 220,
     frequency: 60,
-    wire_colors: { L1: 'brown', L2: 'black', L3: 'gray', PE: 'green', control: 'yellow' },
+    wire_colors: { L1: 'brown', L2: 'black', L3: 'gray', control: 'yellow' },
   },
   schematic: { file: 'schematic.svg', format: 'svg', view_box: '0 0 1200 700' },
   board: { layout_id: 'standard_two_motor_v1' },
@@ -60,12 +60,12 @@ export const trainingDetail: PublicProblemDetail = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.4.0',
+  version: '0.4.1',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.4.0',
+  version: '0.4.1',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,

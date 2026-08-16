@@ -12,6 +12,8 @@ export function useSvgViewport() {
   const fit = useCallback(() => { setZoom(0.82); setPan({ x: 140, y: 70 }) }, [])
 
   const pointerDown = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
+    const target = event.target as EventTarget & { closest?: (selector: string) => Element | null }
+    if (target.closest?.('.element-hitbox')) return
     drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false }
     event.currentTarget.setPointerCapture?.(event.pointerId)
   }, [])
@@ -25,8 +27,9 @@ export function useSvgViewport() {
     drag.current.y = event.clientY
   }, [zoom])
   const pointerUp = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
-    if (drag.current?.pointerId === event.pointerId) {
-      lastDragMoved.current = drag.current.moved
+    const currentDrag = drag.current
+    if (currentDrag && currentDrag.pointerId === event.pointerId) {
+      lastDragMoved.current = currentDrag.moved
       drag.current = undefined
     }
   }, [])

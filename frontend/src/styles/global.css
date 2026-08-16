@@ -156,7 +156,6 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .conductor.power_l1 polyline { stroke: #7a3f25; }
 .conductor.power_l2 polyline { stroke: #161b22; }
 .conductor.power_l3 polyline { stroke: #77808a; }
-.conductor.protective_earth polyline { stroke: #13844b; }
 .conductor.neutral polyline { stroke: #2c527c; }
 .symbol-stroke { fill: #fff; stroke: #172537; stroke-width: 4; vector-effect: non-scaling-stroke; }
 .symbol-stroke text { fill: #172537; stroke: none; font-size: 24px; font-weight: 800; }

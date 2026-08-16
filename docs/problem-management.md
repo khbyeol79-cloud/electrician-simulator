@@ -104,11 +104,10 @@ practice_002
 L1      brown
 L2      black
 L3      gray
-PE      green
 control yellow
 ```
 
-색상 규칙이 다르면 문제 검증에 실패합니다.
+현재 PE 색상은 정의하지 않으며 회로도에도 별도 표시하지 않습니다. 정의된 색상 규칙이 다르면 문제 검증에 실패합니다.
 
 ## 공통 카탈로그
 

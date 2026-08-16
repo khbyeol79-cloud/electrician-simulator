@@ -23,6 +23,10 @@ def mutate_diagram(package, updater):
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
+def element_by_id(data, element_id):
+    return next(item for item in data["elements"] if item["element_id"] == element_id)
+
+
 def test_training_diagram_is_valid():
     result = ProblemPackageValidator(PROJECT_ROOT / "schemas").validate(PROJECT_ROOT / "problems" / "training_socket_demo_001")
     assert result.is_valid is True
@@ -35,10 +39,10 @@ def test_training_diagram_is_valid():
         (lambda d: d["sections"].append(dict(d["sections"][0])), "duplicate_section_id"),
         (lambda d: d["elements"].append(dict(d["elements"][0])), "duplicate_diagram_element_id"),
         (lambda d: d["elements"][0].update(section_id="missing"), "unknown_diagram_section"),
-        (lambda d: d["elements"][8].update(circuit_ref_id="MISSING"), "unknown_diagram_reference"),
-        (lambda d: d["elements"][8].update(x=1700), "element_out_of_viewbox"),
+        (lambda d: element_by_id(d, "diagram_vr1_c1").update(circuit_ref_id="MISSING"), "unknown_diagram_reference"),
+        (lambda d: element_by_id(d, "diagram_vr1_c1").update(x=1700), "element_out_of_viewbox"),
         (lambda d: d["conductors"][0]["points"].append({"x": 250, "y": 700}), "diagonal_conductor"),
-        (lambda d: d["elements"][8].update(question_id=None), "interactive_question_missing"),
+        (lambda d: element_by_id(d, "diagram_vr1_c1").update(question_id=None), "interactive_question_missing"),
     ],
 )
 def test_invalid_diagram_references_exclude_problem(tmp_path, updater, code):

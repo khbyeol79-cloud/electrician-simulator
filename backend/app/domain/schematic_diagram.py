@@ -58,7 +58,7 @@ class DiagramConductor(BaseModel):
     section_id: str
     points: list[DiagramPoint] = Field(min_length=2)
     line_style: Literal[
-        "power_l1", "power_l2", "power_l3", "protective_earth",
+        "power_l1", "power_l2", "power_l3",
         "control", "neutral", "reference",
     ]
     junctions: list[DiagramPoint] = Field(default_factory=list)

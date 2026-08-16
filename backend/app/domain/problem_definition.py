@@ -11,7 +11,6 @@ class WireColors(BaseModel):
     L1: Literal["brown"]
     L2: Literal["black"]
     L3: Literal["gray"]
-    PE: Literal["green"]
     control: Literal["yellow"]
 
 

@@ -13,7 +13,7 @@ def valid_data():
     problem = {
         "schema_version": "1.0", "problem_id": "fixture_001", "description": "가상 참조 검사 데이터",
         "instructions": ["검사"], "learning_objectives": [],
-        "power_supply": {"system": "3P3W_AC_220V", "voltage": 220, "frequency": 60, "wire_colors": {"L1": "brown", "L2": "black", "L3": "gray", "PE": "green", "control": "yellow"}},
+        "power_supply": {"system": "3P3W_AC_220V", "voltage": 220, "frequency": 60, "wire_colors": {"L1": "brown", "L2": "black", "L3": "gray", "control": "yellow"}},
         "schematic": {"file": "schematic.svg", "format": "svg", "view_box": "0 0 10 10"},
         "board": {"layout_id": "fixture_board"}, "available_devices": [],
         "circuit": {
@@ -37,7 +37,7 @@ def valid_data():
         "required_connections": [{"connection_id": "C1", "from": "X1-1", "to": "X1-4", "wire_color": "yellow"}],
         "expected_nets": [{"net_id": "N1", "terminals": ["X1-1", "X1-4"]}],
         "allowed_alternatives": [], "forbidden_connections": [],
-        "wire_color_rules": {"L1": "brown", "L2": "black", "L3": "gray", "PE": "green", "control": "yellow"},
+        "wire_color_rules": {"L1": "brown", "L2": "black", "L3": "gray", "control": "yellow"},
         "operation_tests": []
     }
     return problem, answer

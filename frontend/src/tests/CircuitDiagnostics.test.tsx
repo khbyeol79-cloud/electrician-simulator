@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { CircuitAnalysisPage } from '../pages/CircuitAnalysisPage'
 import userEvent from '@testing-library/user-event'
@@ -50,6 +50,18 @@ describe('회로 데이터 진단', () => {
     expect(window.localStorage.getItem('electrician.circuitDraft.training_socket_demo_001.v1')).toContain('upper')
     await user.click(screen.getByRole('button', { name: '소켓번호 제출' }))
     expect(await screen.findByText('정답 ✓')).toBeInTheDocument()
+  })
+
+  it('selects VR1 by mouse even when the pointer moves inside its hit area', async () => {
+    installApiMock()
+    render(<CircuitAnalysisPage problem={trainingDetail} />)
+    const hitbox = await screen.findByRole('button', { name: 'VR1 VR1-C1 선택' })
+    const svg = screen.getByRole('img', { name: '시퀀스 회로도' })
+    fireEvent.pointerDown(hitbox, { pointerId: 1, clientX: 100, clientY: 100 })
+    fireEvent.pointerMove(svg, { pointerId: 1, clientX: 110, clientY: 103 })
+    fireEvent.pointerUp(svg, { pointerId: 1, clientX: 110, clientY: 103 })
+    fireEvent.click(hitbox)
+    expect(screen.getByText('VR1-C1')).toBeInTheDocument()
   })
 
   it('supports zoom controls and incomplete submission warning', async () => {

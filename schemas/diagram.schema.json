@@ -36,7 +36,7 @@
       "properties": {
         "conductor_id": { "type": "string", "minLength": 1 }, "section_id": { "type": "string", "minLength": 1 },
         "points": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/point" } },
-        "line_style": { "enum": ["power_l1", "power_l2", "power_l3", "protective_earth", "control", "neutral", "reference"] },
+        "line_style": { "enum": ["power_l1", "power_l2", "power_l3", "control", "neutral", "reference"] },
         "junctions": { "type": "array", "items": { "$ref": "#/$defs/point" } }
       }
     }
