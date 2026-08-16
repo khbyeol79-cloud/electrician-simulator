@@ -32,5 +32,6 @@
   },
   "socket_questions": [],
   "device_layout": null,
-  "mounting": null
+  "mounting": null,
+  "operation": null
 }

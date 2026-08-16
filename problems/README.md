@@ -20,7 +20,7 @@ problems/problem_001/
 `problem.json`의 `device_layout.fixed_placements`는 문제지에 제시되는 고정 기구 위치이며 공개 데이터입니다.
 결선 정답과 향후 동작시험 판정 데이터는 `answer.json`에 작성하고 일반 조회 API에 포함하지 않습니다.
 
-고정 기구 배치 작성법은 `docs/device-layout.md`를 확인하세요. 기존 `mounting`과 `mounting_answer`는 0.6.0 데이터 호환을 위해 읽을 수 있지만 새 문제에서는 사용하지 않습니다.
+고정 기구 배치 작성법은 `docs/device-layout.md`, 동작시험 작성법은 `docs/operation-simulation.md`를 확인하세요. 기존 `mounting`과 `mounting_answer`는 0.6.0 데이터 호환을 위해 읽을 수 있지만 새 문제에서는 사용하지 않습니다.
 
 검증 명령:
 

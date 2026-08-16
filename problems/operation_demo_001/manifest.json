@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "operation_demo_001",
+  "title": "자기유지·타이머 동작 기능 확인",
+  "version": 1,
+  "problem_type": "practice",
+  "status": "reviewed",
+  "difficulty": "beginner",
+  "estimated_minutes": 15,
+  "tags": ["자체제작", "자기유지", "타이머", "동작엔진"],
+  "source": {
+    "type": "original",
+    "name": "프로그램 동작 엔진 검증용 자체 제작 문제",
+    "reference": "실제 Q-net 공식 문제 또는 시험 정답이 아님",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

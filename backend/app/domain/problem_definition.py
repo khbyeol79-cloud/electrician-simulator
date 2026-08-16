@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .mounting_attempt import MountingDefinition
 from .operation_setup import DeviceLayoutDefinition
+from .operation_definition import OperationDefinition
 
 
 class WireColors(BaseModel):
@@ -152,3 +153,4 @@ class ProblemDefinition(BaseModel):
     socket_questions: list[SocketQuestion] = Field(default_factory=list)
     device_layout: DeviceLayoutDefinition | None = None
     mounting: MountingDefinition | None = None
+    operation: OperationDefinition | None = None

@@ -22,7 +22,7 @@ def test_operation_setup_exposes_public_fixed_layout_without_answers(tmp_path):
             assert forbidden not in response.text
 
 
-def test_correct_wiring_makes_operation_ready_and_preserves_draft(tmp_path):
+def test_correct_wiring_creates_accepted_snapshot_separate_from_draft(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         saved = client.put(
             "/api/problems/training_socket_demo_001/wiring-draft",
@@ -37,10 +37,13 @@ def test_correct_wiring_makes_operation_ready_and_preserves_draft(tmp_path):
         assert submitted.json()["overall_correct"] is True
 
         setup = client.get("/api/problems/training_socket_demo_001/operation-setup").json()
-        assert setup["operation_ready"] is True
-        assert setup["preview_allowed"] is False
+        assert setup["operation_ready"] is False
+        assert setup["preview_allowed"] is True
         assert setup["wiring_exists"] is True
         assert len(setup["wiring_draft"]["connections"]) == len(CONNECTIONS)
+        assert setup["wiring_source"] == "accepted_submission"
+        assert len(setup["wiring_snapshot"]["connections"]) == len(CONNECTIONS)
+        assert setup["operation"] is None
         assert setup["wiring_submission"]["last_gradable"] is True
         assert setup["wiring_submission"]["last_overall_correct"] is True
 

@@ -5,7 +5,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .board_definition import BoardDefinition
-from .wiring_attempt import WiringDraftResponse, WiringProgress
+from .operation_definition import OperationDefinition
+from .wiring_attempt import WiringConnection, WiringDraftResponse, WiringProgress
 
 
 class FixedDevicePlacement(BaseModel):
@@ -36,8 +37,19 @@ class OperationSetupResponse(BaseModel):
     board: BoardDefinition
     device_layout: DeviceLayoutDefinition | None
     wiring_draft: WiringDraftResponse | None
+    wiring_source: Literal["accepted_submission", "draft_preview", "none"]
+    wiring_snapshot: "AcceptedWiringSnapshot | None"
     wiring_submission: WiringProgress
     wiring_exists: bool
     operation_ready: bool
     preview_allowed: bool
     message: str
+    operation: OperationDefinition | None
+
+
+class AcceptedWiringSnapshot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    attempt_id: int
+    problem_version: int
+    connections: list[WiringConnection]

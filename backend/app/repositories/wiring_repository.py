@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 from app.database import SQLiteDatabase
-from app.domain import WiringAttemptResult, WiringDraftResponse, WiringDraftUpdate, WiringProgress
+from app.domain import AcceptedWiringSnapshot, WiringAttemptResult, WiringDraftResponse, WiringDraftUpdate, WiringProgress
 
 
 class WiringRepository:
@@ -55,3 +55,21 @@ class WiringRepository:
         if row is None:
             return WiringProgress(problem_id=problem_id, attempt_count=0)
         return WiringProgress(problem_id=problem_id, attempt_count=count, last_submitted_at=datetime.fromisoformat(row["submitted_at"]), last_overall_correct=None if row["overall_correct"] is None else bool(row["overall_correct"]), last_gradable=bool(row["gradable"]), last_correct_count=row["correct_count"], required_count=row["required_count"])
+
+    def accepted_snapshot(self, problem_id: str, problem_version: int, attempt_id: int | None = None) -> AcceptedWiringSnapshot | None:
+        query = """SELECT id, problem_version, connections_json FROM wiring_attempts
+                   WHERE problem_id = ? AND problem_version = ? AND overall_correct = 1 AND gradable = 1"""
+        parameters: list[object] = [problem_id, problem_version]
+        if attempt_id is not None:
+            query += " AND id = ?"
+            parameters.append(attempt_id)
+        query += " ORDER BY id DESC LIMIT 1"
+        with self.database.connect() as connection:
+            row = connection.execute(query, parameters).fetchone()
+        if row is None:
+            return None
+        return AcceptedWiringSnapshot(
+            attempt_id=row["id"],
+            problem_version=row["problem_version"],
+            connections=json.loads(row["connections_json"]),
+        )

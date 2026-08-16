@@ -14,12 +14,13 @@ from .api.circuit_analysis import router as circuit_analysis_router
 from .api.problems import router as problems_router
 from .api.wiring import router as wiring_router
 from .api.mounting import router as mounting_router
-from .api.operation import router as operation_router
+from .api.operation import router as operation_router, session_router as operation_session_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
 from .core.logging_config import configure_logging
 from .database import SQLiteDatabase
 from .repositories import AnswerRepository, ProblemRepository
+from .simulation import OperationSessionManager
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -69,6 +70,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.database_ready = False
     app.state.problem_repository = None
     app.state.answer_repository = None
+    app.state.operation_sessions = OperationSessionManager()
     app.add_exception_handler(Exception, unhandled_exception_handler)
 
     if app_settings.allowed_origins:
@@ -87,6 +89,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(wiring_router)
     app.include_router(mounting_router)
     app.include_router(operation_router)
+    app.include_router(operation_session_router)
     static_root = app_settings.resolved_static_dir.resolve()
 
     @app.get("/{full_path:path}", include_in_schema=False)

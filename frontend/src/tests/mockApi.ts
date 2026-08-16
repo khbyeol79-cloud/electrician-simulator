@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { BoardDefinition, BoardPin, MountingDefinition, MountingPlacement, OperationSetup, ProblemSummary, PublicProblemDetail, WiringAttemptResult, WiringConnection } from '../api/client'
+import type { BoardDefinition, BoardPin, MountingDefinition, MountingPlacement, OperationSessionState, OperationSetup, ProblemSummary, PublicProblemDetail, WiringAttemptResult, WiringConnection } from '../api/client'
 
 export const problemSummary: ProblemSummary = {
   problem_id: 'practice_001',
@@ -42,6 +42,7 @@ export const problemDetail: PublicProblemDetail = {
   circuit: { schema_version: '1.0', definition_status: 'structure_only', devices: [], terminals: [], contacts: [], coils: [] },
   socket_questions: [],
   device_layout: null,
+  operation: null,
 }
 
 export const trainingDetail: PublicProblemDetail = {
@@ -105,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.6.1',
+  version: '0.7.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.6.1',
+  version: '0.7.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -126,6 +127,18 @@ function response(data: unknown, status = 200): Response {
 
 export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
   const problems = options?.problems ?? [problemSummary]
+  let operationState: OperationSessionState = {
+    session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
+    powered: false, power_state: 'off',
+    controls: {
+      PB0: { label: 'PB0 정지', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NC', active: false },
+      PB1: { label: 'PB1 기동', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NO', active: false },
+      LS1: { label: 'LS1', control_type: 'limit_switch', mode: 'maintained', contact_type: 'NO', active: false },
+    },
+    coils: { 'MC1-COIL': false, 'T1-COIL': false }, contacts: { 'MC1-HOLD': 'open' },
+    timers: { T1: { status: 'stopped', elapsed_ms: 0, delay_ms: 1000 } }, indicators: { GL: 'off' }, motors: { M1: 'stopped' },
+    faults: [], stable: true, elapsed_ms: 0, events: ['동작시험 세션 시작'],
+  }
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
     if (url === '/api/health') return response(health)
@@ -190,11 +203,25 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       board: wiringBoard,
       device_layout: trainingDetail.device_layout,
       wiring_draft: options?.wiringDraft ? { problem_id: 'training_socket_demo_001', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, updated_at: null } : null,
+      wiring_source: 'draft_preview', wiring_snapshot: null,
       wiring_submission: { problem_id: 'training_socket_demo_001', attempt_count: 1, last_submitted_at: '2026-08-16T00:00:00', last_overall_correct: true, last_gradable: true, last_correct_count: 8, required_count: 8 },
-      wiring_exists: Boolean(options?.wiringDraft?.length), operation_ready: true, preview_allowed: false,
-      message: '결선 확인이 완료되어 동작시험을 준비했습니다.',
+      wiring_exists: Boolean(options?.wiringDraft?.length), operation_ready: false, preview_allowed: true,
+      message: '이 문제에는 실제 동작 데이터가 없어 읽기 전용 미리보기만 제공합니다.', operation: null,
       ...options?.operationSetup,
     })
+    if (url.endsWith('/operation-sessions') && init?.method === 'POST') return response(operationState, 201)
+    if (url.endsWith('/actions') && init?.method === 'POST') {
+      const body = JSON.parse(String(init.body)) as { action: string; value?: boolean; control_id?: string; milliseconds?: number }
+      if (body.action === 'set_power') operationState = { ...operationState, powered: Boolean(body.value), power_state: body.value ? 'on' : 'off', events: [...operationState.events, body.value ? '전원 ON' : '전원 OFF'] }
+      if (body.action === 'press_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: true } }, coils: body.control_id === 'PB1' ? { 'MC1-COIL': true, 'T1-COIL': true } : operationState.coils, motors: body.control_id === 'PB1' ? { M1: 'forward' } : operationState.motors, events: [...operationState.events, `${body.control_id} 작동`] }
+      if (body.action === 'release_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: false } }, events: [...operationState.events, `${body.control_id} 복귀`] }
+      if (body.action === 'toggle_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: !operationState.controls[body.control_id].active } } }
+      if (body.action === 'advance_time') operationState = { ...operationState, elapsed_ms: operationState.elapsed_ms + (body.milliseconds ?? 0), timers: { T1: { status: 'completed', elapsed_ms: 1000, delay_ms: 1000 } }, indicators: { GL: 'on' } }
+      return response(operationState)
+    }
+    if (url.endsWith('/run-check') && init?.method === 'POST') return response({ gradable: true, overall_passed: true, passed_count: 2, total_count: 2, results: [{ test_id: 'A', label: '자기유지', passed: true, message: '정상' }, { test_id: 'B', label: '타이머', passed: true, message: '정상' }], message: '모든 시험 조건이 정상적으로 작동했습니다.' })
+    if (url.endsWith('/reset') && init?.method === 'POST') { operationState = { ...operationState, powered: false, power_state: 'off', coils: { 'MC1-COIL': false, 'T1-COIL': false }, indicators: { GL: 'off' }, motors: { M1: 'stopped' }, events: ['동작시험 초기화'] }; return response(operationState) }
+    if (url.includes('/api/operation-sessions/') && init?.method === 'DELETE') return response(undefined, 204)
     if (url === '/api/problems/training_socket_demo_001/mounting') return response(mountingDefinition)
     if (url === '/api/problems/practice_001/mounting') return response({ schema_version: '1.0', available_devices: [], mount_targets: [] })
     if (url.endsWith('/mounting-draft') && (!init?.method || init.method === 'GET')) return response(options?.mountingDraft ? { problem_id: 'training_socket_demo_001', problem_version: options.mountingDraftVersion ?? 1, placements: options.mountingDraft, updated_at: null } : null)

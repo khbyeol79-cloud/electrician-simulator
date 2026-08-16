@@ -95,6 +95,7 @@ export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail
       const nextResult = await submitCircuitAttempt(problem.problem_id, problem.version, draft)
       setResult(nextResult)
       setProgress((value) => ({ problem_id: problem.problem_id, attempt_count: (value?.attempt_count ?? 0) + 1, last_submitted_at: new Date().toISOString(), last_overall_correct: nextResult.overall_correct, last_correct_count: nextResult.correct_count, total_count: nextResult.total_count }))
+      window.dispatchEvent(new CustomEvent('electrician:progress-changed'))
     } catch (reason) {
       setNotice(reason instanceof Error ? reason.message : '채점 요청에 실패했습니다.')
     }

@@ -46,6 +46,7 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   circuit: CircuitDefinition
   socket_questions: SocketQuestion[]
   device_layout: DeviceLayoutDefinition | null
+  operation: OperationDefinition | null
 }
 
 export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null }
@@ -164,9 +165,36 @@ export type DeviceLayoutDefinition = {
 export type OperationSetup = {
   problem_id: string; problem_version: number; board: BoardDefinition
   device_layout: DeviceLayoutDefinition | null; wiring_draft: WiringDraft | null
+  wiring_source: 'accepted_submission' | 'draft_preview' | 'none'
+  wiring_snapshot: { attempt_id: number; problem_version: number; connections: WiringConnection[] } | null
   wiring_submission: WiringProgress; wiring_exists: boolean; operation_ready: boolean
-  preview_allowed: boolean; message: string
+  preview_allowed: boolean; message: string; operation: OperationDefinition | null
 }
+
+export type OperationDefinition = {
+  schema_version: '1.0'; simulation_status: 'preview' | 'functional'
+  power: { line_terminal_id: string; return_terminal_id: string; phase_terminal_ids: string[] }
+  controls: { control_id: string; label: string; control_type: 'pushbutton' | 'limit_switch' | 'selector'; mode: 'momentary' | 'maintained'; contact_type: 'NO' | 'NC'; terminal_a_id: string; terminal_b_id: string; initial_active: boolean }[]
+  timers: { timer_id: string; label: string; coil_id: string; mode: 'on_delay'; delay_ms: number; timed_contact_ids: string[]; retentive: boolean }[]
+  indicators: { indicator_id: string; label: string; display_color: 'red' | 'green' | 'yellow' | 'white'; terminal_a_id: string; terminal_b_id: string }[]
+  motors: { motor_id: string; label: string; forward_coil_id: string | null; reverse_coil_id: string | null; phase_terminal_ids: string[]; phase_source_terminal_ids: string[]; forward_phase_order: number[] }[]
+  internal_connections: { from: string; to: string }[]
+}
+export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: string; active: boolean }
+export type OperationTimerState = { status: 'stopped' | 'timing' | 'completed' | 'reset'; elapsed_ms: number; delay_ms: number }
+export type OperationFault = { code: string; message: string; severity: 'warning' | 'error' | 'danger'; trip_required: boolean }
+export type OperationSessionState = {
+  session_id: string; problem_id: string; wiring_attempt_id: number; powered: boolean; power_state: 'off' | 'on' | 'tripped'
+  controls: Record<string, OperationControlState>; coils: Record<string, boolean>; contacts: Record<string, 'open' | 'closed'>
+  timers: Record<string, OperationTimerState>; indicators: Record<string, 'off' | 'on' | 'error'>
+  motors: Record<string, 'stopped' | 'forward' | 'reverse' | 'phase_loss' | 'simultaneous_fault' | 'connection_error'>
+  faults: OperationFault[]; stable: boolean; elapsed_ms: number; events: string[]
+}
+export type OperationCheckResult = {
+  gradable: boolean; overall_passed: boolean | null; passed_count: number; total_count: number
+  results: { test_id: string; label: string; passed: boolean; message: string }[]; message: string
+}
+export type OperationProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_passed: boolean | null; last_gradable: boolean | null; last_passed_count: number; total_count: number }
 
 export type ReloadStatistics = {
   loaded: number
@@ -240,6 +268,30 @@ export function getMountingProgress(problemId: string, signal?: AbortSignal) {
 
 export function getOperationSetup(problemId: string, signal?: AbortSignal) {
   return getJson<OperationSetup>(`/api/problems/${encodeURIComponent(problemId)}/operation-setup`, signal)
+}
+
+export function getOperationProgress(problemId: string, signal?: AbortSignal) {
+  return getJson<OperationProgress>(`/api/problems/${encodeURIComponent(problemId)}/operation-progress`, signal)
+}
+
+export function createOperationSession(problemId: string, problemVersion: number, wiringAttemptId?: number) {
+  return mutationJson<OperationSessionState>(`/api/problems/${encodeURIComponent(problemId)}/operation-sessions`, 'POST', { problem_version: problemVersion, wiring_attempt_id: wiringAttemptId })
+}
+
+export function applyOperationAction(sessionId: string, action: Record<string, unknown>) {
+  return mutationJson<OperationSessionState>(`/api/operation-sessions/${encodeURIComponent(sessionId)}/actions`, 'POST', action)
+}
+
+export function resetOperationSession(sessionId: string) {
+  return mutationJson<OperationSessionState>(`/api/operation-sessions/${encodeURIComponent(sessionId)}/reset`, 'POST')
+}
+
+export function runOperationCheck(sessionId: string) {
+  return mutationJson<OperationCheckResult>(`/api/operation-sessions/${encodeURIComponent(sessionId)}/run-check`, 'POST')
+}
+
+export function deleteOperationSession(sessionId: string) {
+  return mutationJson<void>(`/api/operation-sessions/${encodeURIComponent(sessionId)}`, 'DELETE')
 }
 
 async function mutationJson<T>(url: string, method: string, body?: unknown): Promise<T> {

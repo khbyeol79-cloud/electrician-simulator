@@ -457,6 +457,45 @@ class ProblemPackageValidator:
                 elif catalog_device.socket_type_id != placement.socket_type_id:
                     issues.append(self._issue("error", "incompatible_fixed_device", f"기구와 소켓 유형이 호환되지 않습니다: {placement.mount_device_id}", file=manifest.files.problem, problem_id=problem_id))
 
+        if problem and problem.operation:
+            operation = problem.operation
+            terminal_ids = {item.terminal_id for item in problem.circuit.terminals}
+            coil_ids = {item.coil_id for item in problem.circuit.coils}
+            contact_ids = {item.contact_id for item in problem.circuit.contacts}
+
+            def check_operation_terminal(terminal_id: str, field: str):
+                if terminal_id not in terminal_ids:
+                    issues.append(self._issue("error", "unknown_operation_terminal", f"동작 정의가 존재하지 않는 단자를 참조합니다: {terminal_id}", file=manifest.files.problem, field=field, problem_id=problem_id))
+
+            check_operation_terminal(operation.power.line_terminal_id, "operation.power.line_terminal_id")
+            check_operation_terminal(operation.power.return_terminal_id, "operation.power.return_terminal_id")
+            for terminal_id in operation.power.phase_terminal_ids:
+                check_operation_terminal(terminal_id, "operation.power.phase_terminal_ids")
+            control_ids = [item.control_id for item in operation.controls]
+            for duplicate in {item for item in control_ids if control_ids.count(item) > 1}:
+                issues.append(self._issue("error", "duplicate_operation_control", f"동작 입력기구 ID가 중복됩니다: {duplicate}", file=manifest.files.problem, problem_id=problem_id))
+            for control in operation.controls:
+                check_operation_terminal(control.terminal_a_id, f"operation.controls.{control.control_id}.terminal_a_id")
+                check_operation_terminal(control.terminal_b_id, f"operation.controls.{control.control_id}.terminal_b_id")
+            for timer in operation.timers:
+                if timer.coil_id not in coil_ids:
+                    issues.append(self._issue("error", "unknown_operation_timer_coil", f"타이머 코일 참조가 없습니다: {timer.coil_id}", file=manifest.files.problem, problem_id=problem_id))
+                for contact_id in timer.timed_contact_ids:
+                    if contact_id not in contact_ids:
+                        issues.append(self._issue("error", "unknown_operation_timer_contact", f"타이머 접점 참조가 없습니다: {contact_id}", file=manifest.files.problem, problem_id=problem_id))
+            for indicator in operation.indicators:
+                check_operation_terminal(indicator.terminal_a_id, f"operation.indicators.{indicator.indicator_id}.terminal_a_id")
+                check_operation_terminal(indicator.terminal_b_id, f"operation.indicators.{indicator.indicator_id}.terminal_b_id")
+            for motor in operation.motors:
+                for coil_id in (motor.forward_coil_id, motor.reverse_coil_id):
+                    if coil_id and coil_id not in coil_ids:
+                        issues.append(self._issue("error", "unknown_operation_motor_coil", f"모터 제어 코일 참조가 없습니다: {coil_id}", file=manifest.files.problem, problem_id=problem_id))
+                for terminal_id in [*motor.phase_terminal_ids, *motor.phase_source_terminal_ids]:
+                    check_operation_terminal(terminal_id, f"operation.motors.{motor.motor_id}.phase_terminal_ids")
+            for connection in operation.internal_connections:
+                check_operation_terminal(connection.from_terminal, "operation.internal_connections.from")
+                check_operation_terminal(connection.to, "operation.internal_connections.to")
+
         return ProblemValidationResult(
             package_dir=package_dir,
             issues=issues,

@@ -13,7 +13,12 @@ from .mounting_attempt import (
     MountingDraftUpdate, MountingPlacement, MountingProgress,
     WrongMountingPlacement,
 )
-from .operation_setup import DeviceLayoutDefinition, FixedDevicePlacement, OperationSetupResponse
+from .operation_setup import AcceptedWiringSnapshot, DeviceLayoutDefinition, FixedDevicePlacement, OperationSetupResponse
+from .operation_definition import (
+    ControlState, OperationAction, OperationCheckItem, OperationCheckResult,
+    OperationDefinition, OperationFault, OperationProgress, OperationSessionCreate,
+    OperationSessionState, TimerState,
+)
 from .wiring_attempt import (
     WiringAttemptResult, WiringAttemptSubmit, WiringConnection, WiringDraftResponse,
     WiringDraftUpdate, WiringProgress,

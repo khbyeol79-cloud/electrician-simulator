@@ -94,6 +94,7 @@ class PublicProblemDetail(BaseModel):
     circuit: dict[str, object]
     socket_questions: list[dict[str, object]]
     device_layout: dict[str, object] | None
+    operation: dict[str, object] | None
     warning_count: int
 
 

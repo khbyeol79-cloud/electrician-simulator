@@ -110,6 +110,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
       const next = await submitWiringAttempt(problem!.problem_id, problem!.version, connections)
       setResult(next); setNotice(undefined)
       setProgress((value) => ({ problem_id: problem!.problem_id, attempt_count: (value?.attempt_count ?? 0) + 1, last_submitted_at: new Date().toISOString(), last_overall_correct: next.overall_correct, last_gradable: next.gradable, last_correct_count: next.correct_count, required_count: next.required_count }))
+      window.dispatchEvent(new CustomEvent('electrician:progress-changed'))
       if (next.overall_correct) navigate('/operation')
     } catch (reason) { setNotice(reason instanceof Error ? reason.message : '결선 제출에 실패했습니다.') }
   }

@@ -1,5 +1,6 @@
+import { useCallback, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import type { PublicProblemDetail } from '../api/client'
+import { getCircuitProgress, getOperationProgress, getWiringProgress, type PublicProblemDetail } from '../api/client'
 
 const stages = [
   { number: 1, path: '/circuit', label: '회로도 분석', detail: '접점과 소켓번호 확인' },
@@ -11,11 +12,29 @@ const statusLabels = { draft: '작성 중', reviewed: '검토됨', verified: '�
 const difficultyLabels = { beginner: '초급', intermediate: '중급', advanced: '고급' }
 
 export function StageNavigation({ problem }: { problem?: PublicProblemDetail }) {
+  const [completed, setCompleted] = useState(0)
+  const refreshProgress = useCallback(async () => {
+    if (!problem) { setCompleted(0); return }
+    try {
+      const [circuit, wiring, operation] = await Promise.all([
+        getCircuitProgress(problem.problem_id), getWiringProgress(problem.problem_id), getOperationProgress(problem.problem_id),
+      ])
+      setCompleted(Number(circuit.last_overall_correct === true) + Number(wiring.last_overall_correct === true) + Number(operation.last_overall_passed === true))
+    } catch { setCompleted(0) }
+  }, [problem])
+
+  useEffect(() => { void refreshProgress() }, [refreshProgress])
+  useEffect(() => {
+    const refresh = () => void refreshProgress()
+    window.addEventListener('electrician:progress-changed', refresh)
+    return () => window.removeEventListener('electrician:progress-changed', refresh)
+  }, [refreshProgress])
+
   return (
     <aside className="stage-sidebar" aria-label="실습 단계">
       <div className="stage-title">
         <span>진행 단계</span>
-        <strong>0 / 3 완료</strong>
+        <strong>{completed} / 3 완료</strong>
       </div>
       <nav>
         {stages.map((stage) => (
