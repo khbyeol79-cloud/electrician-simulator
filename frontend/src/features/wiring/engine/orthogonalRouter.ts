@@ -9,6 +9,12 @@ import type {
 
 export type RoutedWire = WiringConnection & { points: DiagramPoint[] }
 
+type HorizontalLane = BoardRect & {
+  channel_id: string
+  channel_type: 'horizontal'
+  routeY: number
+}
+
 function compact(points: DiagramPoint[]) {
   return points.filter((point, index) => index === 0 || point.x !== points[index - 1].x || point.y !== points[index - 1].y)
 }
@@ -44,41 +50,56 @@ function pathIsClear(board: BoardDefinition, points: DiagramPoint[]) {
   )
 }
 
-function pathCost(points: DiagramPoint[]) {
-  const distance = points.slice(1).reduce((total, point, index) =>
-    total + Math.abs(point.x - points[index].x) + Math.abs(point.y - points[index].y), 0)
-  return distance + Math.max(0, points.length - 2) * 12
+function intervalOverlap(startA: number, endA: number, startB: number, endB: number) {
+  return Math.min(Math.max(startA, endA), Math.max(startB, endB)) - Math.max(Math.min(startA, endA), Math.min(startB, endB))
 }
 
-function isFacingAcrossRows(start: BoardPin, end: BoardPin) {
-  if (start.y < end.y) return start.side === 'bottom' && end.side === 'top'
-  if (start.y > end.y) return start.side === 'top' && end.side === 'bottom'
+export function pathHasSelfOverlap(points: DiagramPoint[]) {
+  const segments = points.slice(1).map((end, index) => ({ start: points[index], end }))
+  for (let firstIndex = 0; firstIndex < segments.length; firstIndex += 1) {
+    for (let secondIndex = firstIndex + 2; secondIndex < segments.length; secondIndex += 1) {
+      const first = segments[firstIndex]
+      const second = segments[secondIndex]
+      const firstVertical = first.start.x === first.end.x
+      const secondVertical = second.start.x === second.end.x
+      if (firstVertical && secondVertical && first.start.x === second.start.x && intervalOverlap(first.start.y, first.end.y, second.start.y, second.end.y) > 0) return true
+      if (!firstVertical && !secondVertical && first.start.y === second.start.y && intervalOverlap(first.start.x, first.end.x, second.start.x, second.end.x) > 0) return true
+      if (firstVertical !== secondVertical) {
+        const vertical = firstVertical ? first : second
+        const horizontal = firstVertical ? second : first
+        const crossesX = vertical.start.x >= Math.min(horizontal.start.x, horizontal.end.x) && vertical.start.x <= Math.max(horizontal.start.x, horizontal.end.x)
+        const crossesY = horizontal.start.y >= Math.min(vertical.start.y, vertical.end.y) && horizontal.start.y <= Math.max(vertical.start.y, vertical.end.y)
+        if (crossesX && crossesY) return true
+      }
+    }
+  }
   return false
 }
 
-function canUseDirectRowGap(start: { item: BoardItem; pin: BoardPin }, end: { item: BoardItem; pin: BoardPin }) {
-  const adjacentRows = Math.abs(start.item.row - end.item.row) === 1
-  const nearlyAligned = Math.abs(start.pin.x - end.pin.x) <= 90
-  return adjacentRows && nearlyAligned && isFacingAcrossRows(start.pin, end.pin)
+function horizontalLanes(board: BoardDefinition): HorizontalLane[] {
+  const pins = board.items.flatMap((item) => item.pins)
+  return board.routing_channels
+    .filter((channel): channel is BoardDefinition['routing_channels'][number] & { channel_type: 'horizontal' } => channel.channel_type === 'horizontal')
+    .map((channel) => {
+      const center = channel.y + channel.height / 2
+      const above = pins.filter((pin) => pin.side === 'bottom' && pin.y < center).map((pin) => pin.y).sort((left, right) => right - left)[0]
+      const below = pins.filter((pin) => pin.side === 'top' && pin.y > center).map((pin) => pin.y).sort((left, right) => left - right)[0]
+      return { ...channel, routeY: above !== undefined && below !== undefined ? (above + below) / 2 : center }
+    })
+    .sort((left, right) => left.routeY - right.routeY)
 }
 
-function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin) {
-  const minY = Math.min(start.y, end.y)
-  const maxY = Math.max(start.y, end.y)
-  const midpoint = (minY + maxY) / 2
-  const channels = board.routing_channels
-    .filter((channel) => channel.channel_type === 'horizontal')
-    .map((channel) => ({ channel, center: channel.y + channel.height / 2 }))
-    .filter(({ center }) => center > minY && center < maxY)
-    .sort((left, right) => Math.abs(left.center - midpoint) - Math.abs(right.center - midpoint))
-  if (!channels.length) return midpoint
-  const { channel } = channels[0]
-  const safeTop = channel.y + 4
-  const safeBottom = channel.y + channel.height - 4
-  return Math.max(safeTop, Math.min(midpoint, safeBottom))
+function laneForPin(lanes: HorizontalLane[], pin: BoardPin) {
+  return lanes
+    .filter((lane) => pin.side === 'bottom' ? lane.routeY > pin.y : lane.routeY < pin.y)
+    .sort((left, right) => Math.abs(left.routeY - pin.y) - Math.abs(right.routeY - pin.y))[0]
 }
 
-function outerRoute(board: BoardDefinition, start: BoardPin, end: BoardPin, startExit: DiagramPoint, endExit: DiagramPoint, lane: number) {
+function laneY(lane: HorizontalLane) {
+  return lane.routeY
+}
+
+function outerXs(board: BoardDefinition, laneIndex: number) {
   const leftChannel = board.routing_channels.find((channel) => channel.channel_type === 'left_outer')
   const rightChannel = board.routing_channels.find((channel) => channel.channel_type === 'right_outer')
   const leftBase = leftChannel ? leftChannel.x + leftChannel.width + 8 : board.routing_margin + 24
@@ -86,16 +107,24 @@ function outerRoute(board: BoardDefinition, start: BoardPin, end: BoardPin, star
   const clearance = 12
   const leftLimit = Math.min(...board.forbidden_areas.map((area) => area.x), board.width / 2) - clearance
   const rightLimit = Math.max(...board.forbidden_areas.map((area) => area.x + area.width), board.width / 2) + clearance
-  const leftX = Math.min(leftBase + lane, leftLimit)
-  const rightX = Math.max(rightBase - lane, rightLimit)
-  const leftCost = Math.abs(startExit.x - leftX) + Math.abs(endExit.x - leftX)
-  const rightCost = Math.abs(startExit.x - rightX) + Math.abs(endExit.x - rightX)
-  const outerX = leftCost <= rightCost ? leftX : rightX
+  const spread = laneIndex * 7
+  return {
+    left: Math.min(leftBase + spread, leftLimit),
+    right: Math.max(rightBase - spread, rightLimit),
+  }
+}
+
+function viaOuter(start: BoardPin, end: BoardPin, startY: number, endY: number, outerX: number) {
   return compact([
-    { x: start.x, y: start.y }, startExit,
-    { x: outerX, y: startExit.y }, { x: outerX, y: endExit.y },
-    endExit, { x: end.x, y: end.y },
+    { x: start.x, y: start.y }, { x: start.x, y: startY },
+    { x: outerX, y: startY }, { x: outerX, y: endY },
+    { x: end.x, y: endY }, { x: end.x, y: end.y },
   ])
+}
+
+function routeCost(points: DiagramPoint[]) {
+  return points.slice(1).reduce((total, point, index) =>
+    total + Math.abs(point.x - points[index].x) + Math.abs(point.y - points[index].y), 0)
 }
 
 export function routeConnection(board: BoardDefinition, connection: WiringConnection, laneIndex = 0): RoutedWire {
@@ -103,35 +132,29 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   const end = findPin(board, connection.to)
   if (!start || !end) throw new Error('연결 단자의 좌표를 찾을 수 없습니다.')
 
-  const lane = laneIndex * 7
-  const escape = (pin: BoardPin) => ({ x: pin.x, y: pin.y + (pin.side === 'top' ? -(32 + lane) : 32 + lane) })
-  const startPoint = { x: start.pin.x, y: start.pin.y }
-  const endPoint = { x: end.pin.x, y: end.pin.y }
-  const startExit = escape(start.pin)
-  const endExit = escape(end.pin)
+  const lanes = horizontalLanes(board)
+  const startLane = laneForPin(lanes, start.pin)
+  const endLane = laneForPin(lanes, end.pin)
+  if (!startLane || !endLane) throw new Error('단자와 연결할 배선 통로를 찾을 수 없습니다.')
+  const startY = laneY(startLane)
+  const endY = laneY(endLane)
 
-  const candidates: DiagramPoint[][] = []
-
-  // 마주 보는 단자 사이에 빈 행간 통로가 있으면 가장 짧은 직각 경로를 우선한다.
-  const directAcrossRows = canUseDirectRowGap(start, end)
-  if (directAcrossRows) {
-    const channelY = directChannelY(board, start.pin, end.pin)
-    candidates.push(compact([startPoint, { x: start.pin.x, y: channelY }, { x: end.pin.x, y: channelY }, endPoint]))
+  let candidates: DiagramPoint[][]
+  if (startLane.channel_id === endLane.channel_id) {
+    candidates = [compact([
+      { x: start.pin.x, y: start.pin.y }, { x: start.pin.x, y: startY },
+      { x: end.pin.x, y: endY }, { x: end.pin.x, y: end.pin.y },
+    ])]
+  } else {
+    const outer = outerXs(board, laneIndex)
+    candidates = [
+      viaOuter(start.pin, end.pin, startY, endY, outer.left),
+      viaOuter(start.pin, end.pin, startY, endY, outer.right),
+    ].sort((left, right) => routeCost(left) - routeCost(right))
   }
 
-  // 같은 행의 같은 방향 단자는 해당 행의 위·아래 통로를 사용한다.
-  if (start.item.row === end.item.row && start.pin.side === end.pin.side) {
-    const channelY = start.pin.side === 'top' ? Math.min(startExit.y, endExit.y) : Math.max(startExit.y, endExit.y)
-    candidates.push(compact([startPoint, startExit, { x: endExit.x, y: channelY }, endExit, endPoint]))
-  }
-
-  // 중앙 직결 후보가 없거나 금지 영역과 겹치면 좌우 외곽 전용 통로를 사용한다.
-  const directRoute = candidates
-    .filter((points) => isOrthogonal(points) && pathIsClear(board, points))
-    .sort((left, right) => pathCost(left) - pathCost(right))[0]
-  const points = directRoute ?? outerRoute(board, start.pin, end.pin, startExit, endExit, lane)
-
-  if (!isOrthogonal(points)) throw new Error('직교 배선 경로를 만들 수 없습니다.')
+  const points = candidates.find((candidate) => isOrthogonal(candidate) && pathIsClear(board, candidate) && !pathHasSelfOverlap(candidate))
+  if (!points) throw new Error('겹치지 않는 직교 배선 경로를 만들 수 없습니다.')
   return { ...connection, points }
 }
 

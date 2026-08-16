@@ -72,18 +72,24 @@ export const wiringBoard = {
     { item_id: 'X1', label: 'X1', item_type: 'socket_8p', socket_type_id: 'socket_8p_base', row: 1, x: 100, y: 180, width: 150, height: 160, pins: pins8, label_area: { x: 135, y: 235, width: 80, height: 50 } },
     { item_id: 'MC1', label: 'MC1', item_type: 'socket_12p', socket_type_id: 'socket_12p_base', row: 2, x: 450, y: 500, width: 200, height: 180, pins: pins12, label_area: { x: 500, y: 560, width: 100, height: 55 } },
   ],
-  routing_channels: [{ channel_id: 'left', channel_type: 'left_outer', x: 20, y: 20, width: 30, height: 700 }], forbidden_areas: [],
+  routing_channels: [
+    { channel_id: 'top', channel_type: 'horizontal', x: 45, y: 120, width: 810, height: 40 },
+    { channel_id: 'middle', channel_type: 'horizontal', x: 45, y: 400, width: 810, height: 40 },
+    { channel_id: 'bottom', channel_type: 'horizontal', x: 45, y: 700, width: 810, height: 40 },
+    { channel_id: 'left', channel_type: 'left_outer', x: 20, y: 20, width: 30, height: 700 },
+    { channel_id: 'right', channel_type: 'right_outer', x: 850, y: 20, width: 30, height: 700 },
+  ], forbidden_areas: [],
 } satisfies BoardDefinition
 
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.5.4',
+  version: '0.5.5',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.5.4',
+  version: '0.5.5',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,

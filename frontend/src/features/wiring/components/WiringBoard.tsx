@@ -22,22 +22,26 @@ export function deviceSummaryColor(itemId: string) {
   return DEVICE_SUMMARY_COLORS[itemId] ?? '#64748b'
 }
 
+export function terminalSlotLabel(terminalId: string) {
+  const value = terminalId.split('-').at(-1) ?? terminalId
+  return value.replace(/^0+(?=\d)/, '')
+}
+
 export function buildTerminalSummary(board: BoardDefinition, connections: WiringConnection[]) {
   const ownerByTerminal = new Map<string, BoardItem>()
   board.items.forEach((item) => item.pins.forEach((pin) => ownerByTerminal.set(pin.terminal_id, item)))
-  const summary = new Map<string, { other: string; color: string }>()
-  connections.forEach((connection) => {
+  const summary = new Map<string, { other: string; slot: string; color: string; connectionIndex: number }>()
+  connections.forEach((connection, connectionIndex) => {
     const fromOwner = ownerByTerminal.get(connection.from)
     const toOwner = ownerByTerminal.get(connection.to)
-    summary.set(connection.from, { other: connection.to, color: deviceSummaryColor(toOwner?.item_id ?? '') })
-    summary.set(connection.to, { other: connection.from, color: deviceSummaryColor(fromOwner?.item_id ?? '') })
+    summary.set(connection.from, { other: connection.to, slot: terminalSlotLabel(connection.to), color: deviceSummaryColor(toOwner?.item_id ?? ''), connectionIndex })
+    summary.set(connection.to, { other: connection.from, slot: terminalSlotLabel(connection.from), color: deviceSummaryColor(fromOwner?.item_id ?? ''), connectionIndex })
   })
   return summary
 }
 
-export function summaryLabelY(pin: BoardPin, lane: number) {
-  const tierOffset = (lane % 2) * 27
-  return pin.side === 'top' ? pin.y - 18 - tierOffset : pin.y + 31 + tierOffset
+export function summaryLabelY(pin: BoardPin) {
+  return pin.side === 'top' ? pin.y - 18 : pin.y + 31
 }
 
 function ItemBody({ item }: { item: BoardItem }) {
@@ -51,16 +55,13 @@ function ItemBody({ item }: { item: BoardItem }) {
   return <g className="board-item-body component-body"><rect x={item.x} y={item.y} width={item.width} height={item.height} rx="5" /><line x1={item.x + 15} y1={item.y + item.height / 2} x2={item.x + item.width - 15} y2={item.y + item.height / 2} /></g>
 }
 
-function Pin({ pin, selected, summary, summaryLane, onClick, onPointerDown, onPointerUp }: { pin: BoardPin; selected: boolean; summary?: { other: string; color: string }; summaryLane: number; onClick: () => void; onPointerDown: () => void; onPointerUp: () => void }) {
+function Pin({ pin, selected, summary, summarySelected, onClick, onPointerDown, onPointerUp, onSummarySelect }: { pin: BoardPin; selected: boolean; summary?: { other: string; slot: string; color: string; connectionIndex: number }; summarySelected: boolean; onClick: () => void; onPointerDown: () => void; onPointerUp: () => void; onSummarySelect: (connectionIndex: number) => void }) {
   const labelY = pin.side === 'top' ? pin.y + 25 : pin.y - 16
-  const summaryY = summaryLabelY(pin, summaryLane)
-  const pinOffset = pin.y - summaryY
-  const leaderStart = pinOffset > 0 ? 11 : -11
-  const leaderEnd = pinOffset > 0 ? pinOffset - 13 : pinOffset + 13
+  const summaryY = summaryLabelY(pin)
   return <g className={`board-pin${selected ? ' selected' : ''}${pin.enabled ? '' : ' disabled'}`} role="button" tabIndex={pin.enabled ? 0 : -1} aria-label={`${pin.terminal_id} 단자`} onClick={(event) => { event.stopPropagation(); if (pin.enabled) onClick() }} onPointerDown={(event) => { event.stopPropagation(); if (pin.enabled) onPointerDown() }} onPointerUp={(event) => { event.stopPropagation(); if (pin.enabled) onPointerUp() }} onKeyDown={(event) => { if (pin.enabled && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); onClick() } }}>
     <circle cx={pin.x} cy={pin.y} r="13" /><circle cx={pin.x} cy={pin.y} r="5" />
     <text x={pin.x} y={labelY} textAnchor="middle">{pin.label}</text>
-    {summary && <g className="pin-summary" data-summary-tier={summaryLane % 2} aria-label={`${pin.terminal_id} 상대 단자 ${summary.other}`} transform={`translate(${pin.x} ${summaryY})`}><line className="summary-leader" x1="0" y1={leaderStart} x2="0" y2={leaderEnd} style={{ stroke: summary.color }} /><rect x="-34" y="-11" width="68" height="22" rx="4" style={{ stroke: summary.color }} /><circle cx="-25" cy="0" r="4.5" style={{ fill: summary.color }} /><text x="-16" y="3.5">{summary.other}</text></g>}
+    {summary && <g className={`pin-summary${summarySelected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${pin.terminal_id}에서 ${summary.other}로 연결된 요약 표시`} transform={`translate(${pin.x} ${summaryY})`} onClick={(event) => { event.stopPropagation(); onSummarySelect(summary.connectionIndex) }} onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); onSummarySelect(summary.connectionIndex) } }}><rect x="-16" y="-10" width="32" height="20" rx="4" style={{ stroke: summary.color }} /><circle cx="-10" cy="0" r="3.5" style={{ fill: summary.color }} /><text x="3" y="3.5" textAnchor="middle">{summary.slot}</text></g>}
   </g>
 }
 
@@ -77,7 +78,7 @@ export function WiringBoard({ board, connections, mode, selectedPin, selectedWir
         <g className="routing-channel-layer">{board.routing_channels.map((channel) => <rect key={channel.channel_id} className={channel.channel_type} x={channel.x} y={channel.y} width={channel.width} height={channel.height} />)}</g>
         <g className="board-item-layer">{board.items.map((item) => <ItemBody key={item.item_id} item={item} />)}</g>
         {mode === 'graphic' && <g className="wire-layer">{routed.map((wire, index) => <g key={`${wire.from}|${wire.to}`} className={`board-wire${selectedWire === index ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(index) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(index) } }}><polyline points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} style={{ stroke: wireColors[wire.wire_color] }} /><polyline className="wire-hit" points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} /></g>)}</g>}
-        <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={mode === 'summary' ? summary.get(pin.terminal_id) : undefined} summaryLane={item.pins.filter((candidate) => candidate.side === pin.side).findIndex((candidate) => candidate.terminal_id === pin.terminal_id)} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} />))}</g>
+        <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => { const pinSummary = mode === 'summary' ? summary.get(pin.terminal_id) : undefined; return <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={pinSummary} summarySelected={pinSummary?.connectionIndex === selectedWire} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} onSummarySelect={onWireSelect} /> }))}</g>
         <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={item.label_area.x + 11} cy={item.label_area.y + item.label_area.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
       </g>
     </svg>

@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
-import { buildTerminalSummary, deviceSummaryColor, summaryLabelY } from '../features/wiring/components/WiringBoard'
-import { routeConnection } from '../features/wiring/engine/orthogonalRouter'
+import { buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
+import { pathHasSelfOverlap, routeConnection } from '../features/wiring/engine/orthogonalRouter'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
 
@@ -26,7 +26,9 @@ describe('제어함 결선', () => {
     expect(screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '요약 모드' }))
     expect(screen.queryByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })).not.toBeInTheDocument()
-    expect(screen.getAllByText(/MC1-4|X1-1/).length).toBeGreaterThan(1)
+    await user.click(screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 요약 표시' }))
+    expect(screen.getByText('연결 단자 1')).toBeInTheDocument()
+    expect(screen.getByText('연결 단자 2')).toBeInTheDocument()
   })
 
   it('connects X1-1 to MC2-5 directly through an empty row gap', () => {
@@ -71,14 +73,16 @@ describe('제어함 결선', () => {
     expect(route.points[2].y).toBe(435)
   })
 
-  it('uses an outer route only when a device blocks the direct row gap', () => {
-    const blockedBoard = {
-      ...wiringBoard,
-      forbidden_areas: [{ area_id: 'middle_blocker', x: 330, y: 360, width: 80, height: 90 }],
-    }
-    const route = routeConnection(blockedBoard, { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#2563eb' })
-    expect(route.points.some((point) => point.x > blockedBoard.routing_margin && point.x < 100)).toBe(true)
-    expect(route.points.slice(1).every((point, index) => point.x === route.points[index].x || point.y === route.points[index].y)).toBe(true)
+  it('connects MCCB-L2 to TB5-13 directly along their shared top corridor', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const route = routeConnection(board, { from: 'MCCB-L2', to: 'TB5-13', wire_color: 'black', pair_display_color: '#64748b' })
+    expect(route.points).toEqual([
+      { x: 170, y: 210 },
+      { x: 170, y: 157.5 },
+      { x: 847.5, y: 157.5 },
+      { x: 847.5, y: 115 },
+    ])
+    expect(pathHasSelfOverlap(route.points)).toBe(false)
   })
 
   it.each([
@@ -90,14 +94,26 @@ describe('제어함 결선', () => {
     const route = routeConnection(board, { from, to, wire_color: 'yellow', pair_display_color: '#64748b' })
     expect(route.points.some((point) => point.x === 63)).toBe(true)
     expect(route.points.every((point) => point.x !== board.routing_margin)).toBe(true)
+    expect(pathHasSelfOverlap(route.points)).toBe(false)
+  })
+
+  it('creates an orthogonal non-self-overlapping route for every terminal pair on the training board', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const terminalIds = board.items.flatMap((item) => item.pins.filter((pin) => pin.enabled).map((pin) => pin.terminal_id))
+    for (let fromIndex = 0; fromIndex < terminalIds.length; fromIndex += 1) {
+      for (let toIndex = fromIndex + 1; toIndex < terminalIds.length; toIndex += 1) {
+        const route = routeConnection(board, { from: terminalIds[fromIndex], to: terminalIds[toIndex], wire_color: 'yellow', pair_display_color: '#64748b' }, (fromIndex + toIndex) % 5)
+        expect(pathHasSelfOverlap(route.points), `${terminalIds[fromIndex]} → ${terminalIds[toIndex]}`).toBe(false)
+      }
+    }
   })
 
   it('uses the opposite device color on each terminal in summary mode', () => {
     const summary = buildTerminalSummary(wiringBoard, [
       { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#64748b' },
     ])
-    expect(summary.get('X1-1')).toEqual({ other: 'MC1-4', color: deviceSummaryColor('MC1') })
-    expect(summary.get('MC1-4')).toEqual({ other: 'X1-1', color: deviceSummaryColor('X1') })
+    expect(summary.get('X1-1')).toEqual({ other: 'MC1-4', slot: '4', color: deviceSummaryColor('MC1'), connectionIndex: 0 })
+    expect(summary.get('MC1-4')).toEqual({ other: 'X1-1', slot: '1', color: deviceSummaryColor('X1'), connectionIndex: 0 })
   })
 
   it('assigns distinct summary colors to the nine control devices', () => {
@@ -105,16 +121,17 @@ describe('제어함 결선', () => {
     expect(new Set(ids.map(deviceSummaryColor))).toHaveLength(ids.length)
   })
 
-  it('alternates adjacent summary labels between two vertical tiers', () => {
+  it('keeps compact summary labels at the original position and shows only slot numbers', () => {
     const board = trainingBoardData as unknown as BoardDefinition
     const mc2 = board.items.find((item) => item.item_id === 'MC2')!
     const topPins = mc2.pins.filter((pin) => pin.side === 'top')
-    expect(summaryLabelY(topPins[0], 0)).toBe(482)
-    expect(summaryLabelY(topPins[1], 1)).toBe(455)
-    expect(summaryLabelY(topPins[2], 2)).toBe(482)
+    expect(summaryLabelY(topPins[0])).toBe(482)
+    expect(summaryLabelY(topPins[1])).toBe(482)
     const bottomPins = mc2.pins.filter((pin) => pin.side === 'bottom')
-    expect(summaryLabelY(bottomPins[0], 0)).toBe(701)
-    expect(summaryLabelY(bottomPins[1], 1)).toBe(728)
+    expect(summaryLabelY(bottomPins[0])).toBe(701)
+    expect(summaryLabelY(bottomPins[1])).toBe(701)
+    expect(terminalSlotLabel('TB5-04')).toBe('4')
+    expect(terminalSlotLabel('EOCR-L1')).toBe('L1')
   })
 
   it('restores draft, submits feedback and prevents duplicate connection', async () => {
