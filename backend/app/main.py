@@ -12,6 +12,7 @@ from .api.health import router as health_router
 from .api.catalog import router as catalog_router
 from .api.circuit_analysis import router as circuit_analysis_router
 from .api.problems import router as problems_router
+from .api.wiring import router as wiring_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
 from .core.logging_config import configure_logging
@@ -81,6 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(catalog_router)
     app.include_router(circuit_analysis_router)
     app.include_router(problems_router)
+    app.include_router(wiring_router)
     static_root = app_settings.resolved_static_dir.resolve()
 
     @app.get("/{full_path:path}", include_in_schema=False)

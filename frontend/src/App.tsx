@@ -104,6 +104,7 @@ export default function App() {
           if (!selectedProblem) return
           window.localStorage.removeItem(`electrician.circuitDraft.${selectedProblem.problem_id}.v${selectedProblem.version}`)
           window.dispatchEvent(new CustomEvent('electrician:reset-circuit'))
+          window.dispatchEvent(new CustomEvent('electrician:reset-wiring'))
         }}
       />
       <div className="app-body">
@@ -119,7 +120,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/circuit" replace />} />
             <Route path="/circuit" element={<CircuitAnalysisPage problem={selectedProblem} />} />
-            <Route path="/wiring" element={<WiringPage />} />
+            <Route path="/wiring" element={<WiringPage problem={selectedProblem} />} />
             <Route path="/mounting" element={<DeviceMountingPage />} />
             <Route path="/operation" element={<OperationTestPage />} />
             <Route path="*" element={<Navigate to="/circuit" replace />} />

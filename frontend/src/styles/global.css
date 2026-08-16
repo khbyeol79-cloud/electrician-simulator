@@ -151,13 +151,13 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .circuit-svg:active { cursor: grabbing; }
 .diagram-sections rect { fill: rgba(249,251,253,.94); stroke: #b7c4d3; stroke-width: 2; vector-effect: non-scaling-stroke; }
 .diagram-sections text { fill: #264567; font-size: 24px; font-weight: 800; }
-.conductor polyline { fill: none; stroke: #202b38; stroke-width: 4; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.conductor polyline { fill: none; stroke: #202b38; stroke-width: 2.5; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .conductor circle, .junction-dot { fill: #101820; stroke: none; }
 .conductor.power_l1 polyline { stroke: #7a3f25; }
 .conductor.power_l2 polyline { stroke: #161b22; }
 .conductor.power_l3 polyline { stroke: #77808a; }
 .conductor.neutral polyline { stroke: #2c527c; }
-.symbol-stroke { fill: #fff; stroke: #172537; stroke-width: 4; vector-effect: non-scaling-stroke; }
+.symbol-stroke { fill: #fff; stroke: #172537; stroke-width: 2.8; vector-effect: non-scaling-stroke; }
 .symbol-stroke text { fill: #172537; stroke: none; font-size: 24px; font-weight: 800; }
 .diagram-note { fill: #53667f; font-size: 25px; font-weight: 700; }
 .element-label { fill: #132b49; font-size: 21px; font-weight: 800; }
@@ -204,6 +204,59 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .circuit-loading, .circuit-load-error { display: grid; place-content: center; gap: 8px; text-align: center; color: #64758c; background: #f4f7fa; }
 .circuit-load-error strong { color: var(--red); }
 .circuit-load-error button { justify-self: center; padding: 8px 12px; color: #fff; border-radius: 4px; background: var(--blue-600); }
+
+.wiring-workspace { grid-template-rows: 66px minmax(0, 1fr); }
+.wiring-header { background: #fff; }
+.wiring-stats { display: flex; gap: 6px; }
+.wiring-stats span { padding: 6px 9px; color: #315276; border: 1px solid #d4dfeb; background: #f6f9fc; font-size: 10px; }
+.wiring-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 294px; }
+.wiring-stage { min-width: 0; min-height: 0; display: grid; grid-template-rows: 44px minmax(0, 1fr); background: #dce4ed; }
+.wiring-toolbar { display: flex; align-items: center; gap: 5px; padding: 5px 8px; border-bottom: 1px solid #c9d5e2; background: #fff; overflow-x: auto; }
+.wiring-toolbar button { min-width: 34px; height: 31px; padding: 0 9px; white-space: nowrap; color: #3c506b; border: 1px solid #ced9e5; border-radius: 4px; background: #f7f9fc; font-size: 9px; }
+.wiring-toolbar button:hover:not(:disabled), .wiring-toolbar button.active { color: #fff; border-color: #1265e8; background: #1265e8; }
+.wiring-toolbar button.danger { color: #a53131; border-color: #e3baba; background: #fff5f5; }
+.toolbar-separator { width: 1px; height: 22px; margin: 0 3px; background: #d7e0ea; }
+.wiring-board-scroll { min-height: 0; overflow: auto; padding: 10px; }
+.wiring-board { width: 100%; min-width: 820px; height: 100%; min-height: 540px; display: block; background: #cfd8e3; touch-action: none; }
+.board-background { fill: #e8dfcc; stroke: #9c8f75; stroke-width: 3; }
+.routing-channel-layer rect { fill: rgba(74, 111, 151, .035); stroke: rgba(74, 111, 151, .13); stroke-width: 1; stroke-dasharray: 8 7; }
+.board-item-body { fill: #263341; stroke: #111b26; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.board-item-body rect { fill: #283542; }
+.terminal-block-body > rect:first-child { fill: #1f2933; }
+.terminal-block-body > rect:not(:first-child) { fill: #d8dde2; stroke: #596775; stroke-width: 1.4; }
+.socket-body-svg > rect { fill: #27333f; }
+.socket-body-svg circle { fill: #151d25; stroke: #81909d; stroke-width: 2; }
+.socket-body-svg .octal-center { stroke-dasharray: 10 4; }
+.component-body > rect { fill: #27333f; }
+.component-body > line { stroke: #8b99a6; }
+.wire-layer { fill: none; }
+.board-wire polyline:not(.wire-hit) { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 1px 1px rgba(0,0,0,.24)); }
+.board-wire .wire-hit { fill: none; stroke: transparent; stroke-width: 18; cursor: pointer; vector-effect: non-scaling-stroke; }
+.board-wire.selected polyline:not(.wire-hit) { stroke-width: 9; filter: drop-shadow(0 0 4px #1265e8); }
+.board-pin { cursor: pointer; outline: none; }
+.board-pin > circle:first-of-type { fill: #e5e9ed; stroke: #182431; stroke-width: 2.3; }
+.board-pin > circle:nth-of-type(2) { fill: #727f8b; stroke: #fff; stroke-width: 1; }
+.board-pin > text { fill: #101a25; font-size: 17px; font-weight: 900; paint-order: stroke; stroke: #f2ead8; stroke-width: 4px; }
+.board-pin:hover > circle:first-of-type, .board-pin:focus > circle:first-of-type, .board-pin.selected > circle:first-of-type { fill: #dbeaff; stroke: #1265e8; stroke-width: 5; }
+.board-pin.disabled { cursor: not-allowed; opacity: .45; }
+.board-label-layer rect { fill: rgba(250,252,255,.96); stroke: #6d7c8c; stroke-width: 2; }
+.board-label-layer text { fill: #172a40; font-size: 19px; font-weight: 900; }
+.pin-summary rect { fill: rgba(255,255,255,.96); stroke-width: 3; }
+.pin-summary text { fill: #27384d; font-size: 10px; font-weight: 800; }
+.wiring-panel { min-height: 0; overflow: auto; padding: 10px; border-left: 1px solid #c9d5e2; background: #f6f8fb; }
+.wiring-panel section { margin-bottom: 9px; padding: 12px; border: 1px solid #d5dfeb; border-radius: 5px; background: #fff; }
+.wiring-panel h3 { margin: 0 0 7px; font-size: 14px; word-break: break-all; }
+.wiring-panel p { margin: 5px 0; color: #687991; font-size: 9px; line-height: 1.55; }
+.wiring-panel dl { display: grid; gap: 5px; margin: 0 0 9px; font-size: 9px; }
+.wiring-panel dl div { display: flex; justify-content: space-between; gap: 8px; }
+.wiring-panel dt { color: #718198; }
+.wiring-panel dd { margin: 0; color: #263b57; font-weight: 800; }
+.wire-color-select { display: grid; gap: 5px; margin-top: 10px; color: #5d6f86; font-size: 9px; }
+.wire-color-select select { height: 31px; border: 1px solid #bdcad9; border-radius: 4px; background: #fff; }
+.wiring-result { display: grid; gap: 4px; margin: 8px 0; padding: 8px; font-size: 9px; }
+.wiring-result.correct { color: #08713f; background: #e9f8f0; }
+.wiring-result.wrong { color: #a42929; background: #fff0f0; }
+.wiring-result.warning { color: #8d5700; background: #fff6df; }
 
 .status-bar { display: flex; align-items: center; gap: 22px; padding: 0 15px; color: #5a6980; border-top: 1px solid #cfd9e5; background: #f8fafc; font-size: 10px; }
 .status-item { display: flex; align-items: center; gap: 5px; }

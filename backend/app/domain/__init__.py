@@ -1,11 +1,16 @@
 """Problem package and public circuit domain models."""
 
 from .answer_definition import AnswerDefinition
+from .board_definition import BoardDefinition
 from .catalog import DeviceCatalog, DeviceType, SocketCatalog, SocketType
 from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, CircuitQuestionResult
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
 from .schematic_diagram import SchematicDiagram
+from .wiring_attempt import (
+    WiringAttemptResult, WiringAttemptSubmit, WiringConnection, WiringDraftResponse,
+    WiringDraftUpdate, WiringProgress,
+)
 from .problem_package import (
     ProblemPackage,
     CircuitSummary,
@@ -17,6 +22,7 @@ from .problem_package import (
 
 __all__ = [
     "AnswerDefinition",
+    "BoardDefinition",
     "DeviceCatalog",
     "DeviceType",
     "ProblemDefinition",
@@ -34,4 +40,10 @@ __all__ = [
     "SocketCatalog",
     "SocketType",
     "SchematicDiagram",
+    "WiringAttemptResult",
+    "WiringAttemptSubmit",
+    "WiringConnection",
+    "WiringDraftResponse",
+    "WiringDraftUpdate",
+    "WiringProgress",
 ]

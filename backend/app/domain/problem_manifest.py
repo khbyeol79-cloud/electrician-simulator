@@ -27,6 +27,7 @@ class ProblemFiles(BaseModel):
     answer: str
     schematic: str
     diagram: str
+    board: str | None = None
 
 
 class ProblemManifest(BaseModel):

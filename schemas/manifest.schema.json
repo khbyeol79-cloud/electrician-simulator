@@ -56,7 +56,8 @@
         "problem": { "$ref": "#/$defs/safeRelativePath" },
         "answer": { "$ref": "#/$defs/safeRelativePath" },
         "schematic": { "$ref": "#/$defs/safeRelativePath" },
-        "diagram": { "$ref": "#/$defs/safeRelativePath" }
+        "diagram": { "$ref": "#/$defs/safeRelativePath" },
+        "board": { "anyOf": [{ "$ref": "#/$defs/safeRelativePath" }, { "type": "null" }] }
       }
     }
   },

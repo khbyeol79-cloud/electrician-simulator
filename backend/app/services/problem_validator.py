@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from app.domain import (
     AnswerDefinition,
+    BoardDefinition,
     ProblemDefinition,
     ProblemManifest,
     ProblemValidationIssue,
@@ -37,6 +38,7 @@ class ProblemPackageValidator:
             "problem.json": self._read_schema("problem.schema.json"),
             "answer.json": self._read_schema("answer.schema.json"),
             "diagram.json": self._read_schema("diagram.schema.json"),
+            "board.json": self._read_schema("board.schema.json"),
         }
 
     def _read_schema(self, name: str) -> dict[str, Any]:
@@ -174,6 +176,7 @@ class ProblemPackageValidator:
         problem: ProblemDefinition | None = None
         answer: AnswerDefinition | None = None
         diagram: SchematicDiagram | None = None
+        board: BoardDefinition | None = None
 
         if manifest_data and self._validate_schema(
             manifest_data, "manifest.json", issues, manifest_data.get("problem_id")
@@ -216,6 +219,9 @@ class ProblemPackageValidator:
         diagram_data = self._load_json(
             package_dir, manifest.files.diagram, issues, problem_id
         )
+        board_data = self._load_json(
+            package_dir, manifest.files.board, issues, problem_id
+        ) if manifest.files.board else None
 
         if problem_data and self._validate_schema(
             problem_data, "problem.json", issues, problem_id
@@ -253,6 +259,19 @@ class ProblemPackageValidator:
                     self._issue(
                         "error", "pydantic_error", str(exc),
                         file=manifest.files.diagram, problem_id=problem_id
+                    )
+                )
+
+        if board_data and self._validate_schema(
+            board_data, "board.json", issues, problem_id
+        ):
+            try:
+                board = BoardDefinition.model_validate(board_data)
+            except ValidationError as exc:
+                issues.append(
+                    self._issue(
+                        "error", "pydantic_error", str(exc),
+                        file=manifest.files.board, problem_id=problem_id
                     )
                 )
 
@@ -355,6 +374,27 @@ class ProblemPackageValidator:
             issues.extend(self.circuit_validator.validate(problem, answer))
         if problem and diagram:
             issues.extend(self.diagram_validator.validate(problem, diagram))
+        if board:
+            item_ids = [item.item_id for item in board.items]
+            terminal_ids = [pin.terminal_id for item in board.items for pin in item.pins]
+            for value, code, label in ((item_ids, "duplicate_board_item_id", "보드 장치 ID"), (terminal_ids, "duplicate_board_terminal_id", "보드 단자 ID")):
+                duplicates = {item for item in value if value.count(item) > 1}
+                for duplicate in duplicates:
+                    issues.append(self._issue("error", code, f"{label}가 중복됩니다: {duplicate}", file=manifest.files.board, problem_id=problem_id))
+            for item in board.items:
+                if item.x < 0 or item.y < 0 or item.x + item.width > board.width or item.y + item.height > board.height:
+                    issues.append(self._issue("error", "board_item_out_of_bounds", f"장치가 보드 영역을 벗어납니다: {item.item_id}", file=manifest.files.board, problem_id=problem_id))
+                if item.socket_type_id:
+                    socket = self.catalog.get_socket_type(item.socket_type_id)
+                    if socket is None:
+                        issues.append(self._issue("error", "unknown_board_socket_type", f"존재하지 않는 소켓 유형입니다: {item.socket_type_id}", file=manifest.files.board, problem_id=problem_id))
+                    elif {pin.number for pin in item.pins if pin.number is not None} != set(socket.pins):
+                        issues.append(self._issue("error", "board_socket_pin_mismatch", f"소켓 핀 배열이 카탈로그와 일치하지 않습니다: {item.item_id}", file=manifest.files.board, problem_id=problem_id))
+            if answer:
+                terminals = board.terminal_ids
+                for connection in [*answer.wiring_connections, *answer.wiring_forbidden_connections]:
+                    if connection.from_terminal not in terminals or connection.to not in terminals:
+                        issues.append(self._issue("error", "unknown_board_answer_terminal", "배선 답안이 보드에 없는 단자를 참조합니다.", file=manifest.files.answer, problem_id=problem_id))
 
         return ProblemValidationResult(
             package_dir=package_dir,
@@ -363,4 +403,5 @@ class ProblemPackageValidator:
             problem=problem,
             answer=answer,
             diagram=diagram,
+            board=board,
         )

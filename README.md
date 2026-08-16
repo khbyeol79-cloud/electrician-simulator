@@ -1,8 +1,8 @@
 # 전기기능사 시퀀스 결선 시뮬레이터
 
-Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.4.2이며 데이터 기반 SVG 회로도 분석과 소켓번호 입력·채점까지 포함합니다.
+Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.5.0이며 데이터 기반 회로도 분석과 제어함 결선 연습을 포함합니다.
 
-0.4.2에서는 소켓번호 질문이 없는 회로 요소의 잘못된 선택 표시를 수정하고, PE를 검은색 회로선으로 표현하며, 주회로를 TB1·MCCB·EOCR·MC1/MC2·TB2/TB3·M1/M2 흐름으로 개선했습니다.
+0.5.0에서는 문제별 `board.json`, 8P·12P 소켓 베이스, 단자 클릭·드래그 연결, 직교 외곽 우회 경로, 그래픽·요약 모드, 임시 저장·복원 및 기본 결선 채점을 추가했습니다. 회로도 선은 더 얇게 조정했습니다.
 
 ## 현재 구현된 기능
 
@@ -153,6 +153,10 @@ scripts/    Windows 설치·실행·테스트 스크립트
 - `GET /api/problems/{problem_id}/diagram`: 구조화 SVG 회로도
 - `POST /api/problems/{problem_id}/circuit-attempts/submit`: 소켓번호 제출·채점
 - `GET /api/problems/{problem_id}/circuit-progress`: 최근 제출 진행상태
+- `GET /api/problems/{problem_id}/board`: 공개 제어함 배치
+- `GET/PUT/DELETE /api/problems/{problem_id}/wiring-draft`: 결선 임시 저장
+- `POST /api/problems/{problem_id}/wiring-attempts/submit`: 결선 제출·채점
+- `GET /api/problems/{problem_id}/wiring-progress`: 결선 제출 진행상태
 
 API 응답에는 답안 데이터나 로컬 절대경로를 포함하지 않습니다.
 

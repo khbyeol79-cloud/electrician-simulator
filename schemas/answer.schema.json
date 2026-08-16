@@ -57,6 +57,14 @@
       "type": "array",
       "items": { "$ref": "#/$defs/connectionPair" }
     },
+    "wiring_connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connection" }
+    },
+    "wiring_forbidden_connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connectionPair" }
+    },
     "wire_color_rules": { "$ref": "#/$defs/wireColors" },
     "operation_tests": {
       "type": "array",

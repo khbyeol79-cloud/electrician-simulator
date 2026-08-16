@@ -52,5 +52,7 @@ class AnswerDefinition(BaseModel):
     expected_nets: list[ExpectedNet] = Field(default_factory=list)
     allowed_alternatives: list[dict[str, Any]] = Field(default_factory=list)
     forbidden_connections: list[ForbiddenConnection] = Field(default_factory=list)
+    wiring_connections: list[RequiredConnection] = Field(default_factory=list)
+    wiring_forbidden_connections: list[ForbiddenConnection] = Field(default_factory=list)
     wire_color_rules: WireColors
     operation_tests: list[dict[str, Any]] = Field(default_factory=list)

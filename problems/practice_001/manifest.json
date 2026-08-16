@@ -18,6 +18,7 @@
     "problem": "problem.json",
     "answer": "answer.json",
     "schematic": "schematic.svg",
-    "diagram": "diagram.json"
+    "diagram": "diagram.json",
+    "board": "board.json"
   }
 }

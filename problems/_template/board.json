@@ -1,0 +1,491 @@
+{
+  "schema_version": "1.0",
+  "board_id": "template_board_v1",
+  "width": 1400,
+  "height": 900,
+  "routing_margin": 36,
+  "items": [
+    {
+      "item_id": "TB-A",
+      "label": "연습 상단 단자대",
+      "item_type": "terminal_block",
+      "socket_type_id": null,
+      "row": 0,
+      "x": 260,
+      "y": 80,
+      "width": 880,
+      "height": 70,
+      "pins": [
+        {
+          "terminal_id": "TB-A-01",
+          "label": "1",
+          "number": null,
+          "side": "bottom",
+          "x": 296.67,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-02",
+          "label": "2",
+          "number": null,
+          "side": "bottom",
+          "x": 370.0,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-03",
+          "label": "3",
+          "number": null,
+          "side": "bottom",
+          "x": 443.33,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-04",
+          "label": "4",
+          "number": null,
+          "side": "bottom",
+          "x": 516.67,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-05",
+          "label": "5",
+          "number": null,
+          "side": "bottom",
+          "x": 590.0,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-06",
+          "label": "6",
+          "number": null,
+          "side": "bottom",
+          "x": 663.33,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-07",
+          "label": "7",
+          "number": null,
+          "side": "bottom",
+          "x": 736.67,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-08",
+          "label": "8",
+          "number": null,
+          "side": "bottom",
+          "x": 810.0,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-09",
+          "label": "9",
+          "number": null,
+          "side": "bottom",
+          "x": 883.33,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-10",
+          "label": "10",
+          "number": null,
+          "side": "bottom",
+          "x": 956.67,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-11",
+          "label": "11",
+          "number": null,
+          "side": "bottom",
+          "x": 1030.0,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-A-12",
+          "label": "12",
+          "number": null,
+          "side": "bottom",
+          "x": 1103.33,
+          "y": 150,
+          "max_connections": 3,
+          "enabled": true
+        }
+      ],
+      "label_area": {
+        "x": 603.2,
+        "y": 100,
+        "width": 193.6,
+        "height": 30
+      }
+    },
+    {
+      "item_id": "X3",
+      "label": "X3 · 12P",
+      "item_type": "socket_12p",
+      "socket_type_id": "socket_12p_base",
+      "row": 1,
+      "x": 590,
+      "y": 330,
+      "width": 220,
+      "height": 180,
+      "pins": [
+        {
+          "terminal_id": "X3-1",
+          "label": "1",
+          "number": 1,
+          "side": "top",
+          "x": 608.33,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-2",
+          "label": "2",
+          "number": 2,
+          "side": "top",
+          "x": 645.0,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 681.67,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 718.33,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 755.0,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 791.67,
+          "y": 330,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 608.33,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 645.0,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-9",
+          "label": "9",
+          "number": 9,
+          "side": "bottom",
+          "x": 681.67,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-10",
+          "label": "10",
+          "number": 10,
+          "side": "bottom",
+          "x": 718.33,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-11",
+          "label": "11",
+          "number": 11,
+          "side": "bottom",
+          "x": 755.0,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "X3-12",
+          "label": "12",
+          "number": 12,
+          "side": "bottom",
+          "x": 791.67,
+          "y": 510,
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "label_area": {
+        "x": 638.4,
+        "y": 385.8,
+        "width": 123.20000000000002,
+        "height": 68.4
+      }
+    },
+    {
+      "item_id": "TB-B",
+      "label": "연습 하단 단자대",
+      "item_type": "terminal_block",
+      "socket_type_id": null,
+      "row": 2,
+      "x": 260,
+      "y": 720,
+      "width": 880,
+      "height": 70,
+      "pins": [
+        {
+          "terminal_id": "TB-B-01",
+          "label": "1",
+          "number": null,
+          "side": "top",
+          "x": 296.67,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-02",
+          "label": "2",
+          "number": null,
+          "side": "top",
+          "x": 370.0,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-03",
+          "label": "3",
+          "number": null,
+          "side": "top",
+          "x": 443.33,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-04",
+          "label": "4",
+          "number": null,
+          "side": "top",
+          "x": 516.67,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-05",
+          "label": "5",
+          "number": null,
+          "side": "top",
+          "x": 590.0,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-06",
+          "label": "6",
+          "number": null,
+          "side": "top",
+          "x": 663.33,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-07",
+          "label": "7",
+          "number": null,
+          "side": "top",
+          "x": 736.67,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-08",
+          "label": "8",
+          "number": null,
+          "side": "top",
+          "x": 810.0,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-09",
+          "label": "9",
+          "number": null,
+          "side": "top",
+          "x": 883.33,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-10",
+          "label": "10",
+          "number": null,
+          "side": "top",
+          "x": 956.67,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-11",
+          "label": "11",
+          "number": null,
+          "side": "top",
+          "x": 1030.0,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        },
+        {
+          "terminal_id": "TB-B-12",
+          "label": "12",
+          "number": null,
+          "side": "top",
+          "x": 1103.33,
+          "y": 720,
+          "max_connections": 3,
+          "enabled": true
+        }
+      ],
+      "label_area": {
+        "x": 603.2,
+        "y": 740,
+        "width": 193.6,
+        "height": 30
+      }
+    }
+  ],
+  "routing_channels": [
+    {
+      "channel_id": "top_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 145,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "middle_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 425,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "bottom_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 735,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "left_outer",
+      "channel_type": "left_outer",
+      "x": 20,
+      "y": 30,
+      "width": 35,
+      "height": 835
+    },
+    {
+      "channel_id": "right_outer",
+      "channel_type": "right_outer",
+      "x": 1345,
+      "y": 30,
+      "width": 35,
+      "height": 835
+    }
+  ],
+  "forbidden_areas": [
+    {
+      "area_id": "TB-A_body",
+      "x": 260,
+      "y": 80,
+      "width": 880,
+      "height": 70
+    },
+    {
+      "area_id": "X3_body",
+      "x": 590,
+      "y": 330,
+      "width": 220,
+      "height": 180
+    },
+    {
+      "area_id": "TB-B_body",
+      "x": 260,
+      "y": 720,
+      "width": 880,
+      "height": 70
+    }
+  ]
+}

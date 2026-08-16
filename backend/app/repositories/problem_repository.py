@@ -83,6 +83,7 @@ class ProblemRepository:
                 problem=result.problem,
                 answer=result.answer,
                 diagram=result.diagram,
+                board=result.board,
                 warnings=[issue for issue in result.issues if issue.severity == "warning"],
             )
             self._packages[package.manifest.problem_id] = package
@@ -139,6 +140,10 @@ class ProblemRepository:
     def get_diagram(self, problem_id: str):
         package = self._packages.get(problem_id)
         return package.diagram if package else None
+
+    def get_board(self, problem_id: str):
+        package = self._packages.get(problem_id)
+        return package.board if package else None
 
     def get_circuit_summary(self, problem_id: str) -> CircuitSummary | None:
         package = self._packages.get(problem_id)

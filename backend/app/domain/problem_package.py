@@ -9,6 +9,7 @@ from .answer_definition import AnswerDefinition
 from .problem_definition import ProblemDefinition
 from .problem_manifest import Difficulty, ProblemManifest, ProblemStatus, ProblemType
 from .schematic_diagram import SchematicDiagram
+from .board_definition import BoardDefinition
 
 
 class ProblemValidationIssue(BaseModel):
@@ -31,6 +32,7 @@ class ProblemValidationResult(BaseModel):
     problem: ProblemDefinition | None = None
     answer: AnswerDefinition | None = None
     diagram: SchematicDiagram | None = None
+    board: BoardDefinition | None = None
 
     @property
     def is_valid(self) -> bool:
@@ -49,6 +51,7 @@ class ProblemPackage(BaseModel):
     problem: ProblemDefinition
     answer: AnswerDefinition
     diagram: SchematicDiagram
+    board: BoardDefinition | None = None
     warnings: list[ProblemValidationIssue] = Field(default_factory=list)
 
 

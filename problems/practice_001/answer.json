@@ -13,6 +13,8 @@
   "expected_nets": [],
   "allowed_alternatives": [],
   "forbidden_connections": [],
+  "wiring_connections": [],
+  "wiring_forbidden_connections": [],
   "wire_color_rules": {
     "L1": "brown",
     "L2": "black",

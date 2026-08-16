@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { ProblemSummary, PublicProblemDetail } from '../api/client'
+import type { BoardDefinition, BoardPin, ProblemSummary, PublicProblemDetail } from '../api/client'
 
 export const problemSummary: ProblemSummary = {
   problem_id: 'practice_001',
@@ -57,15 +57,33 @@ export const trainingDetail: PublicProblemDetail = {
   socket_questions: [{ question_id: 'SQ-VR1-C1', target_element_type: 'contact', target_element_id: 'VR1-C1', display_label: 'VR1 (가상)', answer_slots: [{ slot_id: 'upper', position: 'above' }, { slot_id: 'lower', position: 'below' }] }],
 }
 
+const pins8: BoardPin[] = [
+  ...[6, 5, 4, 3].map((number, index) => ({ terminal_id: `X1-${number}`, label: String(number), number, side: 'top' as const, x: 130 + index * 35, y: 180, max_connections: 2, enabled: true })),
+  ...[7, 8, 1, 2].map((number, index) => ({ terminal_id: `X1-${number}`, label: String(number), number, side: 'bottom' as const, x: 130 + index * 35, y: 340, max_connections: 2, enabled: true })),
+]
+const pins12: BoardPin[] = [
+  ...[1, 2, 3, 4, 5, 6].map((number, index) => ({ terminal_id: `MC1-${number}`, label: String(number), number, side: 'top' as const, x: 480 + index * 32, y: 500, max_connections: 2, enabled: true })),
+  ...[7, 8, 9, 10, 11, 12].map((number, index) => ({ terminal_id: `MC1-${number}`, label: String(number), number, side: 'bottom' as const, x: 480 + index * 32, y: 680, max_connections: 2, enabled: true })),
+]
+
+export const wiringBoard = {
+  schema_version: '1.0', board_id: 'test_board', width: 900, height: 760, routing_margin: 35,
+  items: [
+    { item_id: 'X1', label: 'X1', item_type: 'socket_8p', socket_type_id: 'socket_8p_base', row: 1, x: 100, y: 180, width: 150, height: 160, pins: pins8, label_area: { x: 135, y: 235, width: 80, height: 50 } },
+    { item_id: 'MC1', label: 'MC1', item_type: 'socket_12p', socket_type_id: 'socket_12p_base', row: 2, x: 450, y: 500, width: 200, height: 180, pins: pins12, label_area: { x: 500, y: 560, width: 100, height: 55 } },
+  ],
+  routing_channels: [{ channel_id: 'left', channel_type: 'left_outer', x: 20, y: 20, width: 30, height: 700 }], forbidden_areas: [],
+} satisfies BoardDefinition
+
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.4.2',
+  version: '0.5.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.4.2',
+  version: '0.5.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -130,6 +148,15 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       conductors: [{ conductor_id: 'control_top', section_id: 'control', points: [{ x: 540, y: 150 }, { x: 1500, y: 150 }], line_style: 'control', junctions: [{ x: 860, y: 150 }] }],
     })
     if (url === '/api/problems/training_socket_demo_001/circuit-progress') return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, total_count: 1 })
+    if (url.endsWith('/board')) return response(wiringBoard)
+    if (url.endsWith('/wiring-draft') && (!init?.method || init.method === 'GET')) return response(null)
+    if (url.endsWith('/wiring-draft') && init?.method === 'PUT') {
+      const body = JSON.parse(String(init.body))
+      return response({ problem_id: url.includes('training_socket') ? 'training_socket_demo_001' : 'practice_001', ...body, updated_at: '2026-08-16T00:00:00' })
+    }
+    if (url.endsWith('/wiring-draft') && init?.method === 'DELETE') return response(undefined, 204)
+    if (url.endsWith('/wiring-progress')) return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, required_count: 8 })
+    if (url.endsWith('/wiring-attempts/submit') && init?.method === 'POST') return response({ attempt_id: 1, gradable: true, overall_correct: false, required_count: 8, correct_count: 1, missing_connections: ['X1-6|MC1-5'], extra_connections: [], forbidden_connections: [], message: '누락 또는 잘못 연결된 단자를 확인해 주세요.' })
     if (url === '/api/problems/training_socket_demo_001/circuit-attempts/submit' && init?.method === 'POST') {
       const body = JSON.parse(String(init.body)) as { responses: Record<string, Record<string, number>> }
       const correct = body.responses['SQ-VR1-C1']?.upper === 6 && body.responses['SQ-VR1-C1']?.lower === 3
