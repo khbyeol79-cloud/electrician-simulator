@@ -6,8 +6,6 @@ import {
 import { WiringBoard } from '../features/wiring/components/WiringBoard'
 import { PlaceholderPage } from './PlaceholderPage'
 
-const pairColors = ['#2563eb', '#f97316', '#7c3aed', '#dc2626', '#0891b2', '#db2777', '#ca8a04', '#4f46e5']
-
 function inferWireColor(from: string, to: string): WiringConnection['wire_color'] {
   const value = `${from}|${to}`
   if (/(L1|T1)/.test(value)) return 'brown'
@@ -68,7 +66,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     if (from === to) { setNotice('같은 단자끼리는 연결할 수 없습니다.'); return }
     const key = [from, to].sort().join('|')
     if (connectionKeys.has(key)) { setNotice('이미 연결된 단자입니다.'); return }
-    commit([...connections, { from, to, wire_color: inferWireColor(from, to), pair_display_color: pairColors[connections.length % pairColors.length] }])
+    commit([...connections, { from, to, wire_color: inferWireColor(from, to), pair_display_color: '#64748b' }])
     setSelectedPin(null)
   }
   const pinClick = (terminalId: string) => {
@@ -149,7 +147,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
         <section><span className="panel-kicker">현재 작업</span><h3>{selectedConnection ? `${selectedConnection.from} → ${selectedConnection.to}` : selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요'}</h3><p>시작 단자와 종료 단자를 차례로 클릭하거나 드래그하여 연결합니다.</p>{selectedConnection && <label className="wire-color-select">물리 전선 색상<select value={selectedConnection.wire_color} onChange={(event) => changeWireColor(event.target.value as WiringConnection['wire_color'])}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section>
         <section className="virtual-warning"><strong>가상 학습 데이터</strong><p>이 문제는 배선 기능 확인용이며 실제 시험 정답이 아닙니다.</p></section>
         <section><span className="panel-kicker">결선 상태</span><dl><div><dt>표시 모드</dt><dd>{mode === 'graphic' ? '그래픽' : '요약'}</dd></div><div><dt>연결 수</dt><dd>{connections.length}</dd></div><div><dt>경로 방식</dt><dd>직교·빈 통로 우선</dd></div></dl>{notice && <div className="submission-notice" role="alert">{notice}</div>}{result && <div className={`wiring-result ${result.overall_correct ? 'correct' : result.gradable ? 'wrong' : 'warning'}`}><strong>{result.message}</strong><span>정상 {result.correct_count}/{result.required_count}</span>{result.gradable && <span>누락 {result.missing_connections.length} · 추가 {result.extra_connections.length} · 금지 {result.forbidden_connections.length}</span>}</div>}<button className="submit-circuit" onClick={() => void submit()}>결선 제출</button></section>
-        <section><span className="panel-kicker">경로 규칙</span><p>빈 행간 통로가 있으면 직접 직각 연결하고, 소켓이나 장치가 막을 때만 좌우 외곽으로 우회합니다.</p></section>
+        <section><span className="panel-kicker">경로 규칙</span><p>위·아래에서 거의 마주 보는 단자만 가운데로 직접 연결하며, 가로 이동이 큰 교차 행 연결은 좌우 외곽 통로로 우회합니다.</p></section>
       </aside>
     </div>}
   </section>

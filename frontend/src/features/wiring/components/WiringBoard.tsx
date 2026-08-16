@@ -3,6 +3,38 @@ import { routeConnections } from '../engine/orthogonalRouter'
 
 const wireColors = { brown: '#7a3f25', black: '#171b22', gray: '#77808a', yellow: '#e0a500' }
 
+export const DEVICE_SUMMARY_COLORS: Record<string, string> = {
+  MCCB: '#dc2626',
+  EOCR: '#f97316',
+  F: '#eab308',
+  FUSE: '#eab308',
+  X1: '#16a34a',
+  X2: '#0891b2',
+  T2: '#2563eb',
+  MC1: '#7c3aed',
+  MC2: '#db2777',
+  T1: '#475569',
+  TB5: '#64748b',
+  TB6: '#64748b',
+}
+
+export function deviceSummaryColor(itemId: string) {
+  return DEVICE_SUMMARY_COLORS[itemId] ?? '#64748b'
+}
+
+export function buildTerminalSummary(board: BoardDefinition, connections: WiringConnection[]) {
+  const ownerByTerminal = new Map<string, BoardItem>()
+  board.items.forEach((item) => item.pins.forEach((pin) => ownerByTerminal.set(pin.terminal_id, item)))
+  const summary = new Map<string, { other: string; color: string }>()
+  connections.forEach((connection) => {
+    const fromOwner = ownerByTerminal.get(connection.from)
+    const toOwner = ownerByTerminal.get(connection.to)
+    summary.set(connection.from, { other: connection.to, color: deviceSummaryColor(toOwner?.item_id ?? '') })
+    summary.set(connection.to, { other: connection.from, color: deviceSummaryColor(fromOwner?.item_id ?? '') })
+  })
+  return summary
+}
+
 function ItemBody({ item }: { item: BoardItem }) {
   if (item.item_type === 'terminal_block') {
     return <g className="board-item-body terminal-block-body"><rect x={item.x} y={item.y} width={item.width} height={item.height} rx="5" />{item.pins.map((pin) => <rect key={pin.terminal_id} x={pin.x - 16} y={item.y + 8} width="32" height={item.height - 16} rx="2" />)}</g>
@@ -29,8 +61,7 @@ export function WiringBoard({ board, connections, mode, selectedPin, selectedWir
   onPinClick: (id: string) => void; onPinPointerDown: (id: string) => void; onPinPointerUp: (id: string) => void; onWireSelect: (index: number) => void; onClearSelection: () => void
 }) {
   const routed = routeConnections(board, connections)
-  const summary = new Map<string, { other: string; color: string }>()
-  connections.forEach((connection) => { summary.set(connection.from, { other: connection.to, color: connection.pair_display_color }); summary.set(connection.to, { other: connection.from, color: connection.pair_display_color }) })
+  const summary = buildTerminalSummary(board, connections)
   return <div className="wiring-board-scroll">
     <svg className="wiring-board" role="img" aria-label="제어함 결선판" viewBox={`0 0 ${board.width} ${board.height}`} onClick={onClearSelection}>
       <g transform={`translate(${board.width * (1 - zoom) / 2} ${board.height * (1 - zoom) / 2}) scale(${zoom})`}>
@@ -39,7 +70,7 @@ export function WiringBoard({ board, connections, mode, selectedPin, selectedWir
         <g className="board-item-layer">{board.items.map((item) => <ItemBody key={item.item_id} item={item} />)}</g>
         {mode === 'graphic' && <g className="wire-layer">{routed.map((wire, index) => <g key={`${wire.from}|${wire.to}`} className={`board-wire${selectedWire === index ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(index) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(index) } }}><polyline points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} style={{ stroke: wireColors[wire.wire_color] }} /><polyline className="wire-hit" points={wire.points.map((point) => `${point.x},${point.y}`).join(' ')} /></g>)}</g>}
         <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={mode === 'summary' ? summary.get(pin.terminal_id) : undefined} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} />))}</g>
-        <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" /><text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
+        <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={item.label_area.x + 11} cy={item.label_area.y + item.label_area.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
       </g>
     </svg>
   </div>

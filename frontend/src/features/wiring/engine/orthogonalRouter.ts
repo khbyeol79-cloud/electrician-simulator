@@ -56,6 +56,12 @@ function isFacingAcrossRows(start: BoardPin, end: BoardPin) {
   return false
 }
 
+function canUseDirectRowGap(start: { item: BoardItem; pin: BoardPin }, end: { item: BoardItem; pin: BoardPin }) {
+  const adjacentRows = Math.abs(start.item.row - end.item.row) === 1
+  const nearlyAligned = Math.abs(start.pin.x - end.pin.x) <= 90
+  return adjacentRows && nearlyAligned && isFacingAcrossRows(start.pin, end.pin)
+}
+
 function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin) {
   const minY = Math.min(start.y, end.y)
   const maxY = Math.max(start.y, end.y)
@@ -73,11 +79,18 @@ function directChannelY(board: BoardDefinition, start: BoardPin, end: BoardPin) 
 }
 
 function outerRoute(board: BoardDefinition, start: BoardPin, end: BoardPin, startExit: DiagramPoint, endExit: DiagramPoint, lane: number) {
-  const leftX = board.routing_margin
-  const rightX = board.width - board.routing_margin
+  const leftChannel = board.routing_channels.find((channel) => channel.channel_type === 'left_outer')
+  const rightChannel = board.routing_channels.find((channel) => channel.channel_type === 'right_outer')
+  const leftBase = leftChannel ? leftChannel.x + leftChannel.width + 8 : board.routing_margin + 24
+  const rightBase = rightChannel ? rightChannel.x - 8 : board.width - board.routing_margin - 24
+  const clearance = 12
+  const leftLimit = Math.min(...board.forbidden_areas.map((area) => area.x), board.width / 2) - clearance
+  const rightLimit = Math.max(...board.forbidden_areas.map((area) => area.x + area.width), board.width / 2) + clearance
+  const leftX = Math.min(leftBase + lane, leftLimit)
+  const rightX = Math.max(rightBase - lane, rightLimit)
   const leftCost = Math.abs(startExit.x - leftX) + Math.abs(endExit.x - leftX)
   const rightCost = Math.abs(startExit.x - rightX) + Math.abs(endExit.x - rightX)
-  const outerX = leftCost <= rightCost ? leftX - lane : rightX + lane
+  const outerX = leftCost <= rightCost ? leftX : rightX
   return compact([
     { x: start.x, y: start.y }, startExit,
     { x: outerX, y: startExit.y }, { x: outerX, y: endExit.y },
@@ -100,8 +113,8 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   const candidates: DiagramPoint[][] = []
 
   // 마주 보는 단자 사이에 빈 행간 통로가 있으면 가장 짧은 직각 경로를 우선한다.
-  const facingAcrossRows = isFacingAcrossRows(start.pin, end.pin)
-  if (facingAcrossRows) {
+  const directAcrossRows = canUseDirectRowGap(start, end)
+  if (directAcrossRows) {
     const channelY = directChannelY(board, start.pin, end.pin)
     candidates.push(compact([startPoint, { x: start.pin.x, y: channelY }, { x: end.pin.x, y: channelY }, endPoint]))
   }
@@ -112,14 +125,7 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
     candidates.push(compact([startPoint, startExit, { x: endExit.x, y: channelY }, endExit, endPoint]))
   }
 
-  // 일반적인 두 직각 후보도 검사한다. 소켓 본체를 통과하지 않는 후보만 사용할 수 있다.
-  if (!facingAcrossRows) {
-    candidates.push(
-      compact([startPoint, startExit, { x: endExit.x, y: startExit.y }, endExit, endPoint]),
-      compact([startPoint, startExit, { x: startExit.x, y: endExit.y }, endExit, endPoint]),
-    )
-  }
-
+  // 중앙 직결 후보가 없거나 금지 영역과 겹치면 좌우 외곽 전용 통로를 사용한다.
   const directRoute = candidates
     .filter((points) => isOrthogonal(points) && pathIsClear(board, points))
     .sort((left, right) => pathCost(left) - pathCost(right))[0]

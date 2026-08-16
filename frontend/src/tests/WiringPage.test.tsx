@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
+import { buildTerminalSummary, deviceSummaryColor } from '../features/wiring/components/WiringBoard'
 import { routeConnection } from '../features/wiring/engine/orthogonalRouter'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
@@ -35,7 +36,8 @@ describe('제어함 결선', () => {
         ...item,
         item_id: 'MC2',
         label: 'MC2',
-        pins: item.pins.map((pin) => ({ ...pin, terminal_id: pin.terminal_id.replace('MC1-', 'MC2-') })),
+        x: item.x - 388,
+        pins: item.pins.map((pin) => ({ ...pin, x: pin.x - 388, terminal_id: pin.terminal_id.replace('MC1-', 'MC2-') })),
       } : item),
     }
     const route = routeConnection(board, { from: 'X1-1', to: 'MC2-5', wire_color: 'yellow', pair_display_color: '#2563eb' })
@@ -43,8 +45,8 @@ describe('제어함 결선', () => {
     expect(route.points).toEqual([
       { x: 200, y: 340 },
       { x: 200, y: 420 },
-      { x: 608, y: 420 },
-      { x: 608, y: 500 },
+      { x: 220, y: 420 },
+      { x: 220, y: 500 },
     ])
     expect(route.points.every((point) => point.x !== board.routing_margin)).toBe(true)
   })
@@ -75,8 +77,32 @@ describe('제어함 결선', () => {
       forbidden_areas: [{ area_id: 'middle_blocker', x: 330, y: 360, width: 80, height: 90 }],
     }
     const route = routeConnection(blockedBoard, { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#2563eb' })
-    expect(route.points.some((point) => point.x === blockedBoard.routing_margin)).toBe(true)
+    expect(route.points.some((point) => point.x > blockedBoard.routing_margin && point.x < 100)).toBe(true)
     expect(route.points.slice(1).every((point, index) => point.x === route.points[index].x || point.y === route.points[index].y)).toBe(true)
+  })
+
+  it.each([
+    ['EOCR-L3', 'MC1-4'],
+    ['MCCB-L1', 'MC2-6'],
+    ['F-2', 'T2-2'],
+  ])('routes %s to %s through an inset outer lane', (from, to) => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const route = routeConnection(board, { from, to, wire_color: 'yellow', pair_display_color: '#64748b' })
+    expect(route.points.some((point) => point.x === 63)).toBe(true)
+    expect(route.points.every((point) => point.x !== board.routing_margin)).toBe(true)
+  })
+
+  it('uses the opposite device color on each terminal in summary mode', () => {
+    const summary = buildTerminalSummary(wiringBoard, [
+      { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#64748b' },
+    ])
+    expect(summary.get('X1-1')).toEqual({ other: 'MC1-4', color: deviceSummaryColor('MC1') })
+    expect(summary.get('MC1-4')).toEqual({ other: 'X1-1', color: deviceSummaryColor('X1') })
+  })
+
+  it('assigns distinct summary colors to the nine control devices', () => {
+    const ids = ['MCCB', 'EOCR', 'F', 'X1', 'X2', 'T2', 'MC1', 'MC2', 'T1']
+    expect(new Set(ids.map(deviceSummaryColor))).toHaveLength(ids.length)
   })
 
   it('restores draft, submits feedback and prevents duplicate connection', async () => {
