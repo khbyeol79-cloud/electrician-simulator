@@ -274,6 +274,8 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-result.correct { color: #08713f; background: #e9f8f0; }
 .wiring-result.wrong { color: #a42929; background: #fff0f0; }
 .wiring-result.warning { color: #8d5700; background: #fff6df; }
+.preview-operation { width: 100%; height: 33px; margin: 0 0 7px; color: #1659aa; border: 1px solid #8fb4e6; border-radius: 4px; background: #edf5ff; font-size: 10px; font-weight: 800; }
+.preview-operation:hover { background: #dfeeff; }
 
 .mounting-workspace { grid-template-rows: 66px minmax(0, 1fr); }
 .mounting-header { background: #fff; }
@@ -327,8 +329,25 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .mounting-not-ready { min-height: 0; display: grid; place-content: center; gap: 8px; text-align: center; color: #687991; background: #eef3f8; }
 .mounting-not-ready strong { color: #344a65; font-size: 18px; }
 
+.operation-workspace { grid-template-rows: 66px minmax(0, 1fr); }
+.operation-header { background: #fff; }
+.operation-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 310px; }
+.operation-stage { background: #dce4ed; }
+.operation-board-scroll { position: relative; }
+.operation-board .board-pin.static, .operation-board .board-wire.readonly, .operation-board .fixed-device-layer { pointer-events: none; }
+.operation-board .board-wire.readonly { opacity: .88; }
+.operation-panel { padding-bottom: 10px; }
+.operation-ready-card { color: #08713f; border-left: 4px solid var(--green) !important; background: #eefaf3 !important; }
+.operation-ready-card strong, .operation-next-warning strong { font-size: 10px; }
+.operation-ready-card p { color: #3d7157 !important; }
+.operation-next-warning { color: #805000; border-left: 4px solid var(--orange) !important; background: #fff8e8 !important; }
+.operation-next-warning p { color: #765f35 !important; }
+.secondary-action { margin-top: auto; color: #24517f; border: 1px solid #a9bfd8; background: #eef3f8; }
+.secondary-action:hover { color: #fff; background: #315f91; }
+
 @media (max-width: 1280px) {
   .mounting-layout { grid-template-columns: minmax(0, 1fr) 292px; }
+  .operation-layout { grid-template-columns: minmax(0, 1fr) 285px; }
 }
 
 .status-bar { display: flex; align-items: center; gap: 22px; padding: 0 15px; color: #5a6980; border-top: 1px solid #cfd9e5; background: #f8fafc; font-size: 10px; }

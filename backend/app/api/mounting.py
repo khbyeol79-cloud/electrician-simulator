@@ -11,7 +11,8 @@ from app.repositories.mounting_repository import MountingRepository
 from app.services.mounting_service import MountingService, MountingValidationError
 
 
-router = APIRouter(prefix="/api/problems", tags=["mounting"])
+# 0.6.0 이전 클라이언트의 데이터 호환을 위해 유지한다. 새 UI에서는 사용하지 않는다.
+router = APIRouter(prefix="/api/problems", tags=["mounting-deprecated"], deprecated=True)
 
 
 def _problems(request: Request) -> ProblemRepository:

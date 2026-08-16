@@ -17,7 +17,7 @@ function StaticPins({ item }: { item: BoardItem }) {
   })}</>
 }
 
-function MountedDeviceGraphic({ item, device }: { item: BoardItem; device: MountDevice }) {
+export function MountedDeviceGraphic({ item, device }: { item: BoardItem; device: Pick<MountDevice, 'label' | 'graphic_type'> }) {
   const x = item.x + 24
   const y = item.y + 36
   const width = item.width - 48

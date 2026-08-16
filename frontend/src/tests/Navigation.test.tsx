@@ -12,13 +12,21 @@ afterEach(() => {
   window.localStorage.clear()
 })
 
-it('switches between all four stages', async () => {
+it('switches between the three exam stages', async () => {
   installApiMock()
   const user = userEvent.setup()
   render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
 
-  for (const label of ['제어함 결선', '기구 장착', '동작시험', '회로도 분석']) {
+  expect(screen.getByText('0 / 3 완료')).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: /기구 장착/ })).not.toBeInTheDocument()
+  for (const label of ['제어함 결선', '동작시험', '회로도 분석']) {
     await user.click(screen.getByRole('link', { name: new RegExp(label) }))
     expect(screen.getByRole('heading', { name: label, level: 2 })).toBeInTheDocument()
   }
+})
+
+it('redirects the old mounting route to operation', async () => {
+  installApiMock()
+  render(<MemoryRouter initialEntries={['/mounting']}><App /></MemoryRouter>)
+  expect(screen.getByRole('heading', { name: '동작시험', level: 2 })).toBeInTheDocument()
 })

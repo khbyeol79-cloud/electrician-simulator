@@ -51,7 +51,7 @@ class WiringRepository:
     def progress(self, problem_id: str) -> WiringProgress:
         with self.database.connect() as connection:
             count = connection.execute("SELECT COUNT(*) AS count FROM wiring_attempts WHERE problem_id = ?", (problem_id,)).fetchone()["count"]
-            row = connection.execute("SELECT submitted_at, overall_correct, correct_count, required_count FROM wiring_attempts WHERE problem_id = ? ORDER BY id DESC LIMIT 1", (problem_id,)).fetchone()
+            row = connection.execute("SELECT submitted_at, overall_correct, gradable, correct_count, required_count FROM wiring_attempts WHERE problem_id = ? ORDER BY id DESC LIMIT 1", (problem_id,)).fetchone()
         if row is None:
             return WiringProgress(problem_id=problem_id, attempt_count=0)
-        return WiringProgress(problem_id=problem_id, attempt_count=count, last_submitted_at=datetime.fromisoformat(row["submitted_at"]), last_overall_correct=None if row["overall_correct"] is None else bool(row["overall_correct"]), last_correct_count=row["correct_count"], required_count=row["required_count"])
+        return WiringProgress(problem_id=problem_id, attempt_count=count, last_submitted_at=datetime.fromisoformat(row["submitted_at"]), last_overall_correct=None if row["overall_correct"] is None else bool(row["overall_correct"]), last_gradable=bool(row["gradable"]), last_correct_count=row["correct_count"], required_count=row["required_count"])

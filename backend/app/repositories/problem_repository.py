@@ -131,6 +131,7 @@ class ProblemRepository:
             available_devices=problem.available_devices,
             circuit=problem.circuit.model_dump(mode="json"),
             socket_questions=[question.model_dump(mode="json") for question in problem.socket_questions],
+            device_layout=problem.device_layout.model_dump(mode="json") if problem.device_layout else None,
             warning_count=len(package.warnings),
         )
 

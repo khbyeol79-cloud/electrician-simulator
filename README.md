@@ -1,13 +1,13 @@
 # 전기기능사 시퀀스 결선 시뮬레이터
 
-Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.6.0이며 데이터 기반 회로도 분석, 제어함 결선, 기구 장착 연습을 포함합니다.
+Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.6.1이며 데이터 기반 회로도 분석, 제어함 결선, 동작시험 준비 화면을 포함합니다.
 
-0.6.0에서는 저장된 제어함 결선을 읽기 전용으로 보면서 8P·12P 릴레이와 타이머를 장착하는 3단계를 구현했습니다. 문제별 기구·장착 위치, 클릭·드래그·키보드 조작, 소켓 호환 검사, 자동 임시저장, 실행 취소·다시 실행, 서버 채점과 SQLite 진행 기록을 지원합니다.
+0.6.1에서는 실제 시험 문제지에 기구 위치가 주어진다는 점을 반영해 별도의 기구 장착 채점 단계를 제거했습니다. 회로도 분석 → 제어함 결선 → 동작시험의 3단계로 진행하며, 결선 제출 후 문제의 공개 고정 배치에 따라 릴레이와 타이머가 자동 삽입된 읽기 전용 화면을 표시합니다.
 
 ## 현재 구현된 기능
 
 - React + TypeScript 공통 화면
-- 회로도 분석·제어함 결선·기구 장착·동작시험 4단계 이동
+- 회로도 분석·제어함 결선·동작시험 3단계 이동
 - FastAPI 상태 API와 React SPA 제공
 - SQLite 스키마 자동 초기화
 - 데스크톱 실행 시 빈 포트 자동 선택
@@ -33,10 +33,10 @@ Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화�
 - 검증 상태를 확인하는 서버 채점과 SQLite 제출 기록
 - 실제 제어함 그래픽·요약 결선, 자동 직교 경로와 전선 색상 변경
 - 회로도 분석 결과를 결선 화면에서 확인하는 확대·이동 참고창
-- 기존 결선을 읽기 전용으로 유지하는 기구 장착 화면
-- 8P·12P 및 위치별 기구 종류 호환 검사
-- 클릭·드래그·키보드 기구 장착과 이동·분리·실행 취소
-- 기구 장착 자동 임시저장, 서버 채점과 SQLite 진행 기록
+- 결선 제출 성공 후 동작시험 화면 자동 이동
+- 문제지 공개 조건인 8P·12P 릴레이·타이머 고정 배치
+- 사용자 결선과 고정 기구를 함께 표시하는 읽기 전용 동작시험 준비 화면
+- 기존 0.6.0 장착 API와 SQLite 테이블의 비파괴 호환 유지
 - 실제 시험 정답이 아닌 가상 기능 확인 문제
 
 실제 전기적 회로 계산과 최종 동작시험은 아직 구현되지 않았습니다.
@@ -163,10 +163,9 @@ scripts/    Windows 설치·실행·테스트 스크립트
 - `GET/PUT/DELETE /api/problems/{problem_id}/wiring-draft`: 결선 임시 저장
 - `POST /api/problems/{problem_id}/wiring-attempts/submit`: 결선 제출·채점
 - `GET /api/problems/{problem_id}/wiring-progress`: 결선 제출 진행상태
-- `GET /api/problems/{problem_id}/mounting`: 공개 기구·장착 위치
-- `GET/PUT/DELETE /api/problems/{problem_id}/mounting-draft`: 장착 임시 저장
-- `POST /api/problems/{problem_id}/mounting-attempts/submit`: 기구 장착 제출·채점
-- `GET /api/problems/{problem_id}/mounting-progress`: 기구 장착 제출 진행상태
+- `GET /api/problems/{problem_id}/operation-setup`: 공개 고정 기구 배치, 사용자 결선 및 동작시험 준비 상태
+- `GET/PUT/DELETE /api/problems/{problem_id}/mounting-draft`: 0.6.0 호환용 장착 임시 저장(새 UI에서 사용하지 않음)
+- `POST /api/problems/{problem_id}/mounting-attempts/submit`: 0.6.0 호환용 장착 채점(새 UI에서 사용하지 않음)
 
 API 응답에는 답안 데이터나 로컬 절대경로를 포함하지 않습니다.
 
@@ -183,7 +182,7 @@ problems/problem_001/
 └─ assets/
 ```
 
-작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, 기구 장착은 `docs/mounting-problem-authoring.md`에서 확인할 수 있습니다. 문제 검증 명령은 다음과 같습니다.
+작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, 고정 기구 배치는 `docs/device-layout.md`에서 확인할 수 있습니다. `docs/mounting-problem-authoring.md`는 0.6.0 호환 데이터 설명으로만 유지합니다. 문제 검증 명령은 다음과 같습니다.
 
 ```powershell
 .venv\Scripts\python.exe -m tools.validate_problem problems\practice_001
@@ -228,4 +227,4 @@ Microsoft Edge WebView2 Runtime 설치 상태와 다음 로그를 확인합니�
 
 ## 다음 개발 단계
 
-다음 단계에서는 1~3단계 결과를 이용해 전원 투입, 푸시버튼, 릴레이 접점, 타이머, 표시등과 모터 상태를 계산하는 동작시험을 구현합니다. 0.6.0의 장착 결과 API는 다음 동작시험 입력으로 재사용할 수 있습니다.
+다음 0.7.0에서는 회로도 분석과 제출된 결선을 이용해 전원 투입, 푸시버튼, 릴레이 접점, 타이머, 표시등과 모터 상태를 계산하는 동작시험을 구현합니다. 동작시험 입력은 `device_layout.fixed_placements`, 사용자 결선, 회로 정의를 사용하며 사용자가 작성했던 장착 답안은 사용하지 않습니다.

@@ -14,7 +14,6 @@ import { ProblemSelector } from './components/ProblemSelector'
 import { StageNavigation } from './components/StageNavigation'
 import { StatusBar } from './components/StatusBar'
 import { CircuitAnalysisPage } from './pages/CircuitAnalysisPage'
-import { DeviceMountingPage } from './pages/DeviceMountingPage'
 import { OperationTestPage } from './pages/OperationTestPage'
 import { WiringPage } from './pages/WiringPage'
 
@@ -105,7 +104,6 @@ export default function App() {
           window.localStorage.removeItem(`electrician.circuitDraft.${selectedProblem.problem_id}.v${selectedProblem.version}`)
           window.dispatchEvent(new CustomEvent('electrician:reset-circuit'))
           window.dispatchEvent(new CustomEvent('electrician:reset-wiring'))
-          window.dispatchEvent(new CustomEvent('electrician:reset-mounting'))
         }}
       />
       <div className="app-body">
@@ -122,8 +120,8 @@ export default function App() {
             <Route path="/" element={<Navigate to="/circuit" replace />} />
             <Route path="/circuit" element={<CircuitAnalysisPage problem={selectedProblem} />} />
             <Route path="/wiring" element={<WiringPage problem={selectedProblem} />} />
-            <Route path="/mounting" element={<DeviceMountingPage problem={selectedProblem} />} />
-            <Route path="/operation" element={<OperationTestPage />} />
+            <Route path="/mounting" element={<Navigate to="/operation" replace />} />
+            <Route path="/operation" element={<OperationTestPage problem={selectedProblem} />} />
             <Route path="*" element={<Navigate to="/circuit" replace />} />
           </Routes>
         </main>

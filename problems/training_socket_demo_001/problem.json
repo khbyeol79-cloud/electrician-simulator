@@ -30,6 +30,17 @@
   "socket_questions": [
     { "question_id": "SQ-VR1-C1", "target_element_type": "contact", "target_element_id": "VR1-C1", "display_label": "VR1 (가상)", "answer_slots": [ { "slot_id": "upper", "position": "above" }, { "slot_id": "lower", "position": "below" } ] }
   ],
+  "device_layout": {
+    "schema_version": "1.0",
+    "fixed_placements": [
+      { "mount_device_id": "DEVICE-X1", "label": "X1 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "socket_id": "X1", "socket_type_id": "socket_8p_base" },
+      { "mount_device_id": "DEVICE-X2", "label": "X2 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "socket_id": "X2", "socket_type_id": "socket_8p_base" },
+      { "mount_device_id": "DEVICE-T1", "label": "T1 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "socket_id": "T1", "socket_type_id": "socket_8p_base" },
+      { "mount_device_id": "DEVICE-T2", "label": "T2 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "socket_id": "T2", "socket_type_id": "socket_8p_base" },
+      { "mount_device_id": "DEVICE-MC1", "label": "MC1 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC1", "socket_type_id": "socket_12p_base" },
+      { "mount_device_id": "DEVICE-MC2", "label": "MC2 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC2", "socket_type_id": "socket_12p_base" }
+    ]
+  },
   "mounting": {
     "schema_version": "1.0",
     "available_devices": [

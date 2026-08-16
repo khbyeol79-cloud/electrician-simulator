@@ -13,6 +13,7 @@ from .mounting_attempt import (
     MountingDraftUpdate, MountingPlacement, MountingProgress,
     WrongMountingPlacement,
 )
+from .operation_setup import DeviceLayoutDefinition, FixedDevicePlacement, OperationSetupResponse
 from .wiring_attempt import (
     WiringAttemptResult, WiringAttemptSubmit, WiringConnection, WiringDraftResponse,
     WiringDraftUpdate, WiringProgress,
@@ -57,6 +58,9 @@ __all__ = [
     "MountingPlacement",
     "MountingProgress",
     "WrongMountingPlacement",
+    "DeviceLayoutDefinition",
+    "FixedDevicePlacement",
+    "OperationSetupResponse",
     "WiringAttemptResult",
     "WiringAttemptSubmit",
     "WiringConnection",

@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
 import { buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
@@ -19,7 +20,7 @@ describe('제어함 결선', () => {
       'SQ-VR1-C1': { upper: 6, lower: 3 },
     }))
     const user = userEvent.setup()
-    render(<WiringPage problem={trainingDetail} />)
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
 
     const diagram = await screen.findByRole('img', { name: '회로도 분석 참고창' })
     expect(screen.getByText('1 / 1 입력')).toBeInTheDocument()
@@ -37,7 +38,7 @@ describe('제어함 결선', () => {
   it('renders symmetric 8P and 12P bases and connects exact terminals', async () => {
     installApiMock()
     const user = userEvent.setup()
-    render(<WiringPage problem={trainingDetail} />)
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
     expect(await screen.findByRole('img', { name: '제어함 결선판' })).toBeInTheDocument()
     expect(screen.getByText('X1')).toBeInTheDocument()
     expect(screen.getByText('MC1')).toBeInTheDocument()
@@ -150,7 +151,7 @@ describe('제어함 결선', () => {
   it('creates every new wire in yellow and lets the user change its color', async () => {
     installApiMock()
     const user = userEvent.setup()
-    render(<WiringPage problem={trainingDetail} />)
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
     await screen.findByRole('img', { name: '제어함 결선판' })
     await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
     await user.click(screen.getByRole('button', { name: 'MC1-4 단자' }))
@@ -177,7 +178,7 @@ describe('제어함 결선', () => {
   it('restores draft, submits feedback and prevents duplicate connection', async () => {
     installApiMock()
     const user = userEvent.setup()
-    render(<WiringPage problem={trainingDetail} />)
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
     await screen.findByRole('img', { name: '제어함 결선판' })
     await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
     await user.click(screen.getByRole('button', { name: 'MC1-4 단자' }))
@@ -186,5 +187,24 @@ describe('제어함 결선', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('이미 연결된 단자')
     await user.click(screen.getByRole('button', { name: '결선 제출' }))
     await waitFor(() => expect(screen.getByText('누락 또는 잘못 연결된 단자를 확인해 주세요.')).toBeInTheDocument())
+  })
+
+  it('moves to operation only after a correct gradable submission', async () => {
+    installApiMock({ wiringResult: { attempt_id: 1, gradable: true, overall_correct: true, required_count: 0, correct_count: 0, missing_connections: [], extra_connections: [], forbidden_connections: [], message: '모든 결선이 정확합니다.' } })
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/wiring']}><Routes><Route path="/wiring" element={<WiringPage problem={trainingDetail} />} /><Route path="/operation" element={<h2>동작시험 이동 완료</h2>} /></Routes></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    await user.click(screen.getByRole('button', { name: '결선 제출' }))
+    expect(await screen.findByRole('heading', { name: '동작시험 이동 완료' })).toBeInTheDocument()
+  })
+
+  it('offers a preview instead of automatic success for an ungradable problem', async () => {
+    installApiMock({ wiringResult: { attempt_id: 1, gradable: false, overall_correct: null, required_count: 0, correct_count: 0, missing_connections: [], extra_connections: [], forbidden_connections: [], message: '이 문제의 배선 정답은 아직 검증되지 않아 채점할 수 없습니다.' } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    await user.click(screen.getByRole('button', { name: '결선 제출' }))
+    expect(await screen.findByRole('button', { name: '동작시험 화면 미리보기' })).toBeInTheDocument()
+    expect(screen.getByText('이 문제의 배선 정답은 아직 검증되지 않아 채점할 수 없습니다.')).toBeInTheDocument()
   })
 })

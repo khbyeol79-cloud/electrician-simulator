@@ -45,6 +45,7 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   available_devices: Record<string, unknown>[]
   circuit: CircuitDefinition
   socket_questions: SocketQuestion[]
+  device_layout: DeviceLayoutDefinition | null
 }
 
 export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null }
@@ -125,7 +126,7 @@ export type WiringAttemptResult = {
   attempt_id: number | null; gradable: boolean; overall_correct: boolean | null; required_count: number; correct_count: number
   missing_connections: string[]; extra_connections: string[]; forbidden_connections: string[]; message: string
 }
-export type WiringProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_correct: boolean | null; last_correct_count: number; required_count: number }
+export type WiringProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_correct: boolean | null; last_gradable: boolean | null; last_correct_count: number; required_count: number }
 
 export type MountDevice = {
   mount_device_id: string; label: string; device_type_id: string
@@ -151,6 +152,20 @@ export type MountingAttemptResult = {
 export type MountingProgress = {
   problem_id: string; attempt_count: number; last_submitted_at: string | null
   last_overall_correct: boolean | null; last_correct_count: number; required_count: number
+}
+
+export type FixedDevicePlacement = {
+  mount_device_id: string; label: string; device_type_id: string
+  graphic_type: 'relay' | 'timer' | 'contactor'; socket_id: string; socket_type_id: string
+}
+export type DeviceLayoutDefinition = {
+  schema_version: '1.0'; fixed_placements: FixedDevicePlacement[]
+}
+export type OperationSetup = {
+  problem_id: string; problem_version: number; board: BoardDefinition
+  device_layout: DeviceLayoutDefinition | null; wiring_draft: WiringDraft | null
+  wiring_submission: WiringProgress; wiring_exists: boolean; operation_ready: boolean
+  preview_allowed: boolean; message: string
 }
 
 export type ReloadStatistics = {
@@ -221,6 +236,10 @@ export function getMountingDraft(problemId: string, signal?: AbortSignal) {
 
 export function getMountingProgress(problemId: string, signal?: AbortSignal) {
   return getJson<MountingProgress>(`/api/problems/${encodeURIComponent(problemId)}/mounting-progress`, signal)
+}
+
+export function getOperationSetup(problemId: string, signal?: AbortSignal) {
+  return getJson<OperationSetup>(`/api/problems/${encodeURIComponent(problemId)}/operation-setup`, signal)
 }
 
 async function mutationJson<T>(url: string, method: string, body?: unknown): Promise<T> {

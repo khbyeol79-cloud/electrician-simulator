@@ -438,6 +438,25 @@ class ProblemPackageValidator:
                     elif target.socket_type_id not in device.compatible_socket_type_ids or device.device_type_id not in target.allowed_device_type_ids:
                         issues.append(self._issue("error", "incompatible_mounting_answer", "기구 장착 정답의 기구와 소켓이 호환되지 않습니다.", file=manifest.files.answer, problem_id=problem_id))
 
+        if problem and problem.device_layout:
+            placements = problem.device_layout.fixed_placements
+            device_ids = [item.mount_device_id for item in placements]
+            socket_ids = [item.socket_id for item in placements]
+            if len(device_ids) != len(set(device_ids)) or len(socket_ids) != len(set(socket_ids)):
+                issues.append(self._issue("error", "duplicate_fixed_device_placement", "고정 기구 배치에 중복된 기구 또는 소켓이 있습니다.", file=manifest.files.problem, problem_id=problem_id))
+            board_items = {item.item_id: item for item in board.items} if board else {}
+            for placement in placements:
+                board_item = board_items.get(placement.socket_id)
+                if board_item is None or board_item.item_type not in ("socket_8p", "socket_12p"):
+                    issues.append(self._issue("error", "unknown_fixed_device_socket", f"고정 기구 위치가 보드의 소켓이 아닙니다: {placement.socket_id}", file=manifest.files.problem, problem_id=problem_id))
+                elif board_item.socket_type_id != placement.socket_type_id:
+                    issues.append(self._issue("error", "fixed_device_socket_mismatch", f"고정 기구의 소켓 유형이 보드와 다릅니다: {placement.socket_id}", file=manifest.files.problem, problem_id=problem_id))
+                catalog_device = self.catalog.get_device_type(placement.device_type_id)
+                if catalog_device is None:
+                    issues.append(self._issue("error", "unknown_fixed_device_type", f"존재하지 않는 고정 기구 유형입니다: {placement.device_type_id}", file=manifest.files.problem, problem_id=problem_id))
+                elif catalog_device.socket_type_id != placement.socket_type_id:
+                    issues.append(self._issue("error", "incompatible_fixed_device", f"기구와 소켓 유형이 호환되지 않습니다: {placement.mount_device_id}", file=manifest.files.problem, problem_id=problem_id))
+
         return ProblemValidationResult(
             package_dir=package_dir,
             issues=issues,

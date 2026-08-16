@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { BoardDefinition, BoardPin, MountingDefinition, MountingPlacement, ProblemSummary, PublicProblemDetail, WiringConnection } from '../api/client'
+import type { BoardDefinition, BoardPin, MountingDefinition, MountingPlacement, OperationSetup, ProblemSummary, PublicProblemDetail, WiringAttemptResult, WiringConnection } from '../api/client'
 
 export const problemSummary: ProblemSummary = {
   problem_id: 'practice_001',
@@ -41,6 +41,7 @@ export const problemDetail: PublicProblemDetail = {
   available_devices: [],
   circuit: { schema_version: '1.0', definition_status: 'structure_only', devices: [], terminals: [], contacts: [], coils: [] },
   socket_questions: [],
+  device_layout: null,
 }
 
 export const trainingDetail: PublicProblemDetail = {
@@ -55,6 +56,13 @@ export const trainingDetail: PublicProblemDetail = {
     coils: [{ coil_id: 'VR1-COIL', owner_device_id: 'VR1' }],
   },
   socket_questions: [{ question_id: 'SQ-VR1-C1', target_element_type: 'contact', target_element_id: 'VR1-C1', display_label: 'VR1 (가상)', answer_slots: [{ slot_id: 'upper', position: 'above' }, { slot_id: 'lower', position: 'below' }] }],
+  device_layout: {
+    schema_version: '1.0',
+    fixed_placements: [
+      { mount_device_id: 'DEVICE-X1', label: 'X1 보조릴레이', device_type_id: 'auxiliary_relay_8p', graphic_type: 'relay', socket_id: 'X1', socket_type_id: 'socket_8p_base' },
+      { mount_device_id: 'DEVICE-MC1', label: 'MC1 12P 릴레이', device_type_id: 'auxiliary_relay_12p', graphic_type: 'contactor', socket_id: 'MC1', socket_type_id: 'socket_12p_base' },
+    ],
+  },
 }
 
 const pins8: BoardPin[] = [
@@ -97,12 +105,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.6.0',
+  version: '0.6.1',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.6.0',
+  version: '0.6.1',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -116,7 +124,7 @@ function response(data: unknown, status = 200): Response {
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; wiringDraft?: WiringConnection[]; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
   const problems = options?.problems ?? [problemSummary]
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
@@ -174,8 +182,19 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       return response({ problem_id: url.includes('training_socket') ? 'training_socket_demo_001' : 'practice_001', ...body, updated_at: '2026-08-16T00:00:00' })
     }
     if (url.endsWith('/wiring-draft') && init?.method === 'DELETE') return response(undefined, 204)
-    if (url.endsWith('/wiring-progress')) return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, required_count: 8 })
-    if (url.endsWith('/wiring-attempts/submit') && init?.method === 'POST') return response({ attempt_id: 1, gradable: true, overall_correct: false, required_count: 8, correct_count: 1, missing_connections: ['X1-6|MC1-5'], extra_connections: [], forbidden_connections: [], message: '누락 또는 잘못 연결된 단자를 확인해 주세요.' })
+    if (url.endsWith('/wiring-progress')) return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_gradable: null, last_correct_count: 0, required_count: 8 })
+    if (url.endsWith('/wiring-attempts/submit') && init?.method === 'POST') return response(options?.wiringResult ?? { attempt_id: 1, gradable: true, overall_correct: false, required_count: 8, correct_count: 1, missing_connections: ['X1-6|MC1-5'], extra_connections: [], forbidden_connections: [], message: '누락 또는 잘못 연결된 단자를 확인해 주세요.' })
+    if (url.endsWith('/operation-setup')) return response({
+      problem_id: url.includes('training_socket') ? 'training_socket_demo_001' : 'practice_001',
+      problem_version: 1,
+      board: wiringBoard,
+      device_layout: trainingDetail.device_layout,
+      wiring_draft: options?.wiringDraft ? { problem_id: 'training_socket_demo_001', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, updated_at: null } : null,
+      wiring_submission: { problem_id: 'training_socket_demo_001', attempt_count: 1, last_submitted_at: '2026-08-16T00:00:00', last_overall_correct: true, last_gradable: true, last_correct_count: 8, required_count: 8 },
+      wiring_exists: Boolean(options?.wiringDraft?.length), operation_ready: true, preview_allowed: false,
+      message: '결선 확인이 완료되어 동작시험을 준비했습니다.',
+      ...options?.operationSetup,
+    })
     if (url === '/api/problems/training_socket_demo_001/mounting') return response(mountingDefinition)
     if (url === '/api/problems/practice_001/mounting') return response({ schema_version: '1.0', available_devices: [], mount_targets: [] })
     if (url.endsWith('/mounting-draft') && (!init?.method || init.method === 'GET')) return response(options?.mountingDraft ? { problem_id: 'training_socket_demo_001', problem_version: options.mountingDraftVersion ?? 1, placements: options.mountingDraft, updated_at: null } : null)

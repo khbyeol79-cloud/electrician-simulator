@@ -64,5 +64,6 @@ class WiringProgress(BaseModel):
     attempt_count: int = 0
     last_submitted_at: datetime | None = None
     last_overall_correct: bool | None = None
+    last_gradable: bool | None = None
     last_correct_count: int = 0
     required_count: int = 0

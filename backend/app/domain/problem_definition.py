@@ -5,6 +5,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .mounting_attempt import MountingDefinition
+from .operation_setup import DeviceLayoutDefinition
 
 
 class WireColors(BaseModel):
@@ -149,4 +150,5 @@ class ProblemDefinition(BaseModel):
     available_devices: list[dict[str, Any]] = Field(default_factory=list)
     circuit: CircuitDefinition
     socket_questions: list[SocketQuestion] = Field(default_factory=list)
+    device_layout: DeviceLayoutDefinition | None = None
     mounting: MountingDefinition | None = None

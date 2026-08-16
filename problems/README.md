@@ -17,10 +17,10 @@ problems/problem_001/
 `answer.json`은 사용자 화면이나 일반 조회 API에 직접 노출하지 않습니다.
 `diagram.json`은 접점 선택용 구조화 SVG 배치 데이터입니다.
 장치와 소켓 유형은 `catalog` 폴더의 공통 정의를 ID로 참조합니다.
-`problem.json`의 `mounting`은 사용자에게 공개되는 기구와 장착 가능한 소켓을 정의합니다.
-`answer.json`의 `mounting_answer`는 비공개 정답이며 일반 조회 API에 포함되지 않습니다.
+`problem.json`의 `device_layout.fixed_placements`는 문제지에 제시되는 고정 기구 위치이며 공개 데이터입니다.
+결선 정답과 향후 동작시험 판정 데이터는 `answer.json`에 작성하고 일반 조회 API에 포함하지 않습니다.
 
-기구 장착 문제 작성법은 `docs/mounting-problem-authoring.md`를 확인하세요.
+고정 기구 배치 작성법은 `docs/device-layout.md`를 확인하세요. 기존 `mounting`과 `mounting_answer`는 0.6.0 데이터 호환을 위해 읽을 수 있지만 새 문제에서는 사용하지 않습니다.
 
 검증 명령:
 
