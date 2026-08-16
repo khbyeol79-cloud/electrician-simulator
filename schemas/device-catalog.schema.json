@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "device-catalog.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "device_types"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "device_types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["device_type_id", "name", "category", "socket_type_id", "mounting", "electrical_definition_status"],
+        "properties": {
+          "device_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "category": { "enum": ["terminal_block", "mccb", "fuse", "eocr", "magnetic_contactor", "auxiliary_relay", "timer", "push_button", "limit_switch", "indicator_lamp", "motor", "power_source", "socket_base"] },
+          "socket_type_id": { "type": ["string", "null"] },
+          "mounting": { "enum": ["fixed", "plug_in", "panel", "external"] },
+          "electrical_definition_status": { "enum": ["unverified", "reviewed", "verified"] }
+        }
+      }
+    }
+  }
+}

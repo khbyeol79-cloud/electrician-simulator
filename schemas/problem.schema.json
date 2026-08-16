@@ -4,32 +4,15 @@
   "title": "Public Problem Definition",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema_version", "problem_id", "description", "instructions",
-    "learning_objectives", "power_supply", "schematic", "board",
-    "available_devices", "circuit", "socket_questions"
-  ],
+  "required": ["schema_version", "problem_id", "description", "instructions", "learning_objectives", "power_supply", "schematic", "board", "available_devices", "circuit", "socket_questions"],
   "properties": {
     "schema_version": { "const": "1.0" },
-    "problem_id": {
-      "type": "string",
-      "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$"
-    },
+    "problem_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
     "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
-    "instructions": {
-      "type": "array",
-      "items": { "type": "string", "minLength": 1, "maxLength": 500 },
-      "minItems": 1,
-      "maxItems": 30
-    },
-    "learning_objectives": {
-      "type": "array",
-      "items": { "type": "string", "minLength": 1, "maxLength": 200 },
-      "maxItems": 30
-    },
+    "instructions": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 500 }, "minItems": 1, "maxItems": 30 },
+    "learning_objectives": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 200 }, "maxItems": 30 },
     "power_supply": {
-      "type": "object",
-      "additionalProperties": false,
+      "type": "object", "additionalProperties": false,
       "required": ["system", "voltage", "frequency", "wire_colors"],
       "properties": {
         "system": { "type": "string", "minLength": 1, "maxLength": 60 },
@@ -39,65 +22,77 @@
       }
     },
     "schematic": {
-      "type": "object",
-      "additionalProperties": false,
+      "type": "object", "additionalProperties": false,
       "required": ["file", "format", "view_box"],
       "properties": {
         "file": { "$ref": "#/$defs/safeRelativePath" },
         "format": { "const": "svg" },
-        "view_box": {
-          "type": "string",
-          "pattern": "^-?[0-9]+(?:\\.[0-9]+)? -?[0-9]+(?:\\.[0-9]+)? [0-9]+(?:\\.[0-9]+)? [0-9]+(?:\\.[0-9]+)?$"
-        }
+        "view_box": { "type": "string", "pattern": "^-?[0-9]+(?:\\.[0-9]+)? -?[0-9]+(?:\\.[0-9]+)? [0-9]+(?:\\.[0-9]+)? [0-9]+(?:\\.[0-9]+)?$" }
       }
     },
     "board": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["layout_id"],
-      "properties": {
-        "layout_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }
-      }
+      "type": "object", "additionalProperties": false, "required": ["layout_id"],
+      "properties": { "layout_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" } }
     },
-    "available_devices": {
-      "type": "array",
-      "items": { "type": "object", "additionalProperties": true }
-    },
+    "available_devices": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
     "circuit": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["devices", "terminals", "contacts", "coils"],
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "definition_status", "devices", "terminals", "contacts", "coils"],
       "properties": {
-        "devices": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
-        "terminals": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
-        "contacts": { "type": "array", "items": { "type": "object", "additionalProperties": true } },
-        "coils": { "type": "array", "items": { "type": "object", "additionalProperties": true } }
+        "schema_version": { "const": "1.0" },
+        "definition_status": { "enum": ["structure_only", "functional"] },
+        "devices": { "type": "array", "items": { "$ref": "#/$defs/device" } },
+        "terminals": { "type": "array", "items": { "$ref": "#/$defs/terminal" } },
+        "contacts": { "type": "array", "items": { "$ref": "#/$defs/contact" } },
+        "coils": { "type": "array", "items": { "$ref": "#/$defs/coil" } }
       }
     },
-    "socket_questions": {
-      "type": "array",
-      "items": { "type": "object", "additionalProperties": true }
-    }
+    "socket_questions": { "type": "array", "items": { "$ref": "#/$defs/socketQuestion" } }
   },
   "$defs": {
-    "safeRelativePath": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 240,
-      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))[^\\u0000]+$"
-    },
+    "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "safeRelativePath": { "type": "string", "minLength": 1, "maxLength": 240, "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))[^\\u0000]+$" },
     "wireColors": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["L1", "L2", "L3", "PE", "control"],
+      "type": "object", "additionalProperties": false, "required": ["L1", "L2", "L3", "PE", "control"],
+      "properties": { "L1": { "const": "brown" }, "L2": { "const": "black" }, "L3": { "const": "gray" }, "PE": { "const": "green" }, "control": { "const": "yellow" } }
+    },
+    "boardPosition": {
+      "type": "object", "additionalProperties": false, "required": ["row", "column", "x", "y"],
+      "properties": { "row": { "type": "integer", "minimum": 0 }, "column": { "type": "integer", "minimum": 0 }, "x": { "type": "number", "minimum": 0, "maximum": 1 }, "y": { "type": "number", "minimum": 0, "maximum": 1 } }
+    },
+    "device": {
+      "type": "object", "additionalProperties": false,
+      "required": ["device_id", "device_type_id", "label", "socket_type_id", "board_position", "installed_initially"],
+      "properties": { "device_id": { "$ref": "#/$defs/id" }, "device_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }, "label": { "$ref": "#/$defs/id" }, "socket_type_id": { "type": ["string", "null"] }, "board_position": { "$ref": "#/$defs/boardPosition" }, "installed_initially": { "type": "boolean" } }
+    },
+    "terminal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["terminal_id", "device_id", "pin_number", "terminal_type", "electrical_role", "max_connections", "enabled"],
       "properties": {
-        "L1": { "const": "brown" },
-        "L2": { "const": "black" },
-        "L3": { "const": "gray" },
-        "PE": { "const": "green" },
-        "control": { "const": "yellow" }
+        "terminal_id": { "$ref": "#/$defs/id" }, "device_id": { "$ref": "#/$defs/id" }, "pin_number": { "type": ["integer", "null"], "minimum": 1 },
+        "terminal_type": { "enum": ["socket_pin", "screw_terminal", "coil_terminal", "contact_terminal", "power_terminal", "ground_terminal", "external_terminal"] },
+        "electrical_role": { "enum": ["unassigned", "line", "neutral", "protective_earth", "control", "coil", "contact_common", "contact_no", "contact_nc", "load"] },
+        "max_connections": { "type": "integer", "minimum": 1, "maximum": 20 }, "enabled": { "type": "boolean" }
       }
+    },
+    "contact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contact_id", "owner_device_id", "contact_type", "common_terminal_id", "switched_terminal_id", "controlled_by_coil_id", "normal_state"],
+      "properties": { "contact_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] }, "common_terminal_id": { "$ref": "#/$defs/id" }, "switched_terminal_id": { "$ref": "#/$defs/id" }, "nc_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "no_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "controlled_by_coil_id": { "$ref": "#/$defs/id" }, "normal_state": { "enum": ["open", "closed"] } }
+    },
+    "coil": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coil_id", "owner_device_id", "terminal_a_id", "terminal_b_id", "rated_voltage", "voltage_type", "frequency"],
+      "properties": { "coil_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "terminal_a_id": { "$ref": "#/$defs/id" }, "terminal_b_id": { "$ref": "#/$defs/id" }, "rated_voltage": { "type": "number", "exclusiveMinimum": 0, "maximum": 1000 }, "voltage_type": { "enum": ["AC", "DC"] }, "frequency": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 1000 } }
+    },
+    "answerSlot": {
+      "type": "object", "additionalProperties": false, "required": ["slot_id", "position"],
+      "properties": { "slot_id": { "type": "string", "minLength": 1, "maxLength": 40 }, "position": { "enum": ["above", "below", "left", "right"] } }
+    },
+    "socketQuestion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["question_id", "target_element_type", "target_element_id", "display_label", "answer_slots"],
+      "properties": { "question_id": { "$ref": "#/$defs/id" }, "target_element_type": { "enum": ["contact", "coil"] }, "target_element_id": { "$ref": "#/$defs/id" }, "display_label": { "$ref": "#/$defs/id" }, "answer_slots": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/answerSlot" } } }
     }
   }
 }
-

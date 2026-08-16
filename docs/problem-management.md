@@ -26,6 +26,7 @@ problems/problem_001/
 3. 세 JSON 파일의 `problem_id`를 폴더명과 동일하게 변경합니다.
 4. `manifest.json`에 제목, 출처, 난이도와 예상 시간을 작성합니다.
 5. `problem.json`에 공개 문제 설명과 지시사항을 작성합니다.
+   장치·단자·접점·코일 작성 규칙은 `docs/circuit-data-model.md`를 확인합니다.
 6. `schematic.svg`를 자체 제작 또는 사용 권한이 있는 회로도로 교체합니다.
 7. `answer.json`에 정답을 별도로 작성합니다.
 8. 아래 검증 명령을 실행합니다.
@@ -106,3 +107,6 @@ control yellow
 
 색상 규칙이 다르면 문제 검증에 실패합니다.
 
+## 공통 카탈로그
+
+8P·12P 소켓의 실제 베이스 배열과 장치 유형은 `catalog` 폴더에서 공통 관리합니다. 개별 문제에 같은 배열을 복사하지 말고 `socket_type_id`와 `device_type_id`로 참조합니다. 실제 전기 자료를 확인하지 않은 장치 유형의 상태는 `unverified`로 유지하십시오.

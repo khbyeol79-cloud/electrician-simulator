@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
@@ -13,11 +16,15 @@ def make_paths(tmp_path):
     (static_dir / "index.html").write_text("<html>test</html>", encoding="utf-8")
     problems = tmp_path / "problems"
     problems.mkdir()
+    project_root = Path(__file__).resolve().parents[2]
+    shutil.copytree(project_root / "schemas", tmp_path / "schemas")
+    shutil.copytree(project_root / "catalog", tmp_path / "catalog")
     return AppPaths(
         project_root=tmp_path,
         bundle_root=tmp_path,
         frontend_dist=static_dir,
         problems_dir=problems,
+        catalog_dir=tmp_path / "catalog",
         writable_root=tmp_path / "data",
         database_file=tmp_path / "data" / "test.db",
         logs_dir=tmp_path / "logs",
@@ -44,4 +51,3 @@ def test_unknown_api_path_returns_404(tmp_path):
     with TestClient(create_app(settings)) as client:
         response = client.get("/api/does-not-exist")
         assert response.status_code == 404
-

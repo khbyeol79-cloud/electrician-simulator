@@ -39,6 +39,7 @@ class AppPaths:
     bundle_root: Path
     frontend_dist: Path
     problems_dir: Path
+    catalog_dir: Path
     writable_root: Path
     database_file: Path
     logs_dir: Path
@@ -58,9 +59,9 @@ def build_paths() -> AppPaths:
         bundle_root=bundle_root,
         frontend_dist=bundle_root / "frontend" / "dist",
         problems_dir=bundle_root / "problems",
+        catalog_dir=bundle_root / "catalog",
         writable_root=writable_root,
         database_file=writable_root / "app.db",
         logs_dir=writable_root / "logs",
         log_file=writable_root / "logs" / "app.log",
     )
-

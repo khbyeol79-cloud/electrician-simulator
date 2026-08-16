@@ -7,6 +7,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from app.domain import (
+    CircuitSummary,
     ProblemPackage,
     ProblemSummary,
     ProblemValidationIssue,
@@ -25,9 +26,10 @@ class ReloadStatistics(BaseModel):
 
 
 class ProblemRepository:
-    def __init__(self, problems_dir: Path, schemas_dir: Path):
+    def __init__(self, problems_dir: Path, schemas_dir: Path, catalog_dir: Path | None = None):
         self.problems_dir = problems_dir.resolve()
-        self.validator = ProblemPackageValidator(schemas_dir)
+        self.validator = ProblemPackageValidator(schemas_dir, catalog_dir)
+        self.catalog = self.validator.catalog
         self._packages: dict[str, ProblemPackage] = {}
         self._issues: list[ProblemValidationIssue] = []
         self._excluded = 0
@@ -133,6 +135,26 @@ class ProblemRepository:
     def _get_package_internal(self, problem_id: str) -> ProblemPackage | None:
         return self._packages.get(problem_id)
 
+    def get_circuit_summary(self, problem_id: str) -> CircuitSummary | None:
+        package = self._packages.get(problem_id)
+        if package is None:
+            return None
+        circuit = package.problem.circuit
+        return CircuitSummary(
+            problem_id=problem_id,
+            problem_title=package.manifest.title,
+            device_count=len(circuit.devices),
+            terminal_count=len(circuit.terminals),
+            contact_count=len(circuit.contacts),
+            coil_count=len(circuit.coils),
+            socket_type_ids=sorted(
+                {device.socket_type_id for device in circuit.devices if device.socket_type_id}
+            ),
+            reference_integrity="valid",
+            warning_count=len(package.warnings),
+            definition_status=circuit.definition_status,
+        )
+
     def issues(self) -> list[ProblemValidationIssue]:
         return list(self._issues)
 
@@ -152,4 +174,3 @@ class ProblemRepository:
             selectable=True,
             warning_count=len(package.warnings),
         )
-

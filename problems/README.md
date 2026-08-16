@@ -14,6 +14,7 @@ problems/problem_001/
 ```
 
 `answer.json`은 사용자 화면이나 일반 조회 API에 직접 노출하지 않습니다.
+장치와 소켓 유형은 `catalog` 폴더의 공통 정의를 ID로 참조합니다.
 
 검증 명령:
 

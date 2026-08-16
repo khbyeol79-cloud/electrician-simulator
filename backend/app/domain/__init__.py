@@ -1,10 +1,12 @@
 """Problem package and public circuit domain models."""
 
 from .answer_definition import AnswerDefinition
+from .catalog import DeviceCatalog, DeviceType, SocketCatalog, SocketType
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
 from .problem_package import (
     ProblemPackage,
+    CircuitSummary,
     ProblemSummary,
     ProblemValidationIssue,
     ProblemValidationResult,
@@ -13,12 +15,16 @@ from .problem_package import (
 
 __all__ = [
     "AnswerDefinition",
+    "DeviceCatalog",
+    "DeviceType",
     "ProblemDefinition",
     "ProblemManifest",
     "ProblemPackage",
+    "CircuitSummary",
     "ProblemSummary",
     "ProblemValidationIssue",
     "ProblemValidationResult",
     "PublicProblemDetail",
+    "SocketCatalog",
+    "SocketType",
 ]
-

@@ -46,12 +46,12 @@ export const problemDetail: PublicProblemDetail = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.2.0',
+  version: '0.3.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.2.0',
+  version: '0.3.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -78,6 +78,26 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       if (options?.failProblems) return response({ detail: '오류' }, 500)
       return response(problems)
     }
+    if (url === '/api/catalog/socket-types') return response([
+      {
+        socket_type_id: 'socket_8p_base', name: '8P 소켓 베이스', pin_count: 8,
+        view_side: 'wiring_base_front',
+        rows: [{ row_id: 'top', pins: [6, 5, 4, 3] }, { row_id: 'bottom', pins: [7, 8, 1, 2] }],
+        center: { shape: 'octal', symmetric: true, label_area: true },
+      },
+      {
+        socket_type_id: 'socket_12p_base', name: '12P 소켓 베이스', pin_count: 12,
+        view_side: 'wiring_base_front',
+        rows: [{ row_id: 'top', pins: [1, 2, 3, 4, 5, 6] }, { row_id: 'bottom', pins: [7, 8, 9, 10, 11, 12] }],
+        center: { shape: 'circular', symmetric: true, label_area: true },
+      },
+    ])
+    if (url === '/api/problems/practice_001/circuit-summary') return response({
+      problem_id: 'practice_001', problem_title: problemDetail.title,
+      device_count: 0, terminal_count: 0, contact_count: 0, coil_count: 0,
+      socket_type_ids: [], reference_integrity: 'valid', warning_count: 1,
+      definition_status: 'structure_only',
+    })
     if (url === '/api/problems/practice_001') return response(problemDetail)
     return response({ detail: '찾을 수 없음' }, 404)
   })

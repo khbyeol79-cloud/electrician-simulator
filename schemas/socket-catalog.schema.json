@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "socket-catalog.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "socket_types"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "socket_types": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["socket_type_id", "name", "pin_count", "view_side", "rows", "center"],
+        "properties": {
+          "socket_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "pin_count": { "enum": [8, 12] },
+          "view_side": { "const": "wiring_base_front" },
+          "rows": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["row_id", "pins"],
+              "properties": {
+                "row_id": { "enum": ["top", "bottom"] },
+                "pins": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "uniqueItems": true }
+              }
+            }
+          },
+          "center": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["shape", "symmetric", "label_area"],
+            "properties": {
+              "shape": { "enum": ["octal", "circular"] },
+              "symmetric": { "type": "boolean" },
+              "label_area": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

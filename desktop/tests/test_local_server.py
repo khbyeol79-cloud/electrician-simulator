@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -27,11 +28,14 @@ def test_local_server_lifecycle(tmp_path):
     (dist / "index.html").write_text("desktop", encoding="utf-8")
     problems = tmp_path / "problems"
     problems.mkdir()
+    shutil.copytree(PROJECT_ROOT / "schemas", tmp_path / "schemas")
+    shutil.copytree(PROJECT_ROOT / "catalog", tmp_path / "catalog")
     paths = AppPaths(
         project_root=tmp_path,
         bundle_root=tmp_path,
         frontend_dist=dist,
         problems_dir=problems,
+        catalog_dir=tmp_path / "catalog",
         writable_root=tmp_path / "data",
         database_file=tmp_path / "data" / "test.db",
         logs_dir=tmp_path / "logs",
@@ -52,4 +56,3 @@ def test_local_server_lifecycle(tmp_path):
     finally:
         server.stop()
     assert server.running is False
-

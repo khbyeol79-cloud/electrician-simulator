@@ -14,6 +14,8 @@ from app.domain import (
     ProblemValidationIssue,
     ProblemValidationResult,
 )
+from app.services.catalog_service import CatalogService
+from app.services.circuit_reference_validator import CircuitReferenceValidator
 
 
 MAX_JSON_BYTES = 2 * 1024 * 1024
@@ -21,8 +23,12 @@ MAX_SCHEMATIC_BYTES = 5 * 1024 * 1024
 
 
 class ProblemPackageValidator:
-    def __init__(self, schemas_dir: Path):
+    def __init__(self, schemas_dir: Path, catalog_dir: Path | None = None):
         self.schemas_dir = schemas_dir.resolve()
+        self.catalog = CatalogService(
+            catalog_dir or self.schemas_dir.parent / "catalog", self.schemas_dir
+        )
+        self.circuit_validator = CircuitReferenceValidator(self.catalog)
         self._schemas = {
             "manifest.json": self._read_schema("manifest.schema.json"),
             "problem.json": self._read_schema("problem.schema.json"),
@@ -324,6 +330,9 @@ class ProblemPackageValidator:
                     )
                 )
 
+        if problem and answer:
+            issues.extend(self.circuit_validator.validate(problem, answer))
+
         return ProblemValidationResult(
             package_dir=package_dir,
             issues=issues,
@@ -331,4 +340,3 @@ class ProblemPackageValidator:
             problem=problem,
             answer=answer,
         )
-

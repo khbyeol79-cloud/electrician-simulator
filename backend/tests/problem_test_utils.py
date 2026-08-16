@@ -11,6 +11,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 def copy_schemas(target_root: Path) -> Path:
     destination = target_root / "schemas"
     shutil.copytree(PROJECT_ROOT / "schemas", destination)
+    catalog_destination = target_root / "catalog"
+    if not catalog_destination.exists():
+        shutil.copytree(PROJECT_ROOT / "catalog", catalog_destination)
     return destination
 
 
@@ -30,4 +33,3 @@ def update_json(path: Path, updater) -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     updater(data)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-

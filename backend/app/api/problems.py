@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request, status
 
-from app.domain import ProblemSummary, PublicProblemDetail
+from app.domain import CircuitSummary, ProblemSummary, PublicProblemDetail
 from app.repositories import ProblemRepository, ReloadStatistics
 
 
@@ -29,10 +29,17 @@ def reload_problems(request: Request) -> ReloadStatistics:
     return _repository(request).reload()
 
 
+@router.get("/{problem_id}/circuit-summary", response_model=CircuitSummary)
+def get_circuit_summary(problem_id: str, request: Request) -> CircuitSummary:
+    summary = _repository(request).get_circuit_summary(problem_id)
+    if summary is None:
+        raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
+    return summary
+
+
 @router.get("/{problem_id}", response_model=PublicProblemDetail)
 def get_problem(problem_id: str, request: Request) -> PublicProblemDetail:
     problem = _repository(request).get_public(problem_id)
     if problem is None:
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
     return problem
-

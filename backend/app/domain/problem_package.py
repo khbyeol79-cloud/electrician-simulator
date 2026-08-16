@@ -85,7 +85,21 @@ class PublicProblemDetail(BaseModel):
     schematic: dict[str, str]
     board: dict[str, str]
     available_devices: list[dict[str, object]]
-    circuit: dict[str, list[dict[str, object]]]
+    circuit: dict[str, object]
     socket_questions: list[dict[str, object]]
     warning_count: int
 
+
+class CircuitSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    problem_id: str
+    problem_title: str
+    device_count: int
+    terminal_count: int
+    contact_count: int
+    coil_count: int
+    socket_type_ids: list[str]
+    reference_integrity: Literal["valid"]
+    warning_count: int
+    definition_status: Literal["structure_only", "functional"]

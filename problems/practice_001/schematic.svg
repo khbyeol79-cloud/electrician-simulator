@@ -4,7 +4,6 @@
   <rect width="1200" height="700" fill="#ffffff"/>
   <rect x="40" y="40" width="1120" height="620" rx="12" fill="#f8fafc" stroke="#b9c7d8" stroke-width="3"/>
   <text x="600" y="300" text-anchor="middle" font-family="sans-serif" font-size="34" fill="#17345f">기본 자기유지 회로 구조 연습</text>
-  <text x="600" y="355" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#607089">3단계에서 실제 회로 데이터와 상호작용을 구현합니다.</text>
+  <text x="600" y="355" text-anchor="middle" font-family="sans-serif" font-size="22" fill="#607089">4단계에서 실제 회로 SVG 상호작용을 구현합니다.</text>
   <text x="600" y="405" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#c23b3b">실제 시험 문제 또는 정답이 아닙니다.</text>
 </svg>
-

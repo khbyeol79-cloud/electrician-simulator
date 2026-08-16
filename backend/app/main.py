@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .api.health import router as health_router
+from .api.catalog import router as catalog_router
 from .api.problems import router as problems_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
@@ -36,6 +37,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             repository = ProblemRepository(
                 app_settings.paths.problems_dir,
                 app_settings.paths.bundle_root / "schemas",
+                app_settings.paths.catalog_dir,
             )
             statistics = repository.reload()
             app.state.problem_repository = repository
@@ -75,6 +77,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
 
     app.include_router(health_router)
+    app.include_router(catalog_router)
     app.include_router(problems_router)
     static_root = app_settings.resolved_static_dir.resolve()
 

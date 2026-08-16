@@ -23,7 +23,13 @@
   },
   "board": { "layout_id": "standard_two_motor_v1" },
   "available_devices": [],
-  "circuit": { "devices": [], "terminals": [], "contacts": [], "coils": [] },
+  "circuit": {
+    "schema_version": "1.0",
+    "definition_status": "structure_only",
+    "devices": [],
+    "terminals": [],
+    "contacts": [],
+    "coils": []
+  },
   "socket_questions": []
 }
-

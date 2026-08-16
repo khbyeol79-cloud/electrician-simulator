@@ -35,7 +35,11 @@
     },
     "socket_pin_answers": {
       "type": "object",
-      "additionalProperties": true
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "integer", "minimum": 1 },
+        "minProperties": 1
+      }
     },
     "required_connections": {
       "type": "array",
@@ -113,4 +117,3 @@
     }
   }
 }
-
