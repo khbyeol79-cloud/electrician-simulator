@@ -256,6 +256,18 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-panel dl div { display: flex; justify-content: space-between; gap: 8px; }
 .wiring-panel dt { color: #718198; }
 .wiring-panel dd { margin: 0; color: #263b57; font-weight: 800; }
+.circuit-reference-panel { padding: 0 !important; overflow: hidden; }
+.circuit-reference-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 11px 12px 8px; }
+.circuit-reference-header .panel-kicker { margin-bottom: 4px; }
+.circuit-reference-header h3 { margin: 0; font-size: 13px; }
+.circuit-reference-header > strong { flex: none; color: #174f94; font-size: 9px; }
+.circuit-reference-stage { width: 100%; height: 300px; min-height: 300px; grid-template-rows: 36px minmax(0, 1fr); border-top: 1px solid #d5dfeb; border-bottom: 1px solid #d5dfeb; background: #eef2f7; }
+.circuit-reference-stage .diagram-toolbar { gap: 3px; padding: 3px 5px; overflow-x: auto; }
+.circuit-reference-stage .diagram-toolbar button { height: 27px; padding: 0 6px; font-size: 8px; }
+.circuit-reference-stage .diagram-toolbar span { white-space: nowrap; font-size: 8px; }
+.circuit-reference-stage .circuit-svg { min-width: 0; min-height: 0; }
+.wiring-panel .circuit-reference-empty { margin: 0; padding: 7px 11px; color: #925800; background: #fff7e4; }
+.wiring-panel .circuit-reference-note { margin: 0; padding: 8px 11px 10px; }
 .wire-color-select { display: grid; gap: 5px; margin-top: 10px; color: #5d6f86; font-size: 9px; }
 .wire-color-select select { height: 31px; border: 1px solid #bdcad9; border-radius: 4px; background: #fff; }
 .wiring-result { display: grid; gap: 4px; margin: 8px 0; padding: 8px; font-size: 9px; }

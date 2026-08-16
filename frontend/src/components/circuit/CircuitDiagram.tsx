@@ -1,7 +1,6 @@
 import type { CircuitAttemptResult, DiagramElement, SchematicDiagram, SocketQuestion } from '../../api/client'
+import type { CircuitDraft } from '../../features/circuit/circuitDraft'
 import { useSvgViewport } from './useSvgViewport'
-
-type Draft = Record<string, Record<string, number>>
 
 function ElementShape({ element }: { element: DiagramElement }) {
   const { x, y, width: w, height: h } = element
@@ -43,7 +42,7 @@ function ElementShape({ element }: { element: DiagramElement }) {
   }
 }
 
-function AnswerMarkers({ element, question, draft, result }: { element: DiagramElement; question?: SocketQuestion; draft: Draft; result?: CircuitAttemptResult }) {
+function AnswerMarkers({ element, question, draft, result }: { element: DiagramElement; question?: SocketQuestion; draft: CircuitDraft; result?: CircuitAttemptResult }) {
   if (!question) return null
   const values = draft[question.question_id] ?? {}
   const slotResult = result?.results.find((item) => item.question_id === question.question_id)?.slot_results
@@ -58,14 +57,15 @@ function AnswerMarkers({ element, question, draft, result }: { element: DiagramE
   </g>
 }
 
-export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear }: {
+export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, ariaLabel = '시퀀스 회로도' }: {
   diagram: SchematicDiagram; questions: SocketQuestion[]; selectedQuestionId: string | null
-  draft: Draft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
+  draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
+  readOnly?: boolean; compact?: boolean; ariaLabel?: string
 }) {
   const viewport = useSvgViewport()
   const questionMap = Object.fromEntries(questions.map((question) => [question.question_id, question]))
-  return <div className="diagram-stage">
-    <div className="diagram-toolbar" aria-label="회로도 보기 도구">
+  return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}`}>
+    <div className="diagram-toolbar" aria-label={compact ? '참고 회로도 보기 도구' : '회로도 보기 도구'}>
       <button type="button" onClick={() => viewport.zoomBy(0.15)} aria-label="확대">＋</button>
       <button type="button" onClick={() => viewport.zoomBy(-0.15)} aria-label="축소">－</button>
       <button type="button" onClick={viewport.fit}>화면 맞춤</button>
@@ -74,7 +74,7 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
       <span>✋ 드래그 이동</span>
     </div>
     <svg
-      className="circuit-svg" role="img" aria-label="시퀀스 회로도"
+      className="circuit-svg" role="img" aria-label={ariaLabel}
       viewBox={`${diagram.view_box.x} ${diagram.view_box.y} ${diagram.view_box.width} ${diagram.view_box.height}`}
       onPointerDown={viewport.pointerDown} onPointerMove={viewport.pointerMove} onPointerUp={viewport.pointerUp}
       onWheel={viewport.wheel} onClick={(event) => { if (event.target === event.currentTarget && !viewport.consumeDragClick()) onClear() }}
@@ -83,12 +83,12 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
         <g className="diagram-sections">{diagram.sections.map((section) => <g key={section.section_id}><rect x={section.bounds.x} y={section.bounds.y} width={section.bounds.width} height={section.bounds.height} /><text x={section.bounds.x + 18} y={section.bounds.y + 34}>{section.label}</text></g>)}</g>
         <g className="conductor-layer">{diagram.conductors.map((wire) => <g key={wire.conductor_id} className={`conductor ${wire.line_style}`}><polyline points={wire.points.map((p) => `${p.x},${p.y}`).join(' ')} />{wire.junctions.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="6" />)}</g>)}</g>
         <g className="symbol-layer">{diagram.elements.map((element) => {
-          const selected = Boolean(element.interactive && element.question_id && element.question_id === selectedQuestionId)
+          const selected = Boolean(!readOnly && element.interactive && element.question_id && element.question_id === selectedQuestionId)
           return <g key={element.element_id} data-element-id={element.element_id} className={`diagram-element${selected ? ' selected' : ''}`}>
             {selected && <rect className="selection-box" x={element.x - 12} y={element.y - 12} width={element.width + 24} height={element.height + 24} rx="10" />}
             <ElementShape element={element} />
             {element.element_type !== 'text' && element.element_type !== 'power_label' && element.label && <text className="element-label" x={element.x + element.width / 2} y={element.y - 10} textAnchor="middle">{element.label}</text>}
-            {element.interactive && element.question_id && <rect className="element-hitbox" role="button" aria-label={`${element.label} ${element.circuit_ref_id} 선택`} tabIndex={0} x={element.x - 14} y={element.y - 14} width={element.width + 28} height={element.height + 28} onClick={(e) => { e.stopPropagation(); if (!viewport.consumeDragClick()) onSelect(element.question_id!) }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(element.question_id!) } }} />}
+            {!readOnly && element.interactive && element.question_id && <rect className="element-hitbox" role="button" aria-label={`${element.label} ${element.circuit_ref_id} 선택`} tabIndex={0} x={element.x - 14} y={element.y - 14} width={element.width + 28} height={element.height + 28} onClick={(e) => { e.stopPropagation(); if (!viewport.consumeDragClick()) onSelect(element.question_id!) }} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(element.question_id!) } }} />}
             <AnswerMarkers element={element} question={element.question_id ? questionMap[element.question_id] : undefined} draft={draft} result={result} />
           </g>
         })}</g>

@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
@@ -13,6 +13,27 @@ afterEach(() => {
 })
 
 describe('제어함 결선', () => {
+  it('shows the stage-one socket-number draft in a read-only zoomable reference diagram', async () => {
+    installApiMock()
+    window.localStorage.setItem('electrician.circuitDraft.training_socket_demo_001.v1', JSON.stringify({
+      'SQ-VR1-C1': { upper: 6, lower: 3 },
+    }))
+    const user = userEvent.setup()
+    render(<WiringPage problem={trainingDetail} />)
+
+    const diagram = await screen.findByRole('img', { name: '회로도 분석 참고창' })
+    expect(screen.getByText('1 / 1 입력')).toBeInTheDocument()
+    expect(diagram.querySelectorAll('.answer-marker.entered')).toHaveLength(2)
+    expect(diagram.querySelector('.answer-marker.entered')?.textContent).toBe('6')
+    expect(within(diagram).queryByRole('button', { name: /VR1.*선택/ })).not.toBeInTheDocument()
+
+    const toolbar = screen.getByLabelText('참고 회로도 보기 도구')
+    await user.click(within(toolbar).getByRole('button', { name: '확대' }))
+    expect(within(toolbar).getByText('115%')).toBeInTheDocument()
+    await user.click(within(toolbar).getByRole('button', { name: '화면 맞춤' }))
+    expect(within(toolbar).getByText('82%')).toBeInTheDocument()
+  })
+
   it('renders symmetric 8P and 12P bases and connects exact terminals', async () => {
     installApiMock()
     const user = userEvent.setup()

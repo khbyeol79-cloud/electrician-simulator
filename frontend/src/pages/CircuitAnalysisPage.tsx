@@ -6,32 +6,15 @@ import {
 } from '../api/client'
 import { CircuitDiagram } from '../components/circuit/CircuitDiagram'
 import { CircuitQuestionPanel } from '../components/circuit/CircuitQuestionPanel'
+import { circuitDraftKey, restoreCircuitDraft, type CircuitDraft } from '../features/circuit/circuitDraft'
 import { PlaceholderPage } from './PlaceholderPage'
-
-type Draft = Record<string, Record<string, number>>
-
-function draftKey(problem: PublicProblemDetail) {
-  return `electrician.circuitDraft.${problem.problem_id}.v${problem.version}`
-}
-
-function restoreDraft(problem: PublicProblemDetail): Draft {
-  try {
-    const raw = window.localStorage.getItem(draftKey(problem))
-    if (!raw) return {}
-    const parsed = JSON.parse(raw) as unknown
-    return parsed && typeof parsed === 'object' ? parsed as Draft : {}
-  } catch {
-    window.localStorage.removeItem(draftKey(problem))
-    return {}
-  }
-}
 
 export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail }) {
   const [diagram, setDiagram] = useState<SchematicDiagram>()
   const [sockets, setSockets] = useState<SocketType[]>([])
   const [progress, setProgress] = useState<CircuitProgress>()
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null)
-  const [draft, setDraft] = useState<Draft>({})
+  const [draft, setDraft] = useState<CircuitDraft>({})
   const [result, setResult] = useState<CircuitAttemptResult>()
   const [error, setError] = useState<string>()
   const [notice, setNotice] = useState<string>()
@@ -49,7 +32,7 @@ export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail
     setNotice(undefined)
     setResult(undefined)
     setSelectedQuestionId(null)
-    setDraft(restoreDraft(problem))
+    setDraft(restoreCircuitDraft(problem.problem_id, problem.version))
     Promise.all([
       getDiagram(problem.problem_id, controller.signal),
       getSocketTypes(controller.signal),
@@ -87,7 +70,7 @@ export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail
   const updateAnswer = (questionId: string, slotId: string, pin: number) => {
     const next = { ...draft, [questionId]: { ...(draft[questionId] ?? {}), [slotId]: pin } }
     setDraft(next)
-    window.localStorage.setItem(draftKey(problem), JSON.stringify(next))
+    window.localStorage.setItem(circuitDraftKey(problem.problem_id, problem.version), JSON.stringify(next))
     setResult(undefined)
     setNotice(undefined)
   }
@@ -96,7 +79,7 @@ export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail
     const next = { ...draft }
     delete next[selectedQuestionId]
     setDraft(next)
-    window.localStorage.setItem(draftKey(problem), JSON.stringify(next))
+    window.localStorage.setItem(circuitDraftKey(problem.problem_id, problem.version), JSON.stringify(next))
     setResult(undefined)
   }
   const submit = async () => {
