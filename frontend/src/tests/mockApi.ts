@@ -60,12 +60,12 @@ export const trainingDetail: PublicProblemDetail = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.4.1',
+  version: '0.4.2',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.4.1',
+  version: '0.4.2',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -122,7 +122,11 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     if (url === '/api/problems/training_socket_demo_001/diagram') return response({
       schema_version: '1.0', view_box: { x: 0, y: 0, width: 1600, height: 900 },
       sections: [{ section_id: 'power', label: '주회로', bounds: { x: 20, y: 20, width: 430, height: 820 } }, { section_id: 'control', label: '제어회로', bounds: { x: 470, y: 20, width: 1110, height: 820 } }],
-      elements: [{ element_id: 'diagram_vr1_c1', element_type: 'contact_no', section_id: 'control', circuit_ref_type: 'contact', circuit_ref_id: 'VR1-C1', question_id: 'SQ-VR1-C1', x: 820, y: 270, width: 80, height: 100, orientation: 'vertical', label: 'VR1', interactive: true }],
+      elements: [
+        { element_id: 'power_title', element_type: 'power_label', section_id: 'power', circuit_ref_type: null, circuit_ref_id: null, question_id: null, x: 65, y: 80, width: 120, height: 40, orientation: 'horizontal', label: '3상 전원', interactive: false },
+        { element_id: 'virtual_mccb', element_type: 'mccb', section_id: 'power', circuit_ref_type: null, circuit_ref_id: null, question_id: null, x: 140, y: 250, width: 130, height: 80, orientation: 'vertical', label: 'MCCB', interactive: false },
+        { element_id: 'diagram_vr1_c1', element_type: 'contact_no', section_id: 'control', circuit_ref_type: 'contact', circuit_ref_id: 'VR1-C1', question_id: 'SQ-VR1-C1', x: 820, y: 270, width: 80, height: 100, orientation: 'vertical', label: 'VR1', interactive: true },
+      ],
       conductors: [{ conductor_id: 'control_top', section_id: 'control', points: [{ x: 540, y: 150 }, { x: 1500, y: 150 }], line_style: 'control', junctions: [{ x: 860, y: 150 }] }],
     })
     if (url === '/api/problems/training_socket_demo_001/circuit-progress') return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, total_count: 1 })

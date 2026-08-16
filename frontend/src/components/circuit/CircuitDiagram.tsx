@@ -7,7 +7,10 @@ function ElementShape({ element }: { element: DiagramElement }) {
   const { x, y, width: w, height: h } = element
   const cx = x + w / 2
   const cy = y + h / 2
+  const poleXs = [x + w / 4, x + w / 2, x + (w * 3) / 4]
   switch (element.element_type) {
+    case 'terminal':
+      return <g className="symbol-stroke terminal-symbol"><line x1={cx} y1={y} x2={cx} y2={cy - 7} /><circle cx={cx} cy={cy} r="7" /><line x1={cx} y1={cy + 7} x2={cx} y2={y + h} /></g>
     case 'contact_no':
     case 'contact_nc':
     case 'push_button_no':
@@ -21,10 +24,15 @@ function ElementShape({ element }: { element: DiagramElement }) {
     case 'motor':
       return <g className="symbol-stroke"><circle cx={cx} cy={cy} r={Math.min(w, h) / 2 - 5} /><text x={cx} y={cy + 9} textAnchor="middle">M</text></g>
     case 'mccb':
+      return <g className="symbol-stroke three-pole-symbol"><rect x={x + 4} y={y + 4} width={w - 8} height={h - 8} rx="3" />{poleXs.map((poleX) => <g key={poleX}><line x1={poleX} y1={y} x2={poleX} y2={cy - 13} /><circle cx={poleX} cy={cy - 13} r="4" /><circle cx={poleX} cy={cy + 13} r="4" /><line x1={poleX} y1={cy + 13} x2={poleX + 13} y2={cy - 9} /><line x1={poleX} y1={cy + 13} x2={poleX} y2={y + h} /></g>)}</g>
     case 'magnetic_contactor':
+      return <g className="symbol-stroke three-pole-symbol">{poleXs.map((poleX) => <g key={poleX}><line x1={poleX} y1={y} x2={poleX} y2={cy - 13} /><circle cx={poleX} cy={cy - 13} r="4" /><circle cx={poleX} cy={cy + 13} r="4" /><line x1={poleX} y1={cy + 13} x2={poleX + 13} y2={cy - 9} /><line x1={poleX} y1={cy + 13} x2={poleX} y2={y + h} /></g>)}</g>
     case 'eocr':
+      return <g className="symbol-stroke eocr-symbol">{poleXs.map((poleX) => <g key={poleX}><line x1={poleX} y1={y} x2={poleX} y2={y + 8} /><line x1={poleX} y1={y + h - 8} x2={poleX} y2={y + h} /></g>)}<rect x={x + 4} y={y + 8} width={w - 8} height={h - 16} /><text x={cx} y={cy + 7} textAnchor="middle">EOCR</text></g>
     case 'fuse':
-      return <g className="symbol-stroke"><rect x={x + 5} y={y + 5} width={w - 10} height={h - 10} rx="4" /><text x={cx} y={cy + 6} textAnchor="middle">{element.element_type.toUpperCase()}</text></g>
+      return <g className="symbol-stroke fuse-symbol"><line x1={x} y1={cy} x2={x + w * .2} y2={cy} /><rect x={x + w * .2} y={y + 5} width={w * .6} height={h - 10} /><line x1={x + w * .8} y1={cy} x2={x + w} y2={cy} /></g>
+    case 'ground':
+      return <g className="symbol-stroke ground-symbol"><line x1={cx} y1={y} x2={cx} y2={y + h * .35} /><line x1={x + w * .15} y1={y + h * .35} x2={x + w * .85} y2={y + h * .35} /><line x1={x + w * .28} y1={y + h * .55} x2={x + w * .72} y2={y + h * .55} /><line x1={x + w * .4} y1={y + h * .75} x2={x + w * .6} y2={y + h * .75} /></g>
     case 'junction':
       return <circle className="junction-dot" cx={cx} cy={cy} r="6" />
     case 'text':
@@ -75,7 +83,7 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
         <g className="diagram-sections">{diagram.sections.map((section) => <g key={section.section_id}><rect x={section.bounds.x} y={section.bounds.y} width={section.bounds.width} height={section.bounds.height} /><text x={section.bounds.x + 18} y={section.bounds.y + 34}>{section.label}</text></g>)}</g>
         <g className="conductor-layer">{diagram.conductors.map((wire) => <g key={wire.conductor_id} className={`conductor ${wire.line_style}`}><polyline points={wire.points.map((p) => `${p.x},${p.y}`).join(' ')} />{wire.junctions.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="6" />)}</g>)}</g>
         <g className="symbol-layer">{diagram.elements.map((element) => {
-          const selected = element.question_id === selectedQuestionId
+          const selected = Boolean(element.interactive && element.question_id && element.question_id === selectedQuestionId)
           return <g key={element.element_id} data-element-id={element.element_id} className={`diagram-element${selected ? ' selected' : ''}`}>
             {selected && <rect className="selection-box" x={element.x - 12} y={element.y - 12} width={element.width + 24} height={element.height + 24} rx="10" />}
             <ElementShape element={element} />

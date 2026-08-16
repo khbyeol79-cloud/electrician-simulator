@@ -39,8 +39,12 @@ describe('회로 데이터 진단', () => {
   it('selects a contact, restricts 8P pins, restores draft and grades', async () => {
     installApiMock()
     const user = userEvent.setup()
-    render(<CircuitAnalysisPage problem={trainingDetail} />)
+    const { container } = render(<CircuitAnalysisPage problem={trainingDetail} />)
+    await screen.findByRole('img', { name: '시퀀스 회로도' })
+    expect(container.querySelectorAll('.selection-box')).toHaveLength(0)
+    expect(screen.getAllByRole('button', { name: /선택$/ })).toHaveLength(1)
     await user.click(await screen.findByRole('button', { name: 'VR1 VR1-C1 선택' }))
+    expect(container.querySelectorAll('.selection-box')).toHaveLength(1)
     expect(screen.getByText('VR1-C1')).toBeInTheDocument()
     const upper = screen.getByLabelText('upper 소켓번호')
     expect(upper.querySelectorAll('option')).toHaveLength(9)
