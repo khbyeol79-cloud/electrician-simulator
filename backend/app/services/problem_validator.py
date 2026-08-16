@@ -396,6 +396,48 @@ class ProblemPackageValidator:
                     if connection.from_terminal not in terminals or connection.to not in terminals:
                         issues.append(self._issue("error", "unknown_board_answer_terminal", "배선 답안이 보드에 없는 단자를 참조합니다.", file=manifest.files.answer, problem_id=problem_id))
 
+        if problem and problem.mounting:
+            mounting = problem.mounting
+            device_ids = [item.mount_device_id for item in mounting.available_devices]
+            target_ids = [item.socket_id for item in mounting.mount_targets]
+            for values, code, label in (
+                (device_ids, "duplicate_mount_device_id", "장착 기구 ID"),
+                (target_ids, "duplicate_mount_target_id", "장착 대상 ID"),
+            ):
+                for duplicate in {item for item in values if values.count(item) > 1}:
+                    issues.append(self._issue("error", code, f"{label}가 중복됩니다: {duplicate}", file=manifest.files.problem, problem_id=problem_id))
+            board_items = {item.item_id: item for item in board.items} if board else {}
+            mount_devices = {item.mount_device_id: item for item in mounting.available_devices}
+            mount_targets = {item.socket_id: item for item in mounting.mount_targets}
+            for device in mounting.available_devices:
+                catalog_device = self.catalog.get_device_type(device.device_type_id)
+                if catalog_device is None:
+                    issues.append(self._issue("error", "unknown_mount_device_type", f"존재하지 않는 기구 유형입니다: {device.device_type_id}", file=manifest.files.problem, problem_id=problem_id))
+                for socket_type_id in device.compatible_socket_type_ids:
+                    if self.catalog.get_socket_type(socket_type_id) is None:
+                        issues.append(self._issue("error", "unknown_mount_socket_type", f"존재하지 않는 호환 소켓 유형입니다: {socket_type_id}", file=manifest.files.problem, problem_id=problem_id))
+            for target in mounting.mount_targets:
+                board_item = board_items.get(target.socket_id)
+                if board_item is None or board_item.item_type not in ("socket_8p", "socket_12p"):
+                    issues.append(self._issue("error", "unknown_mount_board_target", f"장착 대상이 보드의 소켓이 아닙니다: {target.socket_id}", file=manifest.files.problem, problem_id=problem_id))
+                elif board_item.socket_type_id != target.socket_type_id:
+                    issues.append(self._issue("error", "mount_target_socket_mismatch", f"장착 대상의 소켓 유형이 보드와 다릅니다: {target.socket_id}", file=manifest.files.problem, problem_id=problem_id))
+                for device_type_id in target.allowed_device_type_ids:
+                    if self.catalog.get_device_type(device_type_id) is None:
+                        issues.append(self._issue("error", "unknown_allowed_mount_device_type", f"허용 기구 유형이 카탈로그에 없습니다: {device_type_id}", file=manifest.files.problem, problem_id=problem_id))
+            if answer:
+                answer_device_ids = [item.mount_device_id for item in answer.mounting_answer]
+                answer_socket_ids = [item.socket_id for item in answer.mounting_answer]
+                if len(answer_device_ids) != len(set(answer_device_ids)) or len(answer_socket_ids) != len(set(answer_socket_ids)):
+                    issues.append(self._issue("error", "duplicate_mounting_answer", "기구 장착 정답에 중복된 기구 또는 소켓이 있습니다.", file=manifest.files.answer, problem_id=problem_id))
+                for placement in answer.mounting_answer:
+                    device = mount_devices.get(placement.mount_device_id)
+                    target = mount_targets.get(placement.socket_id)
+                    if device is None or target is None:
+                        issues.append(self._issue("error", "unknown_mounting_answer_reference", "기구 장착 정답이 공개 데이터에 없는 기구 또는 소켓을 참조합니다.", file=manifest.files.answer, problem_id=problem_id))
+                    elif target.socket_type_id not in device.compatible_socket_type_ids or device.device_type_id not in target.allowed_device_type_ids:
+                        issues.append(self._issue("error", "incompatible_mounting_answer", "기구 장착 정답의 기구와 소켓이 호환되지 않습니다.", file=manifest.files.answer, problem_id=problem_id))
+
         return ProblemValidationResult(
             package_dir=package_dir,
             issues=issues,

@@ -26,6 +26,14 @@
   "wiring_forbidden_connections": [
     { "from": "X1-1", "to": "X1-6" }
   ],
+  "mounting_answer": [
+    { "mount_device_id": "DEVICE-X1", "socket_id": "X1" },
+    { "mount_device_id": "DEVICE-X2", "socket_id": "X2" },
+    { "mount_device_id": "DEVICE-T1", "socket_id": "T1" },
+    { "mount_device_id": "DEVICE-T2", "socket_id": "T2" },
+    { "mount_device_id": "DEVICE-MC1", "socket_id": "MC1" },
+    { "mount_device_id": "DEVICE-MC2", "socket_id": "MC2" }
+  ],
   "wire_color_rules": { "L1": "brown", "L2": "black", "L3": "gray", "control": "yellow" },
   "operation_tests": []
 }

@@ -127,6 +127,32 @@ export type WiringAttemptResult = {
 }
 export type WiringProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_correct: boolean | null; last_correct_count: number; required_count: number }
 
+export type MountDevice = {
+  mount_device_id: string; label: string; device_type_id: string
+  graphic_type: 'relay' | 'timer' | 'contactor'; compatible_socket_type_ids: string[]
+}
+export type MountTarget = {
+  socket_id: string; socket_type_id: string; enabled: boolean; allowed_device_type_ids: string[]
+}
+export type MountingDefinition = {
+  schema_version: '1.0'; available_devices: MountDevice[]; mount_targets: MountTarget[]
+}
+export type MountingPlacement = { mount_device_id: string; socket_id: string }
+export type MountingDraft = {
+  problem_id: string; problem_version: number; placements: MountingPlacement[]; updated_at: string | null
+}
+export type WrongMountingPlacement = { mount_device_id: string; submitted_socket_id: string }
+export type MountingAttemptResult = {
+  attempt_id: number | null; gradable: boolean; overall_correct: boolean | null
+  required_count: number; correct_count: number; correct_device_ids: string[]
+  missing_device_ids: string[]; missing_socket_ids: string[]
+  wrong_placements: WrongMountingPlacement[]; extra_device_ids: string[]; message: string
+}
+export type MountingProgress = {
+  problem_id: string; attempt_count: number; last_submitted_at: string | null
+  last_overall_correct: boolean | null; last_correct_count: number; required_count: number
+}
+
 export type ReloadStatistics = {
   loaded: number
   excluded: number
@@ -185,6 +211,18 @@ export function getWiringProgress(problemId: string, signal?: AbortSignal) {
   return getJson<WiringProgress>(`/api/problems/${encodeURIComponent(problemId)}/wiring-progress`, signal)
 }
 
+export function getMounting(problemId: string, signal?: AbortSignal) {
+  return getJson<MountingDefinition | null>(`/api/problems/${encodeURIComponent(problemId)}/mounting`, signal)
+}
+
+export function getMountingDraft(problemId: string, signal?: AbortSignal) {
+  return getJson<MountingDraft | null>(`/api/problems/${encodeURIComponent(problemId)}/mounting-draft`, signal)
+}
+
+export function getMountingProgress(problemId: string, signal?: AbortSignal) {
+  return getJson<MountingProgress>(`/api/problems/${encodeURIComponent(problemId)}/mounting-progress`, signal)
+}
+
 async function mutationJson<T>(url: string, method: string, body?: unknown): Promise<T> {
   const response = await fetch(url, { method, headers: body === undefined ? undefined : { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
   if (!response.ok) {
@@ -205,6 +243,18 @@ export function deleteWiringDraft(problemId: string) {
 
 export function submitWiringAttempt(problemId: string, problemVersion: number, connections: WiringConnection[]) {
   return mutationJson<WiringAttemptResult>(`/api/problems/${encodeURIComponent(problemId)}/wiring-attempts/submit`, 'POST', { problem_version: problemVersion, connections })
+}
+
+export function saveMountingDraft(problemId: string, problemVersion: number, placements: MountingPlacement[]) {
+  return mutationJson<MountingDraft>(`/api/problems/${encodeURIComponent(problemId)}/mounting-draft`, 'PUT', { problem_version: problemVersion, placements })
+}
+
+export function deleteMountingDraft(problemId: string) {
+  return mutationJson<void>(`/api/problems/${encodeURIComponent(problemId)}/mounting-draft`, 'DELETE')
+}
+
+export function submitMountingAttempt(problemId: string, problemVersion: number, placements: MountingPlacement[]) {
+  return mutationJson<MountingAttemptResult>(`/api/problems/${encodeURIComponent(problemId)}/mounting-attempts/submit`, 'POST', { problem_version: problemVersion, placements })
 }
 
 export async function submitCircuitAttempt(problemId: string, problemVersion: number, responses: Record<string, Record<string, number>>) {

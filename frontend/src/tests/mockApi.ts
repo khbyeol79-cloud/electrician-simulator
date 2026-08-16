@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { BoardDefinition, BoardPin, ProblemSummary, PublicProblemDetail } from '../api/client'
+import type { BoardDefinition, BoardPin, MountingDefinition, MountingPlacement, ProblemSummary, PublicProblemDetail, WiringConnection } from '../api/client'
 
 export const problemSummary: ProblemSummary = {
   problem_id: 'practice_001',
@@ -81,15 +81,28 @@ export const wiringBoard = {
   ], forbidden_areas: [],
 } satisfies BoardDefinition
 
+export const mountingDefinition = {
+  schema_version: '1.0',
+  available_devices: [
+    { mount_device_id: 'DEVICE-X1', label: 'X1 보조릴레이', device_type_id: 'auxiliary_relay_8p', graphic_type: 'relay', compatible_socket_type_ids: ['socket_8p_base'] },
+    { mount_device_id: 'DEVICE-T1', label: 'T1 타이머', device_type_id: 'timer_8p', graphic_type: 'timer', compatible_socket_type_ids: ['socket_8p_base'] },
+    { mount_device_id: 'DEVICE-MC1', label: 'MC1 12P 릴레이', device_type_id: 'auxiliary_relay_12p', graphic_type: 'contactor', compatible_socket_type_ids: ['socket_12p_base'] },
+  ],
+  mount_targets: [
+    { socket_id: 'X1', socket_type_id: 'socket_8p_base', enabled: true, allowed_device_type_ids: ['auxiliary_relay_8p'] },
+    { socket_id: 'MC1', socket_type_id: 'socket_12p_base', enabled: true, allowed_device_type_ids: ['auxiliary_relay_12p'] },
+  ],
+} satisfies MountingDefinition
+
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.5.8',
+  version: '0.6.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.5.8',
+  version: '0.6.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -103,7 +116,7 @@ function response(data: unknown, status = 200): Response {
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; wiringDraft?: WiringConnection[]; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
   const problems = options?.problems ?? [problemSummary]
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
@@ -155,7 +168,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     })
     if (url === '/api/problems/training_socket_demo_001/circuit-progress') return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, total_count: 1 })
     if (url.endsWith('/board')) return response(wiringBoard)
-    if (url.endsWith('/wiring-draft') && (!init?.method || init.method === 'GET')) return response(null)
+    if (url.endsWith('/wiring-draft') && (!init?.method || init.method === 'GET')) return response(options?.wiringDraft ? { problem_id: 'training_socket_demo_001', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, updated_at: null } : null)
     if (url.endsWith('/wiring-draft') && init?.method === 'PUT') {
       const body = JSON.parse(String(init.body))
       return response({ problem_id: url.includes('training_socket') ? 'training_socket_demo_001' : 'practice_001', ...body, updated_at: '2026-08-16T00:00:00' })
@@ -163,6 +176,24 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     if (url.endsWith('/wiring-draft') && init?.method === 'DELETE') return response(undefined, 204)
     if (url.endsWith('/wiring-progress')) return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, required_count: 8 })
     if (url.endsWith('/wiring-attempts/submit') && init?.method === 'POST') return response({ attempt_id: 1, gradable: true, overall_correct: false, required_count: 8, correct_count: 1, missing_connections: ['X1-6|MC1-5'], extra_connections: [], forbidden_connections: [], message: '누락 또는 잘못 연결된 단자를 확인해 주세요.' })
+    if (url === '/api/problems/training_socket_demo_001/mounting') return response(mountingDefinition)
+    if (url === '/api/problems/practice_001/mounting') return response({ schema_version: '1.0', available_devices: [], mount_targets: [] })
+    if (url.endsWith('/mounting-draft') && (!init?.method || init.method === 'GET')) return response(options?.mountingDraft ? { problem_id: 'training_socket_demo_001', problem_version: options.mountingDraftVersion ?? 1, placements: options.mountingDraft, updated_at: null } : null)
+    if (url.endsWith('/mounting-draft') && init?.method === 'PUT') {
+      const body = JSON.parse(String(init.body))
+      return response({ problem_id: 'training_socket_demo_001', ...body, updated_at: '2026-08-16T00:00:00' })
+    }
+    if (url.endsWith('/mounting-draft') && init?.method === 'DELETE') return response(undefined, 204)
+    if (url.endsWith('/mounting-progress')) return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, required_count: 3 })
+    if (url.endsWith('/mounting-attempts/submit') && init?.method === 'POST') {
+      const body = JSON.parse(String(init.body)) as { placements: MountingPlacement[] }
+      const expected = new Map([['DEVICE-X1', 'X1'], ['DEVICE-MC1', 'MC1']])
+      const correct = body.placements.filter((item) => expected.get(item.mount_device_id) === item.socket_id).map((item) => item.mount_device_id)
+      const wrong = body.placements.filter((item) => expected.has(item.mount_device_id) && expected.get(item.mount_device_id) !== item.socket_id).map((item) => ({ mount_device_id: item.mount_device_id, submitted_socket_id: item.socket_id }))
+      const missing = [...expected.keys()].filter((id) => !body.placements.some((item) => item.mount_device_id === id))
+      const overall = correct.length === expected.size && wrong.length === 0 && body.placements.length === expected.size
+      return response({ attempt_id: 1, gradable: true, overall_correct: overall, required_count: expected.size, correct_count: correct.length, correct_device_ids: correct, missing_device_ids: missing, missing_socket_ids: [...expected.entries()].filter(([id]) => !correct.includes(id)).map(([, socket]) => socket), wrong_placements: wrong, extra_device_ids: body.placements.filter((item) => !expected.has(item.mount_device_id)).map((item) => item.mount_device_id), message: overall ? '모든 기구의 장착 위치가 정확합니다.' : '장착 위치를 다시 확인해 주세요.' })
+    }
     if (url === '/api/problems/training_socket_demo_001/circuit-attempts/submit' && init?.method === 'POST') {
       const body = JSON.parse(String(init.body)) as { responses: Record<string, Record<string, number>> }
       const correct = body.responses['SQ-VR1-C1']?.upper === 6 && body.responses['SQ-VR1-C1']?.lower === 3

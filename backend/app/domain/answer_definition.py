@@ -6,6 +6,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .problem_definition import WireColors
+from .mounting_attempt import MountingAnswerPlacement
 
 
 class AnswerVerification(BaseModel):
@@ -54,5 +55,6 @@ class AnswerDefinition(BaseModel):
     forbidden_connections: list[ForbiddenConnection] = Field(default_factory=list)
     wiring_connections: list[RequiredConnection] = Field(default_factory=list)
     wiring_forbidden_connections: list[ForbiddenConnection] = Field(default_factory=list)
+    mounting_answer: list[MountingAnswerPlacement] = Field(default_factory=list)
     wire_color_rules: WireColors
     operation_tests: list[dict[str, Any]] = Field(default_factory=list)

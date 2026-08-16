@@ -7,6 +7,12 @@ from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, Circuit
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
 from .schematic_diagram import SchematicDiagram
+from .mounting_attempt import (
+    MountDevice, MountTarget, MountingAnswerPlacement, MountingAttemptResult,
+    MountingAttemptSubmit, MountingDefinition, MountingDraftResponse,
+    MountingDraftUpdate, MountingPlacement, MountingProgress,
+    WrongMountingPlacement,
+)
 from .wiring_attempt import (
     WiringAttemptResult, WiringAttemptSubmit, WiringConnection, WiringDraftResponse,
     WiringDraftUpdate, WiringProgress,
@@ -40,6 +46,17 @@ __all__ = [
     "SocketCatalog",
     "SocketType",
     "SchematicDiagram",
+    "MountDevice",
+    "MountTarget",
+    "MountingAnswerPlacement",
+    "MountingAttemptResult",
+    "MountingAttemptSubmit",
+    "MountingDefinition",
+    "MountingDraftResponse",
+    "MountingDraftUpdate",
+    "MountingPlacement",
+    "MountingProgress",
+    "WrongMountingPlacement",
     "WiringAttemptResult",
     "WiringAttemptSubmit",
     "WiringConnection",

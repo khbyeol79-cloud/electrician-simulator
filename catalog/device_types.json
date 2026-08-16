@@ -7,6 +7,7 @@
     { "device_type_id": "eocr", "name": "전자식 과전류 계전기", "category": "eocr", "socket_type_id": "socket_12p_base", "mounting": "plug_in", "electrical_definition_status": "unverified" },
     { "device_type_id": "magnetic_contactor", "name": "전자접촉기", "category": "magnetic_contactor", "socket_type_id": null, "mounting": "fixed", "electrical_definition_status": "unverified" },
     { "device_type_id": "auxiliary_relay_8p", "name": "8P 보조릴레이", "category": "auxiliary_relay", "socket_type_id": "socket_8p_base", "mounting": "plug_in", "electrical_definition_status": "unverified" },
+    { "device_type_id": "auxiliary_relay_12p", "name": "12P 보조릴레이", "category": "auxiliary_relay", "socket_type_id": "socket_12p_base", "mounting": "plug_in", "electrical_definition_status": "unverified" },
     { "device_type_id": "timer_8p", "name": "8P 타이머", "category": "timer", "socket_type_id": "socket_8p_base", "mounting": "plug_in", "electrical_definition_status": "unverified" },
     { "device_type_id": "push_button", "name": "누름버튼", "category": "push_button", "socket_type_id": null, "mounting": "panel", "electrical_definition_status": "unverified" },
     { "device_type_id": "limit_switch", "name": "리밋 스위치", "category": "limit_switch", "socket_type_id": null, "mounting": "external", "electrical_definition_status": "unverified" },

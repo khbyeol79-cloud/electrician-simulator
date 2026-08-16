@@ -33,5 +33,14 @@
     "contacts": [],
     "coils": []
   },
-  "socket_questions": []
+  "socket_questions": [],
+  "mounting": {
+    "schema_version": "1.0",
+    "available_devices": [
+      { "mount_device_id": "DEVICE-X3", "label": "X3 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "compatible_socket_type_ids": ["socket_12p_base"] }
+    ],
+    "mount_targets": [
+      { "socket_id": "X3", "socket_type_id": "socket_12p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_12p"] }
+    ]
+  }
 }

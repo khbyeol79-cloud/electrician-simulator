@@ -65,6 +65,11 @@
       "type": "array",
       "items": { "$ref": "#/$defs/connectionPair" }
     },
+    "mounting_answer": {
+      "type": "array",
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/mountingAnswer" }
+    },
     "wire_color_rules": { "$ref": "#/$defs/wireColors" },
     "operation_tests": {
       "type": "array",
@@ -109,6 +114,15 @@
           "minItems": 2,
           "uniqueItems": true
         }
+      }
+    },
+    "mountingAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mount_device_id", "socket_id"],
+      "properties": {
+        "mount_device_id": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$" },
+        "socket_id": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$" }
       }
     },
     "wireColors": {

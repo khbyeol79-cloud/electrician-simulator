@@ -15,6 +15,7 @@
   "forbidden_connections": [],
   "wiring_connections": [],
   "wiring_forbidden_connections": [],
+  "mounting_answer": [],
   "wire_color_rules": {
     "L1": "brown",
     "L2": "black",

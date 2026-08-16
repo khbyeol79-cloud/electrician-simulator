@@ -47,7 +47,13 @@
         "coils": { "type": "array", "items": { "$ref": "#/$defs/coil" } }
       }
     },
-    "socket_questions": { "type": "array", "items": { "$ref": "#/$defs/socketQuestion" } }
+    "socket_questions": { "type": "array", "items": { "$ref": "#/$defs/socketQuestion" } },
+    "mounting": {
+      "anyOf": [
+        { "$ref": "#/$defs/mountingDefinition" },
+        { "type": "null" }
+      ]
+    }
   },
   "$defs": {
     "id": { "type": "string", "minLength": 1, "maxLength": 80 },
@@ -93,6 +99,36 @@
       "type": "object", "additionalProperties": false,
       "required": ["question_id", "target_element_type", "target_element_id", "display_label", "answer_slots"],
       "properties": { "question_id": { "$ref": "#/$defs/id" }, "target_element_type": { "enum": ["contact", "coil"] }, "target_element_id": { "$ref": "#/$defs/id" }, "display_label": { "$ref": "#/$defs/id" }, "answer_slots": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "$ref": "#/$defs/answerSlot" } } }
+    },
+    "mountDevice": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mount_device_id", "label", "device_type_id", "graphic_type", "compatible_socket_type_ids"],
+      "properties": {
+        "mount_device_id": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$" },
+        "label": { "$ref": "#/$defs/id" },
+        "device_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "graphic_type": { "enum": ["relay", "timer", "contactor"] },
+        "compatible_socket_type_ids": { "type": "array", "minItems": 1, "maxItems": 10, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" } }
+      }
+    },
+    "mountTarget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["socket_id", "socket_type_id", "enabled", "allowed_device_type_ids"],
+      "properties": {
+        "socket_id": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$" },
+        "socket_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+        "enabled": { "type": "boolean" },
+        "allowed_device_type_ids": { "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" } }
+      }
+    },
+    "mountingDefinition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "available_devices", "mount_targets"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "available_devices": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/mountDevice" } },
+        "mount_targets": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/mountTarget" } }
+      }
     }
   }
 }

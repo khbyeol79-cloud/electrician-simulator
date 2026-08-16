@@ -30,5 +30,6 @@
     "contacts": [],
     "coils": []
   },
-  "socket_questions": []
+  "socket_questions": [],
+  "mounting": null
 }

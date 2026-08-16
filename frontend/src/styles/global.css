@@ -275,6 +275,62 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-result.wrong { color: #a42929; background: #fff0f0; }
 .wiring-result.warning { color: #8d5700; background: #fff6df; }
 
+.mounting-workspace { grid-template-rows: 66px minmax(0, 1fr); }
+.mounting-header { background: #fff; }
+.mounting-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; }
+.mounting-stage { background: #dce4ed; }
+.mounting-readonly-note { margin-left: auto; padding: 5px 8px; color: #51647d; border: 1px solid #d6e0eb; background: #eef3f8; font-size: 9px; white-space: nowrap; }
+.mounting-board-scroll { position: relative; }
+.mounting-board .board-pin.static { cursor: default; pointer-events: none; }
+.mounting-board .board-wire.readonly { pointer-events: none; opacity: .84; }
+.mount-target { cursor: pointer; outline: none; }
+.mount-target-focus { fill: transparent; stroke: transparent; stroke-width: 5; vector-effect: non-scaling-stroke; }
+.mount-target:hover .mount-target-focus, .mount-target:focus .mount-target-focus, .mount-target.selected .mount-target-focus { fill: rgba(18,101,232,.06); stroke: #1265e8; }
+.mount-target.correct .mount-target-focus { fill: rgba(20,138,80,.07); stroke: #148a50; }
+.mount-target.wrong .mount-target-focus { fill: rgba(201,59,59,.08); stroke: #c93b3b; }
+.mount-target.missing .mount-target-focus { fill: rgba(217,119,6,.07); stroke: #d97706; stroke-dasharray: 10 7; }
+.mount-target.disabled { cursor: not-allowed; opacity: .48; }
+.empty-mount-target rect { fill: rgba(255,255,255,.88); stroke: #91a0b0; stroke-width: 2; stroke-dasharray: 7 5; vector-effect: non-scaling-stroke; }
+.empty-mount-target text { fill: #66778d; font-size: 14px; font-weight: 800; }
+.mounted-device-shell { fill: rgba(238,244,250,.98); stroke: #32465d; stroke-width: 3; vector-effect: non-scaling-stroke; filter: drop-shadow(2px 3px 2px rgba(0,0,0,.25)); }
+.mounted-device-graphic.timer .mounted-device-shell { fill: #e7edf4; stroke: #2f455e; }
+.mounted-device-graphic.contactor .mounted-device-shell { fill: #dce3ea; stroke: #2a3949; }
+.timer-face circle, .timer-face line { fill: #f8fbfd; stroke: #23364b; stroke-width: 3; vector-effect: non-scaling-stroke; }
+.timer-face circle:last-child { fill: #23364b; }
+.relay-face rect, .contactor-face rect { fill: #fff; stroke: #445a70; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.relay-face path, .contactor-face line { fill: none; stroke: #28425f; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.mounted-device-name { fill: #102b4b; font-size: 18px; font-weight: 900; }
+.mounted-device-type { fill: #5d6f84; font-size: 9px; font-weight: 800; letter-spacing: 1px; }
+.mounting-panel { padding-bottom: 10px; }
+.mounting-panel section { flex: 0 0 auto; }
+.mounting-wiring-warning { color: #8b5300; border-left: 4px solid var(--orange) !important; background: #fff8e8 !important; }
+.mounting-wiring-warning strong { font-size: 10px; }
+.mounting-wiring-warning p { color: #765f35 !important; }
+.device-shelf { padding-bottom: 8px !important; }
+.device-card-list { display: grid; gap: 6px; }
+.mount-device-card { width: 100%; min-height: 52px; display: grid; grid-template-columns: 34px minmax(0,1fr) auto; align-items: center; gap: 8px; padding: 7px; text-align: left; color: #253a55; border: 1px solid #d1dce8; border-radius: 5px; background: #f8fafc; }
+.mount-device-card:hover { border-color: #82a9e3; background: #f0f6ff; }
+.mount-device-card.selected { border: 2px solid #1265e8; background: #eaf2ff; }
+.mount-device-card.mounted { border-left: 4px solid #148a50; }
+.device-card-icon { width: 31px; height: 31px; display: grid; place-items: center; color: #fff; border-radius: 4px; background: #3d5875; font-size: 17px; }
+.device-card-icon.timer { background: #285879; }
+.device-card-icon.contactor { background: #34404d; }
+.mount-device-card span:nth-child(2) { min-width: 0; display: grid; gap: 2px; }
+.mount-device-card strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+.mount-device-card small { color: #708097; font-size: 8px; }
+.mount-device-card em { color: #536880; font-size: 8px; font-style: normal; white-space: nowrap; }
+.mount-device-card.mounted em { color: #08713f; font-weight: 800; }
+.mounting-result { display: grid; gap: 4px; margin: 8px 0; padding: 8px; font-size: 9px; }
+.mounting-result.correct { color: #08713f; background: #e9f8f0; }
+.mounting-result.wrong { color: #a42929; background: #fff0f0; }
+.mounting-result.warning { color: #8d5700; background: #fff6df; }
+.mounting-not-ready { min-height: 0; display: grid; place-content: center; gap: 8px; text-align: center; color: #687991; background: #eef3f8; }
+.mounting-not-ready strong { color: #344a65; font-size: 18px; }
+
+@media (max-width: 1280px) {
+  .mounting-layout { grid-template-columns: minmax(0, 1fr) 292px; }
+}
+
 .status-bar { display: flex; align-items: center; gap: 22px; padding: 0 15px; color: #5a6980; border-top: 1px solid #cfd9e5; background: #f8fafc; font-size: 10px; }
 .status-item { display: flex; align-items: center; gap: 5px; }
 .status-item strong, .status-bar > span strong { color: #2e3f58; }
