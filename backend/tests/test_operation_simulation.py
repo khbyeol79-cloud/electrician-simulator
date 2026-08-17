@@ -119,7 +119,7 @@ def test_engine_detects_direct_short_phase_loss_and_deterministic_time():
     assert state.power_state == "tripped"
     assert any(item.code == "direct_short" for item in state.faults)
 
-    missing_phase = [item for item in wiring if set(item.key) != {"MCCB-T3", "EOCR-W"}]
+    missing_phase = [item for item in wiring if set(item.key) != {"MCCB-T3", "EOCR-L3"}]
     engine = OperationEngine(
         session_id="phase", problem_id=package.manifest.problem_id, wiring_attempt_id=2,
         circuit=package.problem.circuit, definition=package.problem.operation, connections=missing_phase,

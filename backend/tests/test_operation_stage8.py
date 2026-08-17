@@ -128,7 +128,7 @@ def test_phase_loss_and_private_operation_tests_are_not_public(tmp_path):
         assert setup.status_code == 200
         assert "operation_tests" not in setup.text and "expected" not in setup.text
 
-        connections = [item for item in answer_connections(PROBLEM_ID) if {item["from"], item["to"]} != {"MCCB-T3", "EOCR-W"}]
+        connections = [item for item in answer_connections(PROBLEM_ID) if {item["from"], item["to"]} != {"MCCB-T3", "EOCR-L3"}]
         package = client.app.state.problem_repository._get_package_internal(PROBLEM_ID)
         from app.domain import OperationAction, WiringConnection
         from app.simulation import OperationEngine

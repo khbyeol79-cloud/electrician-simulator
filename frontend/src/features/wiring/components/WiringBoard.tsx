@@ -29,13 +29,14 @@ export function terminalSlotLabel(terminalId: string) {
 
 export function buildTerminalSummary(board: BoardDefinition, connections: WiringConnection[]) {
   const ownerByTerminal = new Map<string, BoardItem>()
-  board.items.forEach((item) => item.pins.forEach((pin) => ownerByTerminal.set(pin.terminal_id, item)))
+  const pinByTerminal = new Map<string, BoardPin>()
+  board.items.forEach((item) => item.pins.forEach((pin) => { ownerByTerminal.set(pin.terminal_id, item); pinByTerminal.set(pin.terminal_id, pin) }))
   const summary = new Map<string, { other: string; slot: string; color: string; connectionIndex: number }[]>()
   connections.forEach((connection, connectionIndex) => {
     const fromOwner = ownerByTerminal.get(connection.from)
     const toOwner = ownerByTerminal.get(connection.to)
-    summary.set(connection.from, [...(summary.get(connection.from) ?? []), { other: connection.to, slot: terminalSlotLabel(connection.to), color: deviceSummaryColor(toOwner?.item_id ?? ''), connectionIndex }])
-    summary.set(connection.to, [...(summary.get(connection.to) ?? []), { other: connection.from, slot: terminalSlotLabel(connection.from), color: deviceSummaryColor(fromOwner?.item_id ?? ''), connectionIndex }])
+    summary.set(connection.from, [...(summary.get(connection.from) ?? []), { other: connection.to, slot: String(pinByTerminal.get(connection.to)?.number ?? terminalSlotLabel(connection.to)), color: deviceSummaryColor(toOwner?.item_id ?? ''), connectionIndex }])
+    summary.set(connection.to, [...(summary.get(connection.to) ?? []), { other: connection.from, slot: String(pinByTerminal.get(connection.from)?.number ?? terminalSlotLabel(connection.from)), color: deviceSummaryColor(fromOwner?.item_id ?? ''), connectionIndex }])
   })
   return summary
 }
@@ -57,6 +58,7 @@ export function BoardItemBody({ item }: { item: BoardItem }) {
 
 function Pin({ pin, selected, summary, summarySelected, onClick, onPointerDown, onPointerUp, onSummarySelect }: { pin: BoardPin; selected: boolean; summary?: { other: string; slot: string; color: string; connectionIndex: number }[]; summarySelected: boolean; onClick: () => void; onPointerDown: () => void; onPointerUp: () => void; onSummarySelect: (terminalId: string, connectionIndices: number[]) => void }) {
   const labelY = pin.side === 'top' ? pin.y + 25 : pin.y - 16
+  const roleY = pin.side === 'top' ? pin.y + 39 : pin.y - 31
   const summaryY = summaryLabelY(pin)
   const primary = summary?.[0]
   const extraCount = Math.max(0, (summary?.length ?? 0) - 1)
@@ -66,6 +68,7 @@ function Pin({ pin, selected, summary, summarySelected, onClick, onPointerDown, 
   return <g className={`board-pin${selected ? ' selected' : ''}${pin.enabled ? '' : ' disabled'}`} role="button" tabIndex={pin.enabled ? 0 : -1} aria-label={`${pin.terminal_id} 단자`} onClick={(event) => { event.stopPropagation(); if (pin.enabled) onClick() }} onPointerDown={(event) => { event.stopPropagation(); if (pin.enabled) onPointerDown() }} onPointerUp={(event) => { event.stopPropagation(); if (pin.enabled) onPointerUp() }} onKeyDown={(event) => { if (pin.enabled && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); onClick() } }}>
     <circle cx={pin.x} cy={pin.y} r="13" /><circle cx={pin.x} cy={pin.y} r="5" />
     <text x={pin.x} y={labelY} textAnchor="middle">{pin.label}</text>
+    {pin.role_label && <text className="board-pin-role" x={pin.x} y={roleY} textAnchor="middle">{pin.role_label}</text>}
     {primary && summary && <g className={`pin-summary${summarySelected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={summaryAriaLabel} transform={`translate(${pin.x} ${summaryY})`} onClick={(event) => { event.stopPropagation(); onSummarySelect(pin.terminal_id, summary.map((item) => item.connectionIndex)) }} onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopPropagation(); onSummarySelect(pin.terminal_id, summary.map((item) => item.connectionIndex)) } }}><rect x="-16" y="-10" width="32" height="20" rx="4" style={{ stroke: primary.color }} /><circle cx="-10" cy="0" r="3.5" style={{ fill: primary.color }} /><text x="3" y="3.5" textAnchor="middle">{primary.slot}</text>{extraCount > 0 && <g className="pin-summary-count"><rect x="8" y="-19" width="24" height="13" rx="6" style={{ stroke: summary[1]?.color ?? primary.color }} /><text x="20" y="-9.5" textAnchor="middle">+{extraCount}</text></g>}</g>}
   </g>
 }

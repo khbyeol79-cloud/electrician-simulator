@@ -38,6 +38,15 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     return []
   }), [connections, selectedSummaryTerminal])
   const connectionKeys = useMemo(() => new Set(connections.map((item) => [item.from, item.to].sort().join('|'))), [connections])
+  const pinByTerminal = useMemo(() => new Map(board?.items.flatMap((item) => item.pins).map((pin) => [pin.terminal_id, pin]) ?? []), [board])
+  const terminalConnectionCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    connections.forEach((connection) => {
+      counts.set(connection.from, (counts.get(connection.from) ?? 0) + 1)
+      counts.set(connection.to, (counts.get(connection.to) ?? 0) + 1)
+    })
+    return counts
+  }, [connections])
   const analyzedQuestionCount = useMemo(() => problem?.socket_questions.filter((question) =>
     question.answer_slots.every((slot) => Boolean(circuitDraft[question.question_id]?.[slot.slot_id])),
   ).length ?? 0, [circuitDraft, problem])
@@ -74,6 +83,13 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     if (from === to) { setNotice('같은 단자끼리는 연결할 수 없습니다.'); return }
     const key = [from, to].sort().join('|')
     if (connectionKeys.has(key)) { setNotice('이미 연결된 단자입니다.'); return }
+    for (const terminalId of [from, to]) {
+      const maximum = pinByTerminal.get(terminalId)?.max_connections ?? 2
+      if ((terminalConnectionCounts.get(terminalId) ?? 0) >= maximum) {
+        setNotice(`${terminalId} 단자에는 전선을 최대 ${maximum}개까지 연결할 수 있습니다.`)
+        return
+      }
+    }
     commit([...connections, { from, to, wire_color: 'yellow', pair_display_color: '#64748b' }])
     setSelectedPin(null)
   }

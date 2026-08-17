@@ -108,7 +108,7 @@ export type CircuitProgress = {
   last_overall_correct: boolean | null; last_correct_count: number; total_count: number
 }
 
-export type BoardPin = { terminal_id: string; label: string; number: number | null; side: 'top' | 'bottom'; x: number; y: number; max_connections: number; enabled: boolean }
+export type BoardPin = { terminal_id: string; label: string; role_label?: string | null; number: number | null; side: 'top' | 'bottom'; x: number; y: number; max_connections: number; enabled: boolean }
 export type BoardRect = { x: number; y: number; width: number; height: number }
 export type BoardItem = {
   item_id: string; label: string; item_type: 'socket_8p' | 'socket_12p' | 'terminal_block' | 'component'

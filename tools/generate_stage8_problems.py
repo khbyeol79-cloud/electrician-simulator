@@ -64,7 +64,7 @@ def update_identity(target: Path, problem_id: str, title: str, tags: list[str]) 
     answer["problem_id"] = problem_id
     answer["verification"] = {
         "status": "reviewed",
-        "verified_by": "0.8.0 자동 회귀시험",
+        "verified_by": "0.8.2 자동 회귀시험",
         "verified_at": "2026-08-16T00:00:00+09:00",
         "notes": "프로그램 기능 확인용 자체 제작 정답이며 실제 시험 답안이 아닙니다.",
     }
@@ -89,22 +89,16 @@ def generate_forward_reverse() -> None:
     ])
     by_terminal = {item["terminal_id"]: item for item in circuit["terminals"]}
     by_terminal["TB5-06"]["max_connections"] = 6
-    circuit["terminals"] = list(by_terminal.values()) + [
-        terminal("MC2-1", "MC2", 1, "contact_common"),
-        terminal("MC2-2", "MC2", 2, "contact_no"),
-        terminal("MC2-3", "MC2", 3, "contact_common"),
-        terminal("MC2-4", "MC2", 4, "contact_nc"),
-        terminal("MC2-11", "MC2", 11, "coil"),
-        terminal("MC2-12", "MC2", 12, "coil"),
-    ]
-    contacts = [item for item in circuit["contacts"] if item["contact_id"] != "MC1-TIMER"]
+    mc2_roles = {1: "line", 2: "line", 3: "line", 4: "contact_common", 5: "contact_common", 6: "coil", 7: "load", 8: "load", 9: "load", 10: "contact_no", 11: "contact_nc", 12: "coil"}
+    circuit["terminals"] = list(by_terminal.values()) + [terminal(f"MC2-{number}", "MC2", number, role) for number, role in mc2_roles.items()]
+    contacts = list(circuit["contacts"])
     contacts.extend([
-        {"contact_id": "MC1-INTERLOCK", "owner_device_id": "MC1", "contact_type": "NC", "common_terminal_id": "MC1-3", "switched_terminal_id": "MC1-4", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC1-COIL", "normal_state": "closed"},
-        {"contact_id": "MC2-HOLD", "owner_device_id": "MC2", "contact_type": "NO", "common_terminal_id": "MC2-1", "switched_terminal_id": "MC2-2", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC2-COIL", "normal_state": "open"},
-        {"contact_id": "MC2-INTERLOCK", "owner_device_id": "MC2", "contact_type": "NC", "common_terminal_id": "MC2-3", "switched_terminal_id": "MC2-4", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC2-COIL", "normal_state": "closed"},
+        {"contact_id": "MC1-INTERLOCK", "owner_device_id": "MC1", "contact_type": "NC", "common_terminal_id": "MC1-5", "switched_terminal_id": "MC1-11", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC1-COIL", "normal_state": "closed"},
+        {"contact_id": "MC2-HOLD", "owner_device_id": "MC2", "contact_type": "NO", "common_terminal_id": "MC2-4", "switched_terminal_id": "MC2-10", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC2-COIL", "normal_state": "open"},
+        {"contact_id": "MC2-INTERLOCK", "owner_device_id": "MC2", "contact_type": "NC", "common_terminal_id": "MC2-5", "switched_terminal_id": "MC2-11", "nc_terminal_id": None, "no_terminal_id": None, "controlled_by_coil_id": "MC2-COIL", "normal_state": "closed"},
     ])
     circuit["contacts"] = contacts
-    circuit["coils"].append({"coil_id": "MC2-COIL", "owner_device_id": "MC2", "terminal_a_id": "MC2-11", "terminal_b_id": "MC2-12", "rated_voltage": 220, "voltage_type": "AC", "frequency": 60})
+    circuit["coils"].append({"coil_id": "MC2-COIL", "owner_device_id": "MC2", "terminal_a_id": "MC2-6", "terminal_b_id": "MC2-12", "rated_voltage": 220, "voltage_type": "AC", "frequency": 60})
     problem["device_layout"]["fixed_placements"] = [
         {"mount_device_id": "DEVICE-MC1", "label": "MC1 정회전 접촉기", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC1", "socket_type_id": "socket_12p_base"},
         {"mount_device_id": "DEVICE-MC2", "label": "MC2 역회전 접촉기", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC2", "socket_type_id": "socket_12p_base"},
@@ -119,8 +113,8 @@ def generate_forward_reverse() -> None:
         ],
         "timers": [],
         "indicators": [
-            {"indicator_id": "RL", "label": "정회전 표시", "display_color": "red", "terminal_a_id": "MC1-11", "terminal_b_id": "MC1-12"},
-            {"indicator_id": "GL", "label": "역회전 표시", "display_color": "green", "terminal_a_id": "MC2-11", "terminal_b_id": "MC2-12"},
+            {"indicator_id": "RL", "label": "정회전 표시", "display_color": "red", "terminal_a_id": "MC1-6", "terminal_b_id": "MC1-12"},
+            {"indicator_id": "GL", "label": "역회전 표시", "display_color": "green", "terminal_a_id": "MC2-6", "terminal_b_id": "MC2-12"},
         ],
         "motors": [{"motor_id": "M1", "label": "M1 모터", "forward_coil_id": "MC1-COIL", "reverse_coil_id": "MC2-COIL", "phase_terminal_ids": ["EOCR-U", "EOCR-V", "EOCR-W"], "phase_source_terminal_ids": ["TB5-01", "TB5-02", "TB5-03"], "forward_phase_order": [0, 1, 2]}],
         "contactors": [
@@ -137,12 +131,12 @@ def generate_forward_reverse() -> None:
     }
     pairs = [
         ("TB5-01", "MCCB-L1", "brown"), ("TB5-02", "MCCB-L2", "black"), ("TB5-03", "MCCB-L3", "gray"),
-        ("MCCB-T1", "EOCR-U", "brown"), ("MCCB-T2", "EOCR-V", "black"), ("MCCB-T3", "EOCR-W", "gray"),
+        ("MCCB-T1", "EOCR-L1", "brown"), ("MCCB-T2", "EOCR-L2", "black"), ("MCCB-T3", "EOCR-L3", "gray"),
         ("TB5-04", "F-1", "yellow"), ("F-2", "TB5-05", "yellow"),
-        ("TB5-06", "TB5-07", "yellow"), ("TB5-08", "MC2-3", "yellow"), ("MC2-4", "MC1-11", "yellow"), ("MC1-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC1-1", "yellow"), ("MC1-2", "TB5-08", "yellow"),
-        ("TB5-06", "TB5-09", "yellow"), ("TB5-10", "MC1-3", "yellow"), ("MC1-4", "MC2-11", "yellow"), ("MC2-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC2-1", "yellow"), ("MC2-2", "TB5-10", "yellow"),
+        ("TB5-06", "TB5-07", "yellow"), ("TB5-08", "MC2-5", "yellow"), ("MC2-11", "MC1-6", "yellow"), ("MC1-12", "TB6-01", "yellow"),
+        ("TB5-06", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
+        ("TB5-06", "TB5-09", "yellow"), ("TB5-10", "MC1-5", "yellow"), ("MC1-11", "MC2-6", "yellow"), ("MC2-12", "TB6-01", "yellow"),
+        ("TB5-06", "MC2-4", "yellow"), ("MC2-10", "TB5-10", "yellow"),
     ]
     answer["wiring_connections"] = [connection(index, a, b, color) for index, (a, b, color) in enumerate(pairs, 1)]
     answer["operation_tests"] = [
@@ -192,7 +186,7 @@ def generate_eocr_sequence() -> None:
 def main() -> None:
     generate_forward_reverse()
     generate_eocr_sequence()
-    print("0.8.0 자체 제작 문제 2개를 생성했습니다.")
+    print("0.8.2 자체 제작 문제 2개를 생성했습니다.")
 
 
 if __name__ == "__main__":

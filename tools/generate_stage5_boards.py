@@ -11,11 +11,14 @@ def rect(x, y, width, height):
     return {"x": x, "y": y, "width": width, "height": height}
 
 
-def pin(terminal_id, label, number, side, x, y, max_connections=2):
-    return {"terminal_id": terminal_id, "label": label, "number": number, "side": side, "x": x, "y": y, "max_connections": max_connections, "enabled": True}
+def pin(terminal_id, label, number, side, x, y, max_connections=2, role_label=None):
+    result = {"terminal_id": terminal_id, "label": label, "number": number, "side": side, "x": x, "y": y, "max_connections": max_connections, "enabled": True}
+    if role_label is not None:
+        result["role_label"] = role_label
+    return result
 
 
-def socket(item_id, label, socket_type, row, x, y, width, height):
+def socket(item_id, label, socket_type, row, x, y, width, height, terminal_ids=None, role_labels=None):
     if socket_type == "socket_8p_base":
         top, bottom, item_type = [6, 5, 4, 3], [7, 8, 1, 2], "socket_8p"
     else:
@@ -24,7 +27,8 @@ def socket(item_id, label, socket_type, row, x, y, width, height):
     for side, numbers, py in (("top", top, y), ("bottom", bottom, y + height)):
         for index, number in enumerate(numbers):
             px = x + width * (index + 0.5) / len(numbers)
-            pins.append(pin(f"{item_id}-{number}", str(number), number, side, round(px, 2), py))
+            terminal_suffix = (terminal_ids or {}).get(number, str(number))
+            pins.append(pin(f"{item_id}-{terminal_suffix}", str(number), number, side, round(px, 2), py, role_label=(role_labels or {}).get(number)))
     return {
         "item_id": item_id, "label": label, "item_type": item_type, "socket_type_id": socket_type,
         "row": row, "x": x, "y": y, "width": width, "height": height, "pins": pins,
@@ -65,13 +69,15 @@ def base(board_id, items):
 training_items = [
     terminal_block("TB5", "TB5 (10P+10P)", 0, 110, 45, 1180, 20, "bottom"),
     component("MCCB", "MCCB", 1, 90, 210, 160, (["L1", "L2", "L3"], ["T1", "T2", "T3"])),
-    component("EOCR", "EOCR", 1, 300, 210, 160, (["L1", "L2", "L3"], ["U", "V", "W"])),
+    socket("EOCR", "EOCR", "socket_12p_base", 1, 280, 200, 220, 170,
+           {1: "L1", 2: "L2", 3: "L3", 4: "96", 5: "98", 6: "A1", 7: "U", 8: "V", 9: "W", 10: "95", 11: "97", 12: "A2"},
+           {1: "L1", 2: "L2", 3: "L3", 4: "96", 5: "98", 6: "A1", 7: "U", 8: "V", 9: "W", 10: "95", 11: "97", 12: "A2"}),
     component("F", "FUSE", 1, 510, 210, 120, (["1"], ["2"])),
     socket("X1", "X1", "socket_8p_base", 1, 700, 200, 180, 170),
     socket("X2", "X2", "socket_8p_base", 1, 990, 200, 180, 170),
     socket("T2", "T2", "socket_8p_base", 2, 90, 500, 180, 170),
-    socket("MC1", "MC1", "socket_12p_base", 2, 350, 500, 220, 170),
-    socket("MC2", "MC2", "socket_12p_base", 2, 680, 500, 220, 170),
+    socket("MC1", "MC1", "socket_12p_base", 2, 350, 500, 220, 170, role_labels={1: "L1", 2: "L2", 3: "L3", 4: "a1", 5: "b1", 6: "A1", 7: "U", 8: "V", 9: "W", 10: "a2", 11: "b2", 12: "A2"}),
+    socket("MC2", "MC2", "socket_12p_base", 2, 680, 500, 220, 170, role_labels={1: "L1", 2: "L2", 3: "L3", 4: "a1", 5: "b1", 6: "A1", 7: "U", 8: "V", 9: "W", 10: "a2", 11: "b2", 12: "A2"}),
     socket("T1", "T1", "socket_8p_base", 2, 1010, 500, 180, 170),
     terminal_block("TB6", "TB6 (10P+10P)", 3, 110, 785, 1180, 20, "top"),
 ]

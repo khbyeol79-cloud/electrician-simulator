@@ -173,6 +173,21 @@ describe('제어함 결선', () => {
     expect(within(list).getByText('MC1-5')).toBeInTheDocument()
   })
 
+  it('blocks a third wire immediately when a socket terminal already has two', async () => {
+    installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    for (const target of ['MC1-4', 'MC1-5']) {
+      await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
+      await user.click(screen.getByRole('button', { name: `${target} 단자` }))
+    }
+    await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
+    await user.click(screen.getByRole('button', { name: 'MC1-6 단자' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('X1-1 단자에는 전선을 최대 2개까지 연결할 수 있습니다.')
+    expect(screen.queryByRole('button', { name: 'X1-1에서 MC1-6로 연결된 전선' })).not.toBeInTheDocument()
+  })
+
   it('assigns distinct summary colors including T1, TB5 and TB6', () => {
     const ids = ['MCCB', 'EOCR', 'F', 'X1', 'X2', 'T2', 'MC1', 'MC2', 'T1', 'TB5', 'TB6']
     expect(new Set(ids.map(deviceSummaryColor))).toHaveLength(ids.length)

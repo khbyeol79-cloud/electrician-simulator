@@ -178,6 +178,19 @@
           "y": 0.25
         },
         "installed_initially": true
+      },
+      {
+        "device_id": "EOCR",
+        "device_type_id": "eocr",
+        "label": "EOCR",
+        "socket_type_id": "socket_12p_base",
+        "board_position": {
+          "row": 1,
+          "column": 1,
+          "x": 0.28,
+          "y": 0.3
+        },
+        "installed_initially": true
       }
     ],
     "terminals": [
@@ -218,60 +231,6 @@
         "enabled": true
       },
       {
-        "terminal_id": "MC1-1",
-        "device_id": "MC1",
-        "pin_number": 1,
-        "terminal_type": "socket_pin",
-        "electrical_role": "contact_common",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "MC1-2",
-        "device_id": "MC1",
-        "pin_number": 2,
-        "terminal_type": "socket_pin",
-        "electrical_role": "contact_no",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "MC1-3",
-        "device_id": "MC1",
-        "pin_number": 3,
-        "terminal_type": "socket_pin",
-        "electrical_role": "contact_common",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "MC1-4",
-        "device_id": "MC1",
-        "pin_number": 4,
-        "terminal_type": "socket_pin",
-        "electrical_role": "contact_no",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "MC1-11",
-        "device_id": "MC1",
-        "pin_number": 11,
-        "terminal_type": "socket_pin",
-        "electrical_role": "coil",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "MC1-12",
-        "device_id": "MC1",
-        "pin_number": 12,
-        "terminal_type": "socket_pin",
-        "electrical_role": "coil",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
         "terminal_id": "T1-2",
         "device_id": "T1",
         "pin_number": 2,
@@ -290,9 +249,9 @@
         "enabled": true
       },
       {
-        "terminal_id": "T1-6",
+        "terminal_id": "T1-1",
         "device_id": "T1",
-        "pin_number": 6,
+        "pin_number": 1,
         "terminal_type": "socket_pin",
         "electrical_role": "contact_common",
         "max_connections": 2,
@@ -377,33 +336,6 @@
         "terminal_type": "external_terminal",
         "electrical_role": "load",
         "max_connections": 3,
-        "enabled": true
-      },
-      {
-        "terminal_id": "EOCR-U",
-        "device_id": "M1",
-        "pin_number": null,
-        "terminal_type": "external_terminal",
-        "electrical_role": "load",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "EOCR-V",
-        "device_id": "M1",
-        "pin_number": null,
-        "terminal_type": "external_terminal",
-        "electrical_role": "load",
-        "max_connections": 2,
-        "enabled": true
-      },
-      {
-        "terminal_id": "EOCR-W",
-        "device_id": "M1",
-        "pin_number": null,
-        "terminal_type": "external_terminal",
-        "electrical_role": "load",
-        "max_connections": 2,
         "enabled": true
       },
       {
@@ -522,6 +454,222 @@
         "electrical_role": "control",
         "max_connections": 2,
         "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-L1",
+        "device_id": "EOCR",
+        "pin_number": 1,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-L2",
+        "device_id": "EOCR",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-L3",
+        "device_id": "EOCR",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-96",
+        "device_id": "EOCR",
+        "pin_number": 4,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_nc",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-98",
+        "device_id": "EOCR",
+        "pin_number": 5,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-A1",
+        "device_id": "EOCR",
+        "pin_number": 6,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-U",
+        "device_id": "EOCR",
+        "pin_number": 7,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-V",
+        "device_id": "EOCR",
+        "pin_number": 8,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-W",
+        "device_id": "EOCR",
+        "pin_number": 9,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-95",
+        "device_id": "EOCR",
+        "pin_number": 10,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-97",
+        "device_id": "EOCR",
+        "pin_number": 11,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-A2",
+        "device_id": "EOCR",
+        "pin_number": 12,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-1",
+        "device_id": "MC1",
+        "pin_number": 1,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-2",
+        "device_id": "MC1",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-3",
+        "device_id": "MC1",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-4",
+        "device_id": "MC1",
+        "pin_number": 4,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-5",
+        "device_id": "MC1",
+        "pin_number": 5,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-6",
+        "device_id": "MC1",
+        "pin_number": 6,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-7",
+        "device_id": "MC1",
+        "pin_number": 7,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-8",
+        "device_id": "MC1",
+        "pin_number": 8,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-9",
+        "device_id": "MC1",
+        "pin_number": 9,
+        "terminal_type": "socket_pin",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-10",
+        "device_id": "MC1",
+        "pin_number": 10,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-11",
+        "device_id": "MC1",
+        "pin_number": 11,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_nc",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-12",
+        "device_id": "MC1",
+        "pin_number": 12,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
       }
     ],
     "contacts": [
@@ -535,30 +683,21 @@
         "normal_state": "open"
       },
       {
-        "contact_id": "MC1-HOLD",
-        "owner_device_id": "MC1",
-        "contact_type": "NO",
-        "common_terminal_id": "MC1-1",
-        "switched_terminal_id": "MC1-2",
-        "controlled_by_coil_id": "MC1-COIL",
-        "normal_state": "open"
-      },
-      {
-        "contact_id": "MC1-TIMER",
-        "owner_device_id": "MC1",
-        "contact_type": "NO",
-        "common_terminal_id": "MC1-3",
-        "switched_terminal_id": "MC1-4",
-        "controlled_by_coil_id": "MC1-COIL",
-        "normal_state": "open"
-      },
-      {
         "contact_id": "T1-C1",
         "owner_device_id": "T1",
         "contact_type": "NO",
-        "common_terminal_id": "T1-6",
+        "common_terminal_id": "T1-1",
         "switched_terminal_id": "T1-3",
         "controlled_by_coil_id": "T1-COIL",
+        "normal_state": "open"
+      },
+      {
+        "contact_id": "MC1-HOLD",
+        "owner_device_id": "MC1",
+        "contact_type": "NO",
+        "common_terminal_id": "MC1-4",
+        "switched_terminal_id": "MC1-10",
+        "controlled_by_coil_id": "MC1-COIL",
         "normal_state": "open"
       }
     ],
@@ -575,7 +714,7 @@
       {
         "coil_id": "MC1-COIL",
         "owner_device_id": "MC1",
-        "terminal_a_id": "MC1-11",
+        "terminal_a_id": "MC1-6",
         "terminal_b_id": "MC1-12",
         "rated_voltage": 220,
         "voltage_type": "AC",
@@ -737,6 +876,18 @@
       {
         "from": "F-1",
         "to": "F-2"
+      },
+      {
+        "from": "EOCR-L1",
+        "to": "EOCR-U"
+      },
+      {
+        "from": "EOCR-L2",
+        "to": "EOCR-V"
+      },
+      {
+        "from": "EOCR-L3",
+        "to": "EOCR-W"
       }
     ],
     "contactors": [

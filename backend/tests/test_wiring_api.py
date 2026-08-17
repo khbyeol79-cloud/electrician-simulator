@@ -26,6 +26,16 @@ def test_board_is_public_but_answer_is_not(tmp_path):
         payload = response.json()
         assert payload["board_id"] == "training_wiring_board_v1"
         assert any(item["item_id"] == "X1" for item in payload["items"])
+        eocr = next(item for item in payload["items"] if item["item_id"] == "EOCR")
+        assert eocr["item_type"] == "socket_12p"
+        assert eocr["socket_type_id"] == "socket_12p_base"
+        assert [(pin["number"], pin["role_label"]) for pin in eocr["pins"]] == [
+            (1, "L1"), (2, "L2"), (3, "L3"), (4, "96"), (5, "98"), (6, "A1"),
+            (7, "U"), (8, "V"), (9, "W"), (10, "95"), (11, "97"), (12, "A2"),
+        ]
+        mc1 = next(item for item in payload["items"] if item["item_id"] == "MC1")
+        assert {pin["number"]: pin["role_label"] for pin in mc1["pins"]}[6] == "A1"
+        assert {pin["number"]: pin["role_label"] for pin in mc1["pins"]}[12] == "A2"
         assert "wiring_connections" not in response.text
         assert "W-001" not in response.text
 
@@ -54,3 +64,23 @@ def test_wiring_validation_and_unverified_problem(tmp_path):
         unverified = client.post("/api/problems/practice_001/wiring-attempts/submit", json={"problem_version": 1, "connections": []})
         assert unverified.status_code == 200
         assert unverified.json()["gradable"] is False
+
+
+def test_normal_terminal_allows_two_connections_and_terminal_block_uses_its_configured_exception(tmp_path):
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        three_on_socket = [
+            {"from": "X1-1", "to": "MC1-4", "wire_color": "yellow"},
+            {"from": "X1-1", "to": "MC1-5", "wire_color": "yellow"},
+            {"from": "X1-1", "to": "MC1-6", "wire_color": "yellow"},
+        ]
+        rejected = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_socket})
+        assert rejected.status_code == 422
+        assert "최대 연결 수" in rejected.text
+
+        three_on_terminal_block = [
+            {"from": "TB5-01", "to": "MCCB-L1", "wire_color": "brown"},
+            {"from": "TB5-01", "to": "EOCR-L1", "wire_color": "brown"},
+            {"from": "TB5-01", "to": "F-1", "wire_color": "brown"},
+        ]
+        accepted = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_terminal_block})
+        assert accepted.status_code == 200

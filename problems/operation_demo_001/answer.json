@@ -1,44 +1,237 @@
 {
-  "schema_version":"1.0","problem_id":"operation_demo_001","answer_version":1,
-  "verification":{"status":"reviewed","verified_by":"동작 엔진 자동 테스트","verified_at":"2026-08-16T00:00:00+09:00","notes":"프로그램 기능 확인용 자체 제작 정답이며 실제 시험 답안이 아닙니다."},
-  "socket_pin_answers":{"SQ-VR1-C1":{"upper":6,"lower":3}},
-  "required_connections":[],"expected_nets":[],"allowed_alternatives":[],"forbidden_connections":[],
-  "wiring_connections":[
-    {"connection_id":"W-001","from":"TB5-01","to":"MCCB-L1","wire_color":"brown"},
-    {"connection_id":"W-002","from":"TB5-02","to":"MCCB-L2","wire_color":"black"},
-    {"connection_id":"W-003","from":"TB5-03","to":"MCCB-L3","wire_color":"gray"},
-    {"connection_id":"W-004","from":"MCCB-T1","to":"EOCR-U","wire_color":"brown"},
-    {"connection_id":"W-005","from":"MCCB-T2","to":"EOCR-V","wire_color":"black"},
-    {"connection_id":"W-006","from":"MCCB-T3","to":"EOCR-W","wire_color":"gray"},
-    {"connection_id":"W-007","from":"TB5-04","to":"F-1","wire_color":"yellow"},
-    {"connection_id":"W-008","from":"F-2","to":"TB5-05","wire_color":"yellow"},
-    {"connection_id":"W-009","from":"TB5-06","to":"TB5-07","wire_color":"yellow"},
-    {"connection_id":"W-010","from":"TB5-08","to":"MC1-11","wire_color":"yellow"},
-    {"connection_id":"W-011","from":"MC1-12","to":"TB6-01","wire_color":"yellow"},
-    {"connection_id":"W-012","from":"TB5-06","to":"MC1-1","wire_color":"yellow"},
-    {"connection_id":"W-013","from":"MC1-2","to":"MC1-11","wire_color":"yellow"},
-    {"connection_id":"W-014","from":"TB5-06","to":"MC1-3","wire_color":"yellow"},
-    {"connection_id":"W-015","from":"MC1-4","to":"T1-2","wire_color":"yellow"},
-    {"connection_id":"W-016","from":"T1-7","to":"TB6-01","wire_color":"yellow"},
-    {"connection_id":"W-017","from":"MC1-2","to":"T1-6","wire_color":"yellow"},
-    {"connection_id":"W-018","from":"T1-3","to":"TB6-02","wire_color":"yellow"},
-    {"connection_id":"W-019","from":"TB6-03","to":"TB6-01","wire_color":"yellow"}
+  "schema_version": "1.0",
+  "problem_id": "operation_demo_001",
+  "answer_version": 1,
+  "verification": {
+    "status": "reviewed",
+    "verified_by": "동작 엔진 자동 테스트",
+    "verified_at": "2026-08-16T00:00:00+09:00",
+    "notes": "프로그램 기능 확인용 자체 제작 정답이며 실제 시험 답안이 아닙니다."
+  },
+  "socket_pin_answers": {
+    "SQ-VR1-C1": {
+      "upper": 6,
+      "lower": 3
+    }
+  },
+  "required_connections": [],
+  "expected_nets": [],
+  "allowed_alternatives": [],
+  "forbidden_connections": [],
+  "wiring_connections": [
+    {
+      "connection_id": "W-001",
+      "from": "TB5-01",
+      "to": "MCCB-L1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-002",
+      "from": "TB5-02",
+      "to": "MCCB-L2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-003",
+      "from": "TB5-03",
+      "to": "MCCB-L3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-004",
+      "from": "MCCB-T1",
+      "to": "EOCR-L1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-005",
+      "from": "MCCB-T2",
+      "to": "EOCR-L2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-006",
+      "from": "MCCB-T3",
+      "to": "EOCR-L3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-007",
+      "from": "TB5-04",
+      "to": "F-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-008",
+      "from": "F-2",
+      "to": "TB5-05",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-009",
+      "from": "TB5-06",
+      "to": "TB5-07",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-010",
+      "from": "TB5-08",
+      "to": "MC1-6",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-011",
+      "from": "MC1-12",
+      "to": "TB6-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-012",
+      "from": "TB5-06",
+      "to": "MC1-4",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-013",
+      "from": "MC1-10",
+      "to": "TB5-08",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-014",
+      "from": "TB5-08",
+      "to": "T1-2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-015",
+      "from": "T1-7",
+      "to": "TB6-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-016",
+      "from": "TB5-06",
+      "to": "T1-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-017",
+      "from": "T1-3",
+      "to": "TB6-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-018",
+      "from": "TB6-03",
+      "to": "TB6-01",
+      "wire_color": "yellow"
+    }
   ],
-  "wiring_forbidden_connections":[],"mounting_answer":[],
-  "wire_color_rules":{"L1":"brown","L2":"black","L3":"gray","control":"yellow"},
-  "operation_tests":[
-    {"test_id":"SELF_HOLD_START_STOP","label":"자기유지 기동·정지","steps":[
-      {"action":"set_power","value":true,"expect":{"powered":true,"coils":{"MC1-COIL":false}}},
-      {"action":"press_control","control_id":"PB1","expect":{"coils":{"MC1-COIL":true,"T1-COIL":true},"motors":{"M1":"forward"}}},
-      {"action":"release_control","control_id":"PB1","expect":{"coils":{"MC1-COIL":true}}},
-      {"action":"press_control","control_id":"PB0","expect":{"coils":{"MC1-COIL":false,"T1-COIL":false},"motors":{"M1":"stopped"}}}
-    ]},
-    {"test_id":"TIMER_INDICATOR","label":"타이머 완료·표시등","steps":[
-      {"action":"set_power","value":true},
-      {"action":"press_control","control_id":"PB1"},
-      {"action":"release_control","control_id":"PB1"},
-      {"action":"advance_time","milliseconds":1000,"expect":{"timers":{"T1":{"status":"completed"}},"indicators":{"GL":"on"}}},
-      {"action":"set_power","value":false,"expect":{"powered":false,"indicators":{"GL":"off"},"motors":{"M1":"stopped"}}}
-    ]}
+  "wiring_forbidden_connections": [],
+  "mounting_answer": [],
+  "wire_color_rules": {
+    "L1": "brown",
+    "L2": "black",
+    "L3": "gray",
+    "control": "yellow"
+  },
+  "operation_tests": [
+    {
+      "test_id": "SELF_HOLD_START_STOP",
+      "label": "자기유지 기동·정지",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true,
+          "expect": {
+            "powered": true,
+            "coils": {
+              "MC1-COIL": false
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "MC1-COIL": true,
+              "T1-COIL": true
+            },
+            "motors": {
+              "M1": "forward"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "MC1-COIL": true
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB0",
+          "expect": {
+            "coils": {
+              "MC1-COIL": false,
+              "T1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "TIMER_INDICATOR",
+      "label": "타이머 완료·표시등",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000,
+          "expect": {
+            "timers": {
+              "T1": {
+                "status": "completed"
+              }
+            },
+            "indicators": {
+              "GL": "on"
+            }
+          }
+        },
+        {
+          "action": "set_power",
+          "value": false,
+          "expect": {
+            "powered": false,
+            "indicators": {
+              "GL": "off"
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        }
+      ]
+    }
   ]
 }

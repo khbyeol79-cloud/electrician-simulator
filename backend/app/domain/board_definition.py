@@ -17,6 +17,7 @@ class BoardPin(BaseModel):
     model_config = ConfigDict(extra="forbid")
     terminal_id: str = Field(pattern=r"^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$")
     label: str
+    role_label: str | None = None
     number: int | None = Field(default=None, ge=1)
     side: Literal["top", "bottom"]
     x: float

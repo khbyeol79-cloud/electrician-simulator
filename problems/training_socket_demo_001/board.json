@@ -306,80 +306,152 @@
     {
       "item_id": "EOCR",
       "label": "EOCR",
-      "item_type": "component",
-      "socket_type_id": null,
+      "item_type": "socket_12p",
+      "socket_type_id": "socket_12p_base",
       "row": 1,
-      "x": 300,
-      "y": 210,
-      "width": 160,
-      "height": 150,
+      "x": 280,
+      "y": 200,
+      "width": 220,
+      "height": 170,
       "pins": [
         {
           "terminal_id": "EOCR-L1",
-          "label": "L1",
-          "number": null,
+          "label": "1",
+          "role_label": "L1",
+          "number": 1,
           "side": "top",
-          "x": 326.67,
-          "y": 210,
+          "x": 298.33,
+          "y": 200,
           "max_connections": 2,
           "enabled": true
         },
         {
           "terminal_id": "EOCR-L2",
-          "label": "L2",
-          "number": null,
+          "label": "2",
+          "role_label": "L2",
+          "number": 2,
           "side": "top",
-          "x": 380.0,
-          "y": 210,
+          "x": 335.0,
+          "y": 200,
           "max_connections": 2,
           "enabled": true
         },
         {
           "terminal_id": "EOCR-L3",
-          "label": "L3",
-          "number": null,
+          "label": "3",
+          "role_label": "L3",
+          "number": 3,
           "side": "top",
-          "x": 433.33,
-          "y": 210,
+          "x": 371.67,
+          "y": 200,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-96",
+          "label": "4",
+          "role_label": "96",
+          "number": 4,
+          "side": "top",
+          "x": 408.33,
+          "y": 200,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-98",
+          "label": "5",
+          "role_label": "98",
+          "number": 5,
+          "side": "top",
+          "x": 445.0,
+          "y": 200,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-A1",
+          "label": "6",
+          "role_label": "A1",
+          "number": 6,
+          "side": "top",
+          "x": 481.67,
+          "y": 200,
           "max_connections": 2,
           "enabled": true
         },
         {
           "terminal_id": "EOCR-U",
-          "label": "U",
-          "number": null,
+          "label": "7",
+          "role_label": "U",
+          "number": 7,
           "side": "bottom",
-          "x": 326.67,
-          "y": 360,
+          "x": 298.33,
+          "y": 370,
           "max_connections": 2,
           "enabled": true
         },
         {
           "terminal_id": "EOCR-V",
-          "label": "V",
-          "number": null,
+          "label": "8",
+          "role_label": "V",
+          "number": 8,
           "side": "bottom",
-          "x": 380.0,
-          "y": 360,
+          "x": 335.0,
+          "y": 370,
           "max_connections": 2,
           "enabled": true
         },
         {
           "terminal_id": "EOCR-W",
-          "label": "W",
-          "number": null,
+          "label": "9",
+          "role_label": "W",
+          "number": 9,
           "side": "bottom",
-          "x": 433.33,
-          "y": 360,
+          "x": 371.67,
+          "y": 370,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-95",
+          "label": "10",
+          "role_label": "95",
+          "number": 10,
+          "side": "bottom",
+          "x": 408.33,
+          "y": 370,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-97",
+          "label": "11",
+          "role_label": "97",
+          "number": 11,
+          "side": "bottom",
+          "x": 445.0,
+          "y": 370,
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_id": "EOCR-A2",
+          "label": "12",
+          "role_label": "A2",
+          "number": 12,
+          "side": "bottom",
+          "x": 481.67,
+          "y": 370,
           "max_connections": 2,
           "enabled": true
         }
       ],
       "label_area": {
-        "x": 322,
-        "y": 264,
-        "width": 116,
-        "height": 42
+        "x": 328.4,
+        "y": 252.7,
+        "width": 123.2,
+        "height": 64.6
       }
     },
     {
@@ -737,7 +809,8 @@
           "x": 368.33,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L1"
         },
         {
           "terminal_id": "MC1-2",
@@ -747,7 +820,8 @@
           "x": 405.0,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L2"
         },
         {
           "terminal_id": "MC1-3",
@@ -757,7 +831,8 @@
           "x": 441.67,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L3"
         },
         {
           "terminal_id": "MC1-4",
@@ -767,7 +842,8 @@
           "x": 478.33,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "a1"
         },
         {
           "terminal_id": "MC1-5",
@@ -777,7 +853,8 @@
           "x": 515.0,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "b1"
         },
         {
           "terminal_id": "MC1-6",
@@ -787,7 +864,8 @@
           "x": 551.67,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "A1"
         },
         {
           "terminal_id": "MC1-7",
@@ -797,7 +875,8 @@
           "x": 368.33,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "U"
         },
         {
           "terminal_id": "MC1-8",
@@ -807,7 +886,8 @@
           "x": 405.0,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "V"
         },
         {
           "terminal_id": "MC1-9",
@@ -817,7 +897,8 @@
           "x": 441.67,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "W"
         },
         {
           "terminal_id": "MC1-10",
@@ -827,7 +908,8 @@
           "x": 478.33,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "a2"
         },
         {
           "terminal_id": "MC1-11",
@@ -837,7 +919,8 @@
           "x": 515.0,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "b2"
         },
         {
           "terminal_id": "MC1-12",
@@ -847,7 +930,8 @@
           "x": 551.67,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "A2"
         }
       ],
       "label_area": {
@@ -876,7 +960,8 @@
           "x": 698.33,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L1"
         },
         {
           "terminal_id": "MC2-2",
@@ -886,7 +971,8 @@
           "x": 735.0,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L2"
         },
         {
           "terminal_id": "MC2-3",
@@ -896,7 +982,8 @@
           "x": 771.67,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "L3"
         },
         {
           "terminal_id": "MC2-4",
@@ -906,7 +993,8 @@
           "x": 808.33,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "a1"
         },
         {
           "terminal_id": "MC2-5",
@@ -916,7 +1004,8 @@
           "x": 845.0,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "b1"
         },
         {
           "terminal_id": "MC2-6",
@@ -926,7 +1015,8 @@
           "x": 881.67,
           "y": 500,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "A1"
         },
         {
           "terminal_id": "MC2-7",
@@ -936,7 +1026,8 @@
           "x": 698.33,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "U"
         },
         {
           "terminal_id": "MC2-8",
@@ -946,7 +1037,8 @@
           "x": 735.0,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "V"
         },
         {
           "terminal_id": "MC2-9",
@@ -956,7 +1048,8 @@
           "x": 771.67,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "W"
         },
         {
           "terminal_id": "MC2-10",
@@ -966,7 +1059,8 @@
           "x": 808.33,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "a2"
         },
         {
           "terminal_id": "MC2-11",
@@ -976,7 +1070,8 @@
           "x": 845.0,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "b2"
         },
         {
           "terminal_id": "MC2-12",
@@ -986,7 +1081,8 @@
           "x": 881.67,
           "y": 670,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "role_label": "A2"
         }
       ],
       "label_area": {
