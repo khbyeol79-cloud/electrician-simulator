@@ -1,5 +1,9 @@
 # 문제 데이터 폴더
 
+0.8.0에는 자체 제작 기능 검증 문제 `forward_reverse_interlock_demo_001`과 `eocr_sequence_demo_001`이 포함됩니다. 두 문제는 Q-net 공개문제 원본이 아닙니다.
+
+정·역회전 문제는 공개 `problem.json.operation`에 contactors, interlocks, protection_devices를 정의하고, 비공개 `answer.json.operation_tests`에 자동시험 순서와 기대 상태를 저장합니다. 공개 API에는 `operation_tests`를 포함하지 않습니다.
+
 문제마다 별도의 하위 폴더를 사용합니다. 세부 작성법은 `docs/problem-management.md`를 확인하세요.
 
 예정 구조:

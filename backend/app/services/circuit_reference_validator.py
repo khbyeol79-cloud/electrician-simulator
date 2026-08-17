@@ -152,4 +152,77 @@ class CircuitReferenceValidator:
         for index, connection in enumerate(answer.forbidden_connections):
             check_terminal(connection.from_terminal, "unknown_forbidden_terminal", f"forbidden_connections.{index}.from")
             check_terminal(connection.to, "unknown_forbidden_terminal", f"forbidden_connections.{index}.to")
+
+        operation = problem.operation
+        if operation is not None:
+            control_ids = {item.control_id for item in operation.controls}
+            motor_ids = {item.motor_id for item in operation.motors}
+            contactor_ids = {item.contactor_id for item in operation.contactors}
+            protection_ids = {item.protection_device_id for item in operation.protection_devices}
+            operation_id_groups = (
+                ("duplicate_operation_control_id", "조작기구 ID", "operation.controls", [item.control_id for item in operation.controls]),
+                ("duplicate_operation_motor_id", "모터 ID", "operation.motors", [item.motor_id for item in operation.motors]),
+                ("duplicate_operation_contactor_id", "전자접촉기 ID", "operation.contactors", [item.contactor_id for item in operation.contactors]),
+                ("duplicate_operation_interlock_id", "인터록 ID", "operation.interlocks", [item.interlock_id for item in operation.interlocks]),
+                ("duplicate_operation_protection_id", "보호장치 ID", "operation.protection_devices", [item.protection_device_id for item in operation.protection_devices]),
+            )
+            for code, label, field, values in operation_id_groups:
+                for duplicate in self._duplicates(values):
+                    issues.append(self._issue(code, f"{label}가 중복됩니다: {duplicate}", field, problem_id))
+
+            def check_operation_terminal(terminal_id: str, field: str):
+                if terminal_id not in terminals:
+                    issues.append(self._issue("unknown_operation_terminal", f"동작 정의가 존재하지 않는 단자를 참조합니다: {terminal_id}", field, problem_id))
+
+            check_operation_terminal(operation.power.line_terminal_id, "operation.power.line_terminal_id")
+            check_operation_terminal(operation.power.return_terminal_id, "operation.power.return_terminal_id")
+            for terminal_id in operation.power.phase_terminal_ids:
+                check_operation_terminal(terminal_id, "operation.power.phase_terminal_ids")
+            for index, control in enumerate(operation.controls):
+                check_operation_terminal(control.terminal_a_id, f"operation.controls.{index}.terminal_a_id")
+                check_operation_terminal(control.terminal_b_id, f"operation.controls.{index}.terminal_b_id")
+            for index, indicator in enumerate(operation.indicators):
+                check_operation_terminal(indicator.terminal_a_id, f"operation.indicators.{index}.terminal_a_id")
+                check_operation_terminal(indicator.terminal_b_id, f"operation.indicators.{index}.terminal_b_id")
+            for index, motor in enumerate(operation.motors):
+                for coil_id in (motor.forward_coil_id, motor.reverse_coil_id):
+                    if coil_id and coil_id not in coils:
+                        issues.append(self._issue("unknown_operation_motor_coil", f"모터가 존재하지 않는 코일을 참조합니다: {coil_id}", f"operation.motors.{index}", problem_id))
+                for terminal_id in motor.phase_terminal_ids + motor.phase_source_terminal_ids:
+                    check_operation_terminal(terminal_id, f"operation.motors.{index}")
+            for index, pair in enumerate(operation.internal_connections):
+                check_operation_terminal(pair.from_terminal, f"operation.internal_connections.{index}.from")
+                check_operation_terminal(pair.to, f"operation.internal_connections.{index}.to")
+            for index, contactor in enumerate(operation.contactors):
+                if contactor.coil_id not in coils:
+                    issues.append(self._issue("unknown_operation_contactor_coil", f"전자접촉기가 존재하지 않는 코일을 참조합니다: {contactor.coil_id}", f"operation.contactors.{index}.coil_id", problem_id))
+                if contactor.start_control_id and contactor.start_control_id not in control_ids:
+                    issues.append(self._issue("unknown_operation_start_control", f"전자접촉기가 존재하지 않는 시작 입력을 참조합니다: {contactor.start_control_id}", f"operation.contactors.{index}.start_control_id", problem_id))
+                if contactor.motor_id and contactor.motor_id not in motor_ids:
+                    issues.append(self._issue("unknown_operation_contactor_motor", f"전자접촉기가 존재하지 않는 모터를 참조합니다: {contactor.motor_id}", f"operation.contactors.{index}.motor_id", problem_id))
+            for index, interlock in enumerate(operation.interlocks):
+                for contactor_id in interlock.contactor_ids:
+                    if contactor_id not in contactor_ids:
+                        issues.append(self._issue("unknown_operation_interlock_contactor", f"인터록 대상 전자접촉기가 없습니다: {contactor_id}", f"operation.interlocks.{index}.contactor_ids", problem_id))
+                for contact_id in interlock.contact_ids:
+                    contact = contacts.get(contact_id)
+                    if contact is None:
+                        issues.append(self._issue("unknown_operation_interlock_contact", f"인터록 접점이 없습니다: {contact_id}", f"operation.interlocks.{index}.contact_ids", problem_id))
+                    elif interlock.type == "electrical" and contact.contact_type != "NC":
+                        issues.append(self._issue("invalid_electrical_interlock_contact", f"전기적 인터록 접점은 NC여야 합니다: {contact_id}", f"operation.interlocks.{index}.contact_ids", problem_id))
+            for index, protection in enumerate(operation.protection_devices):
+                for coil_id in protection.protected_coil_ids:
+                    if coil_id not in coils:
+                        issues.append(self._issue("unknown_operation_protected_coil", f"보호 대상 코일이 없습니다: {coil_id}", f"operation.protection_devices.{index}.protected_coil_ids", problem_id))
+                for motor_id in protection.protected_motor_ids:
+                    if motor_id not in motor_ids:
+                        issues.append(self._issue("unknown_operation_protected_motor", f"보호 대상 모터가 없습니다: {motor_id}", f"operation.protection_devices.{index}.protected_motor_ids", problem_id))
+
+            for test_index, test in enumerate(answer.operation_tests):
+                for step_index, step in enumerate(test.get("steps", [])):
+                    action = step.get("action")
+                    if action in {"press_control", "release_control", "toggle_control"} and step.get("control_id") not in control_ids:
+                        issues.append(self._issue("unknown_operation_test_control", f"자동시험 입력기구가 없습니다: {step.get('control_id')}", f"answer.operation_tests.{test_index}.steps.{step_index}", problem_id))
+                    if action in {"trigger_fault", "reset_fault"} and step.get("target_id") not in protection_ids:
+                        issues.append(self._issue("unknown_operation_test_protection", f"자동시험 보호장치가 없습니다: {step.get('target_id')}", f"answer.operation_tests.{test_index}.steps.{step_index}", problem_id))
         return issues

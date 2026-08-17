@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "5"
+SCHEMA_VERSION = "6"
 
 
 class SQLiteDatabase:
@@ -121,6 +121,19 @@ class SQLiteDatabase:
                     fault_codes_json TEXT NOT NULL,
                     FOREIGN KEY(wiring_attempt_id) REFERENCES wiring_attempts(id)
                 );
+
+                CREATE TABLE IF NOT EXISTS operation_progress_flags (
+                    problem_id TEXT PRIMARY KEY,
+                    problem_version INTEGER NOT NULL,
+                    wiring_attempt_id INTEGER NOT NULL,
+                    manual_run_count INTEGER NOT NULL DEFAULT 0,
+                    last_run_at TEXT,
+                    forward_seen INTEGER NOT NULL DEFAULT 0,
+                    reverse_seen INTEGER NOT NULL DEFAULT 0,
+                    interlock_seen INTEGER NOT NULL DEFAULT 0,
+                    protection_trip_seen INTEGER NOT NULL DEFAULT 0,
+                    FOREIGN KEY(wiring_attempt_id) REFERENCES wiring_attempts(id)
+                );
                 """
             )
             connection.execute(
@@ -138,6 +151,6 @@ class SQLiteDatabase:
                     "SELECT name FROM sqlite_master WHERE type='table'"
                 ).fetchall()
             names = {row["name"] for row in rows}
-            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts"}.issubset(names)
+            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags"}.issubset(names)
         except sqlite3.Error:
             return False

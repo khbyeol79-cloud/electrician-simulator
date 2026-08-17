@@ -1,0 +1,915 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "forward_reverse_interlock_demo_001",
+  "description": "정·역회전 자기유지·인터록·EOCR 연습. 이 문제는 프로그램 기능 확인용 자체 제작 연습문제이며 Q-net 공개문제 원본이 아닙니다.",
+  "instructions": [
+    "회로도 분석 결과를 참고하여 제어함을 결선합니다.",
+    "정상 결선 제출 후 동작시험에서 버튼과 보호장치를 조작합니다.",
+    "이 문제는 프로그램 기능 확인용 자체 제작 연습문제입니다."
+  ],
+  "learning_objectives": [
+    "자기유지 회로 확인",
+    "ON delay 타이머 확인",
+    "표시등과 모터 논리 상태 확인"
+  ],
+  "power_supply": {
+    "system": "3P3W_AC_220V",
+    "voltage": 220,
+    "frequency": 60,
+    "wire_colors": {
+      "L1": "brown",
+      "L2": "black",
+      "L3": "gray",
+      "control": "yellow"
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "format": "svg",
+    "view_box": "0 0 1600 900"
+  },
+  "board": {
+    "layout_id": "operation_demo_board_v1"
+  },
+  "available_devices": [],
+  "circuit": {
+    "schema_version": "1.0",
+    "definition_status": "functional",
+    "devices": [
+      {
+        "device_id": "VR1",
+        "device_type_id": "auxiliary_relay_8p",
+        "label": "VR1 (분석 연습)",
+        "socket_type_id": "socket_8p_base",
+        "board_position": {
+          "row": 1,
+          "column": 4,
+          "x": 0.64,
+          "y": 0.25
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "MC1",
+        "device_type_id": "auxiliary_relay_12p",
+        "label": "MC1",
+        "socket_type_id": "socket_12p_base",
+        "board_position": {
+          "row": 2,
+          "column": 2,
+          "x": 0.37,
+          "y": 0.62
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "T1",
+        "device_type_id": "timer_8p",
+        "label": "T1",
+        "socket_type_id": "socket_8p_base",
+        "board_position": {
+          "row": 2,
+          "column": 4,
+          "x": 0.78,
+          "y": 0.62
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "PB0",
+        "device_type_id": "push_button",
+        "label": "PB0 정지",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 0,
+          "x": 0.05,
+          "y": 0.1
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "PB1",
+        "device_type_id": "push_button",
+        "label": "PB1 기동",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 1,
+          "x": 0.12,
+          "y": 0.1
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "LS1",
+        "device_type_id": "limit_switch",
+        "label": "LS1",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 2,
+          "x": 0.19,
+          "y": 0.1
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "GL",
+        "device_type_id": "indicator_lamp",
+        "label": "GL",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 3,
+          "x": 0.26,
+          "y": 0.1
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "M1",
+        "device_type_id": "motor",
+        "label": "M1",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 3,
+          "column": 2,
+          "x": 0.5,
+          "y": 0.9
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "PWR",
+        "device_type_id": "power_source",
+        "label": "전원",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 0,
+          "x": 0,
+          "y": 0
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "MCCB",
+        "device_type_id": "mccb",
+        "label": "MCCB",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 1,
+          "column": 0,
+          "x": 0.12,
+          "y": 0.25
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "F",
+        "device_type_id": "fuse",
+        "label": "FUSE",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 1,
+          "column": 2,
+          "x": 0.42,
+          "y": 0.25
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "MC2",
+        "device_type_id": "auxiliary_relay_12p",
+        "label": "MC2",
+        "socket_type_id": "socket_12p_base",
+        "board_position": {
+          "row": 2,
+          "column": 2,
+          "x": 0.6,
+          "y": 0.65
+        },
+        "installed_initially": true
+      },
+      {
+        "device_id": "PB2",
+        "device_type_id": "push_button",
+        "label": "PB2",
+        "socket_type_id": null,
+        "board_position": {
+          "row": 0,
+          "column": 2,
+          "x": 0.2,
+          "y": 0.1
+        },
+        "installed_initially": true
+      }
+    ],
+    "terminals": [
+      {
+        "terminal_id": "VR1-2",
+        "device_id": "VR1",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-3",
+        "device_id": "VR1",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-6",
+        "device_id": "VR1",
+        "pin_number": 6,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-7",
+        "device_id": "VR1",
+        "pin_number": 7,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-1",
+        "device_id": "MC1",
+        "pin_number": 1,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-2",
+        "device_id": "MC1",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-3",
+        "device_id": "MC1",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-4",
+        "device_id": "MC1",
+        "pin_number": 4,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-11",
+        "device_id": "MC1",
+        "pin_number": 11,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC1-12",
+        "device_id": "MC1",
+        "pin_number": 12,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "T1-2",
+        "device_id": "T1",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "T1-3",
+        "device_id": "T1",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "T1-6",
+        "device_id": "T1",
+        "pin_number": 6,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "T1-7",
+        "device_id": "T1",
+        "pin_number": 7,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-05",
+        "device_id": "PB0",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_common",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-06",
+        "device_id": "PB0",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_nc",
+        "max_connections": 6,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-07",
+        "device_id": "PB1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_common",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-08",
+        "device_id": "PB1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_no",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-09",
+        "device_id": "LS1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_common",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-10",
+        "device_id": "LS1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "contact_no",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB6-02",
+        "device_id": "GL",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "load",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB6-03",
+        "device_id": "GL",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "load",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-U",
+        "device_id": "M1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-V",
+        "device_id": "M1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "EOCR-W",
+        "device_id": "M1",
+        "pin_number": null,
+        "terminal_type": "external_terminal",
+        "electrical_role": "load",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-01",
+        "device_id": "PWR",
+        "pin_number": null,
+        "terminal_type": "power_terminal",
+        "electrical_role": "line",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-02",
+        "device_id": "PWR",
+        "pin_number": null,
+        "terminal_type": "power_terminal",
+        "electrical_role": "line",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-03",
+        "device_id": "PWR",
+        "pin_number": null,
+        "terminal_type": "power_terminal",
+        "electrical_role": "line",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB5-04",
+        "device_id": "PWR",
+        "pin_number": null,
+        "terminal_type": "power_terminal",
+        "electrical_role": "control",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "TB6-01",
+        "device_id": "PWR",
+        "pin_number": null,
+        "terminal_type": "power_terminal",
+        "electrical_role": "neutral",
+        "max_connections": 3,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-L1",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-L2",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-L3",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-T1",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-T2",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MCCB-T3",
+        "device_id": "MCCB",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "line",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "F-1",
+        "device_id": "F",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "control",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "F-2",
+        "device_id": "F",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "control",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-1",
+        "device_id": "MC2",
+        "pin_number": 1,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-2",
+        "device_id": "MC2",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-3",
+        "device_id": "MC2",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-4",
+        "device_id": "MC2",
+        "pin_number": 4,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_nc",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-11",
+        "device_id": "MC2",
+        "pin_number": 11,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "MC2-12",
+        "device_id": "MC2",
+        "pin_number": 12,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      }
+    ],
+    "contacts": [
+      {
+        "contact_id": "VR1-C1",
+        "owner_device_id": "VR1",
+        "contact_type": "NO",
+        "common_terminal_id": "VR1-6",
+        "switched_terminal_id": "VR1-3",
+        "controlled_by_coil_id": "VR1-COIL",
+        "normal_state": "open"
+      },
+      {
+        "contact_id": "MC1-HOLD",
+        "owner_device_id": "MC1",
+        "contact_type": "NO",
+        "common_terminal_id": "MC1-1",
+        "switched_terminal_id": "MC1-2",
+        "controlled_by_coil_id": "MC1-COIL",
+        "normal_state": "open"
+      },
+      {
+        "contact_id": "T1-C1",
+        "owner_device_id": "T1",
+        "contact_type": "NO",
+        "common_terminal_id": "T1-6",
+        "switched_terminal_id": "T1-3",
+        "controlled_by_coil_id": "T1-COIL",
+        "normal_state": "open"
+      },
+      {
+        "contact_id": "MC1-INTERLOCK",
+        "owner_device_id": "MC1",
+        "contact_type": "NC",
+        "common_terminal_id": "MC1-3",
+        "switched_terminal_id": "MC1-4",
+        "nc_terminal_id": null,
+        "no_terminal_id": null,
+        "controlled_by_coil_id": "MC1-COIL",
+        "normal_state": "closed"
+      },
+      {
+        "contact_id": "MC2-HOLD",
+        "owner_device_id": "MC2",
+        "contact_type": "NO",
+        "common_terminal_id": "MC2-1",
+        "switched_terminal_id": "MC2-2",
+        "nc_terminal_id": null,
+        "no_terminal_id": null,
+        "controlled_by_coil_id": "MC2-COIL",
+        "normal_state": "open"
+      },
+      {
+        "contact_id": "MC2-INTERLOCK",
+        "owner_device_id": "MC2",
+        "contact_type": "NC",
+        "common_terminal_id": "MC2-3",
+        "switched_terminal_id": "MC2-4",
+        "nc_terminal_id": null,
+        "no_terminal_id": null,
+        "controlled_by_coil_id": "MC2-COIL",
+        "normal_state": "closed"
+      }
+    ],
+    "coils": [
+      {
+        "coil_id": "VR1-COIL",
+        "owner_device_id": "VR1",
+        "terminal_a_id": "VR1-2",
+        "terminal_b_id": "VR1-7",
+        "rated_voltage": 220,
+        "voltage_type": "AC",
+        "frequency": 60
+      },
+      {
+        "coil_id": "MC1-COIL",
+        "owner_device_id": "MC1",
+        "terminal_a_id": "MC1-11",
+        "terminal_b_id": "MC1-12",
+        "rated_voltage": 220,
+        "voltage_type": "AC",
+        "frequency": 60
+      },
+      {
+        "coil_id": "T1-COIL",
+        "owner_device_id": "T1",
+        "terminal_a_id": "T1-2",
+        "terminal_b_id": "T1-7",
+        "rated_voltage": 220,
+        "voltage_type": "AC",
+        "frequency": 60
+      },
+      {
+        "coil_id": "MC2-COIL",
+        "owner_device_id": "MC2",
+        "terminal_a_id": "MC2-11",
+        "terminal_b_id": "MC2-12",
+        "rated_voltage": 220,
+        "voltage_type": "AC",
+        "frequency": 60
+      }
+    ]
+  },
+  "socket_questions": [
+    {
+      "question_id": "SQ-VR1-C1",
+      "target_element_type": "contact",
+      "target_element_id": "VR1-C1",
+      "display_label": "VR1 (분석 연습)",
+      "answer_slots": [
+        {
+          "slot_id": "upper",
+          "position": "above"
+        },
+        {
+          "slot_id": "lower",
+          "position": "below"
+        }
+      ]
+    }
+  ],
+  "device_layout": {
+    "schema_version": "1.0",
+    "fixed_placements": [
+      {
+        "mount_device_id": "DEVICE-MC1",
+        "label": "MC1 정회전 접촉기",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "socket_id": "MC1",
+        "socket_type_id": "socket_12p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-MC2",
+        "label": "MC2 역회전 접촉기",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "socket_id": "MC2",
+        "socket_type_id": "socket_12p_base"
+      }
+    ]
+  },
+  "mounting": null,
+  "operation": {
+    "schema_version": "1.0",
+    "simulation_status": "functional",
+    "power": {
+      "line_terminal_id": "TB5-04",
+      "return_terminal_id": "TB6-01",
+      "phase_terminal_ids": [
+        "TB5-01",
+        "TB5-02",
+        "TB5-03"
+      ]
+    },
+    "controls": [
+      {
+        "control_id": "PB0",
+        "label": "PB0 정지",
+        "control_type": "pushbutton",
+        "mode": "momentary",
+        "contact_type": "NC",
+        "terminal_a_id": "TB5-05",
+        "terminal_b_id": "TB5-06",
+        "initial_active": false
+      },
+      {
+        "control_id": "PB1",
+        "label": "PB1 정회전",
+        "control_type": "pushbutton",
+        "mode": "momentary",
+        "contact_type": "NO",
+        "terminal_a_id": "TB5-07",
+        "terminal_b_id": "TB5-08",
+        "initial_active": false
+      },
+      {
+        "control_id": "PB2",
+        "label": "PB2 역회전",
+        "control_type": "pushbutton",
+        "mode": "momentary",
+        "contact_type": "NO",
+        "terminal_a_id": "TB5-09",
+        "terminal_b_id": "TB5-10",
+        "initial_active": false
+      }
+    ],
+    "timers": [],
+    "indicators": [
+      {
+        "indicator_id": "RL",
+        "label": "정회전 표시",
+        "display_color": "red",
+        "terminal_a_id": "MC1-11",
+        "terminal_b_id": "MC1-12"
+      },
+      {
+        "indicator_id": "GL",
+        "label": "역회전 표시",
+        "display_color": "green",
+        "terminal_a_id": "MC2-11",
+        "terminal_b_id": "MC2-12"
+      }
+    ],
+    "motors": [
+      {
+        "motor_id": "M1",
+        "label": "M1 모터",
+        "forward_coil_id": "MC1-COIL",
+        "reverse_coil_id": "MC2-COIL",
+        "phase_terminal_ids": [
+          "EOCR-U",
+          "EOCR-V",
+          "EOCR-W"
+        ],
+        "phase_source_terminal_ids": [
+          "TB5-01",
+          "TB5-02",
+          "TB5-03"
+        ],
+        "forward_phase_order": [
+          0,
+          1,
+          2
+        ]
+      }
+    ],
+    "contactors": [
+      {
+        "contactor_id": "MC1",
+        "label": "MC1 정회전",
+        "coil_id": "MC1-COIL",
+        "role": "forward",
+        "start_control_id": "PB1",
+        "motor_id": "M1"
+      },
+      {
+        "contactor_id": "MC2",
+        "label": "MC2 역회전",
+        "coil_id": "MC2-COIL",
+        "role": "reverse",
+        "start_control_id": "PB2",
+        "motor_id": "M1"
+      }
+    ],
+    "interlocks": [
+      {
+        "interlock_id": "ELEC-MC1-MC2",
+        "label": "MC1·MC2 전기적 인터록",
+        "type": "electrical",
+        "contactor_ids": [
+          "MC1",
+          "MC2"
+        ],
+        "contact_ids": [
+          "MC1-INTERLOCK",
+          "MC2-INTERLOCK"
+        ],
+        "policy": "prevent_simultaneous_activation"
+      },
+      {
+        "interlock_id": "MECH-MC1-MC2",
+        "label": "MC1·MC2 기계적 인터록",
+        "type": "mechanical",
+        "contactor_ids": [
+          "MC1",
+          "MC2"
+        ],
+        "contact_ids": [],
+        "policy": "prevent_simultaneous_activation"
+      }
+    ],
+    "protection_devices": [
+      {
+        "protection_device_id": "EOCR",
+        "label": "EOCR",
+        "protection_type": "eocr",
+        "protected_coil_ids": [
+          "MC1-COIL",
+          "MC2-COIL"
+        ],
+        "protected_motor_ids": [
+          "M1"
+        ],
+        "reset_mode": "manual",
+        "allowed_fault_types": [
+          "overload"
+        ]
+      }
+    ],
+    "direction_change_policy": "stop_before_reverse",
+    "internal_connections": [
+      {
+        "from": "MCCB-L1",
+        "to": "MCCB-T1"
+      },
+      {
+        "from": "MCCB-L2",
+        "to": "MCCB-T2"
+      },
+      {
+        "from": "MCCB-L3",
+        "to": "MCCB-T3"
+      },
+      {
+        "from": "F-1",
+        "to": "F-2"
+      }
+    ]
+  }
+}

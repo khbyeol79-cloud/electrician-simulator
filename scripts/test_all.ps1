@@ -10,6 +10,10 @@ Write-Host "Running Python tests..."
 & ".venv\Scripts\python.exe" -m pytest
 if ($LASTEXITCODE -ne 0) { throw "Python tests failed." }
 
+Write-Host "Validating problem packages..."
+& ".venv\Scripts\python.exe" "scripts\validate_problems.py"
+if ($LASTEXITCODE -ne 0) { throw "Problem validation failed." }
+
 Write-Host "Running frontend tests..."
 Push-Location "frontend"
 try {
@@ -23,4 +27,3 @@ finally {
 }
 
 Write-Host "All tests and builds passed."
-

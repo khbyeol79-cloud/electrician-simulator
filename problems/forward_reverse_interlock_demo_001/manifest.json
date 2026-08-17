@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "forward_reverse_interlock_demo_001",
+  "title": "정·역회전 자기유지·인터록·EOCR 연습",
+  "version": 1,
+  "problem_type": "practice",
+  "status": "reviewed",
+  "difficulty": "beginner",
+  "estimated_minutes": 15,
+  "tags": [
+    "자체제작",
+    "정역회전",
+    "인터록",
+    "EOCR"
+  ],
+  "source": {
+    "type": "original",
+    "name": "프로그램 논리 동작시험 검증용 자체 제작 문제",
+    "reference": "Q-net 공개문제 원본 또는 실제 시험 정답이 아님",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

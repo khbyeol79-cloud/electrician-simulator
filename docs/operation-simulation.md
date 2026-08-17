@@ -1,6 +1,20 @@
 # 동작시험 데이터 작성법
 
-0.7.0의 동작시험은 공개 `problem.json.operation`, 공개 `problem.json.circuit`, 사용자가 정상 제출한 결선 스냅샷을 이용합니다. 자동 검사의 절차와 기대 상태는 비공개 `answer.json.operation_tests`에 저장합니다.
+0.8.0의 동작시험은 공개 `problem.json.operation`, 공개 `problem.json.circuit`, 사용자가 정상 제출한 결선 스냅샷을 이용합니다. 자동 검사의 절차와 기대 상태는 비공개 `answer.json.operation_tests`에 저장합니다.
+
+## 0.8.0 정·역회전과 보호장치
+
+`operation.contactors`는 전자접촉기 ID, 코일 ID, 정·역 역할과 시작 입력을 연결합니다. `operation.interlocks`는 전기적 인터록과 기계적 인터록을 구분하며, 전기적 인터록의 `contact_ids`는 실제 회로의 NC 접점을 참조해야 합니다. `direction_change_policy`는 동시 입력과 방향 전환 정책을 결정합니다.
+
+`operation.protection_devices`의 EOCR는 보호 대상 코일과 모터, 복귀 방식을 정의합니다. `trigger_fault`는 실제 전류 측정이 아니라 교육용 과부하 고장 주입입니다. 수동 복귀 후에는 시작 버튼을 다시 눌러야 합니다.
+
+모터 방향은 승인 결선의 L1·L2·L3와 U·V·W 연결, 정·역 코일 상태를 이용해 계산합니다. 이 엔진은 논리 시뮬레이션이며 실제 전압, 전류, RPM, 토크 또는 열을 계산하지 않습니다.
+
+전체 문제 참조 검사는 다음 명령으로 실행합니다.
+
+```powershell
+python scripts/validate_problems.py
+```
 
 ## 공개 데이터
 
@@ -51,7 +65,7 @@
 }
 ```
 
-지원 동작은 `set_power`, `press_control`, `release_control`, `toggle_control`, `advance_time`입니다. `expect`에는 `powered`, `coils`, `contacts`, `timers`, `indicators`, `motors`의 필요한 값만 작성합니다. API는 시험 단계와 기대 상태를 반환하지 않고 시험명·통과 여부·안내만 반환합니다.
+지원 동작은 `set_power`, `press_control`, `release_control`, `toggle_control`, `advance_time`, `trigger_fault`, `reset_fault`, `reset_operation`입니다. `expect`에는 `powered`, `coils`, `contacts`, `timers`, `indicators`, `motors`, `protections`, `interlocks`의 필요한 값만 작성합니다. API는 시험 단계와 기대 상태를 반환하지 않고 시험명·통과 여부·안내만 반환합니다.
 
 ## 정상 제출 스냅샷
 

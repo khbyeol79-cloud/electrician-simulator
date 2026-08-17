@@ -371,6 +371,24 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .operation-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .operation-actions button { min-height: 35px; color: #fff; border-radius: 4px; background: #1265e8; font-size: 9px; font-weight: 800; }
 .operation-actions .secondary-action { margin: 0; color: #24517f; background: #eef3f8; }
+.protection-controls { display: grid; gap: 6px; margin-top: 9px; padding-top: 8px; border-top: 1px solid #d7e0ea; }
+.protection-controls p { margin: 0; color: #8a5a08; font-size: 8px; line-height: 1.45; }
+.protection-controls > div { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.protection-controls button { min-height: 32px; border-radius: 4px; font-size: 8px; font-weight: 800; }
+.protection-controls .fault-trigger { color: #8d2d22; border-color: #e6b7ad; background: #fff3ef; }
+.protection-controls .fault-reset { color: #244e78; border-color: #b8cce0; background: #eff6fd; }
+.status-chip.motor b { display: inline-flex; gap: 5px; align-items: center; }
+.status-chip.motor b i { min-width: 13px; color: #1265e8; font-size: 14px; font-style: normal; line-height: 1; }
+.status-chip.motor.reverse b i { color: #b94a2e; }
+.status-chip.motor.phase_loss, .status-chip.motor.phase_sequence_error,
+.status-chip.motor.simultaneous_fault, .status-chip.motor.protection_trip { border-color: #e3a6a6; background: #fff2f2; }
+.status-chip.protection.reset_required, .status-chip.protection.tripped { border-color: #e0a76b; background: #fff7e9; }
+.operation-interlocks { display: grid; gap: 5px; }
+.operation-interlocks p { display: grid; grid-template-columns: 48px 1fr auto; gap: 6px; align-items: center; margin: 0; padding: 6px; border: 1px solid #dce5ef; border-radius: 4px; color: #50657c; font-size: 8px; }
+.operation-interlocks p b { color: #173e69; }
+.operation-interlocks p em { color: #587088; font-style: normal; font-weight: 800; }
+.operation-interlocks p.blocking { border-color: #e7b36d; background: #fff8ea; }
+.operation-interlocks p.blocking em { color: #a85d00; }
 .operation-check-result { display: grid; gap: 4px; border-left: 4px solid #c93b3b !important; background: #fff1f1 !important; }
 .operation-check-result.passed { border-left-color: #148a50 !important; background: #edf9f2 !important; }
 .operation-check-result.warning { border-left-color: #d97706 !important; background: #fff8e8 !important; }

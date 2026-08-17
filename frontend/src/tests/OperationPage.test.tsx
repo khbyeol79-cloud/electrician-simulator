@@ -71,6 +71,31 @@ describe('동작시험', () => {
     expect(screen.getByRole('img', { name: '동작시험 준비 제어함' }).querySelectorAll('.board-wire.readonly')).toHaveLength(1)
   })
 
+  it('shows EOCR trip and reset controls as an educational simulation', async () => {
+    installApiMock({ operationSetup: readySetup })
+    const user = userEvent.setup()
+    render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)
+    await screen.findByRole('button', { name: 'EOCR 과부하 발생' })
+    expect(screen.getByText(/실제 전류 측정이 아닌 교육용/)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'EOCR 과부하 발생' }))
+    expect(await screen.findByText('복귀 필요')).toBeInTheDocument()
+    expect(screen.getByText('M1 모터').parentElement).toHaveTextContent('보호 정지')
+    await user.click(screen.getByRole('button', { name: 'EOCR 복귀' }))
+    await waitFor(() => expect(screen.getByText('M1 모터').parentElement).toHaveTextContent('정지'))
+  })
+
+  it('releases a momentary control on window pointer up', async () => {
+    const fetchMock = installApiMock({ operationSetup: readySetup })
+    render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)
+    const pb1 = await screen.findByRole('button', { name: /PB1/ })
+    fireEvent.pointerDown(pb1, { pointerId: 3 })
+    fireEvent.pointerUp(window, { pointerId: 3 })
+    await waitFor(() => {
+      const bodies = fetchMock.mock.calls.filter(([, init]) => init?.method === 'POST').map(([, init]) => String(init?.body))
+      expect(bodies.some((body) => body.includes('release_control'))).toBe(true)
+    })
+  })
+
   it('supports zoom and returns to the editable wiring stage', async () => {
     installApiMock({ operationSetup: readySetup })
     const user = userEvent.setup()

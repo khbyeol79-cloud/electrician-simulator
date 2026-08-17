@@ -115,7 +115,15 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"동작 회로 정의를 확인해 주세요. {exc}") from exc
     request.app.state.operation_sessions.add(engine)
-    return engine.state()
+    repository = OperationRepository(request.app.state.database)
+    repository.start_manual_run(
+        problem_id=problem_id,
+        problem_version=package.manifest.version,
+        wiring_attempt_id=snapshot.attempt_id,
+    )
+    state = engine.state()
+    repository.observe_state(problem_id=problem_id, problem_version=package.manifest.version, state=state)
+    return state
 
 
 @problem_router.get("/{problem_id}/operation-progress", response_model=OperationProgress)
@@ -133,7 +141,16 @@ def get_operation_session(session_id: str, request: Request):
 @session_router.post("/{session_id}/actions", response_model=OperationSessionState)
 def apply_operation_action(session_id: str, payload: OperationAction, request: Request):
     try:
-        return _engine(request, session_id).apply(payload)
+        engine = _engine(request, session_id)
+        state = engine.apply(payload)
+        package = _problems(request)._get_package_internal(engine.problem_id)
+        if package is not None:
+            OperationRepository(request.app.state.database).observe_state(
+                problem_id=engine.problem_id,
+                problem_version=package.manifest.version,
+                state=state,
+            )
+        return state
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

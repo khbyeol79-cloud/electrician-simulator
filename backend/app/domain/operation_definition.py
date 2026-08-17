@@ -67,6 +67,40 @@ class OperationMotor(BaseModel):
     forward_phase_order: list[int] = Field(default_factory=lambda: [0, 1, 2], min_length=3, max_length=3)
 
 
+class OperationContactor(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    contactor_id: str
+    label: str
+    coil_id: str
+    role: Literal["forward", "reverse", "general"] = "general"
+    start_control_id: str | None = None
+    motor_id: str | None = None
+
+
+class OperationInterlock(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    interlock_id: str
+    label: str
+    type: Literal["electrical", "mechanical"]
+    contactor_ids: list[str] = Field(min_length=2, max_length=2)
+    contact_ids: list[str] = Field(default_factory=list, max_length=10)
+    policy: Literal["prevent_simultaneous_activation"] = "prevent_simultaneous_activation"
+
+
+class OperationProtectionDevice(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    protection_device_id: str
+    label: str
+    protection_type: Literal["eocr"] = "eocr"
+    protected_coil_ids: list[str] = Field(min_length=1, max_length=20)
+    protected_motor_ids: list[str] = Field(default_factory=list, max_length=10)
+    reset_mode: Literal["manual", "automatic", "restart_required"] = "manual"
+    allowed_fault_types: list[Literal["overload"]] = Field(default_factory=lambda: ["overload"], min_length=1)
+
+
 class OperationDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -77,16 +111,27 @@ class OperationDefinition(BaseModel):
     timers: list[OperationTimer] = Field(default_factory=list, max_length=20)
     indicators: list[OperationIndicator] = Field(default_factory=list, max_length=30)
     motors: list[OperationMotor] = Field(default_factory=list, max_length=10)
+    contactors: list[OperationContactor] = Field(default_factory=list, max_length=30)
+    interlocks: list[OperationInterlock] = Field(default_factory=list, max_length=30)
+    protection_devices: list[OperationProtectionDevice] = Field(default_factory=list, max_length=20)
+    direction_change_policy: Literal[
+        "current_direction_first", "first_input_first", "block_both", "stop_before_reverse"
+    ] = "block_both"
     internal_connections: list[TerminalPair] = Field(default_factory=list, max_length=500)
 
 
 class OperationAction(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    action: Literal["set_power", "press_control", "release_control", "toggle_control", "advance_time"]
+    action: Literal[
+        "set_power", "press_control", "release_control", "toggle_control", "advance_time",
+        "trigger_fault", "reset_fault", "reset_operation",
+    ]
     value: bool | None = None
     control_id: str | None = None
     milliseconds: int | None = Field(default=None, ge=0, le=60_000)
+    target_id: str | None = None
+    fault_type: Literal["overload"] | None = None
 
     @model_validator(mode="after")
     def validate_payload(self):
@@ -96,6 +141,10 @@ class OperationAction(BaseModel):
             raise ValueError("조작할 입력기구 ID가 필요합니다.")
         if self.action == "advance_time" and self.milliseconds is None:
             raise ValueError("진행할 시간이 필요합니다.")
+        if self.action in {"trigger_fault", "reset_fault"} and not self.target_id:
+            raise ValueError("보호장치 ID가 필요합니다.")
+        if self.action == "trigger_fault" and self.fault_type is None:
+            raise ValueError("고장 종류가 필요합니다.")
         return self
 
 
@@ -133,6 +182,24 @@ class ControlState(BaseModel):
     active: bool
 
 
+class ProtectionState(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str
+    protection_type: str
+    status: Literal["normal", "tripped", "reset_required"]
+    reset_mode: str
+
+
+class InterlockState(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    label: str
+    type: Literal["electrical", "mechanical"]
+    status: Literal["ready", "blocking", "fault"]
+    blocked_contactor_id: str | None = None
+
+
 class OperationSessionState(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -146,7 +213,13 @@ class OperationSessionState(BaseModel):
     contacts: dict[str, Literal["open", "closed"]]
     timers: dict[str, TimerState]
     indicators: dict[str, Literal["off", "on", "error"]]
-    motors: dict[str, Literal["stopped", "forward", "reverse", "phase_loss", "simultaneous_fault", "connection_error"]]
+    motors: dict[str, Literal[
+        "stopped", "forward", "reverse", "phase_loss", "phase_sequence_error",
+        "simultaneous_fault", "connection_error", "power_off", "protection_trip", "undetermined",
+    ]]
+    protections: dict[str, ProtectionState]
+    interlocks: dict[str, InterlockState]
+    active_faults: list[str]
     faults: list[OperationFault]
     stable: bool
     elapsed_ms: int
@@ -183,4 +256,9 @@ class OperationProgress(BaseModel):
     last_gradable: bool | None = None
     last_passed_count: int = 0
     total_count: int = 0
-
+    manual_run_count: int = 0
+    last_run_at: str | None = None
+    forward_seen: bool = False
+    reverse_seen: bool = False
+    interlock_seen: bool = False
+    protection_trip_seen: bool = False

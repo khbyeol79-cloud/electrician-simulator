@@ -178,23 +178,30 @@ export type OperationDefinition = {
   timers: { timer_id: string; label: string; coil_id: string; mode: 'on_delay'; delay_ms: number; timed_contact_ids: string[]; retentive: boolean }[]
   indicators: { indicator_id: string; label: string; display_color: 'red' | 'green' | 'yellow' | 'white'; terminal_a_id: string; terminal_b_id: string }[]
   motors: { motor_id: string; label: string; forward_coil_id: string | null; reverse_coil_id: string | null; phase_terminal_ids: string[]; phase_source_terminal_ids: string[]; forward_phase_order: number[] }[]
+  contactors: { contactor_id: string; label: string; coil_id: string; role: 'forward' | 'reverse' | 'general'; start_control_id: string | null; motor_id: string | null }[]
+  interlocks: { interlock_id: string; label: string; type: 'electrical' | 'mechanical'; contactor_ids: string[]; contact_ids: string[]; policy: 'prevent_simultaneous_activation' }[]
+  protection_devices: { protection_device_id: string; label: string; protection_type: 'eocr'; protected_coil_ids: string[]; protected_motor_ids: string[]; reset_mode: 'manual' | 'automatic' | 'restart_required'; allowed_fault_types: 'overload'[] }[]
+  direction_change_policy: 'current_direction_first' | 'first_input_first' | 'block_both' | 'stop_before_reverse'
   internal_connections: { from: string; to: string }[]
 }
 export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: string; active: boolean }
 export type OperationTimerState = { status: 'stopped' | 'timing' | 'completed' | 'reset'; elapsed_ms: number; delay_ms: number }
 export type OperationFault = { code: string; message: string; severity: 'warning' | 'error' | 'danger'; trip_required: boolean }
+export type OperationProtectionState = { label: string; protection_type: string; status: 'normal' | 'tripped' | 'reset_required'; reset_mode: string }
+export type OperationInterlockState = { label: string; type: 'electrical' | 'mechanical'; status: 'ready' | 'blocking' | 'fault'; blocked_contactor_id: string | null }
 export type OperationSessionState = {
   session_id: string; problem_id: string; wiring_attempt_id: number; powered: boolean; power_state: 'off' | 'on' | 'tripped'
   controls: Record<string, OperationControlState>; coils: Record<string, boolean>; contacts: Record<string, 'open' | 'closed'>
   timers: Record<string, OperationTimerState>; indicators: Record<string, 'off' | 'on' | 'error'>
-  motors: Record<string, 'stopped' | 'forward' | 'reverse' | 'phase_loss' | 'simultaneous_fault' | 'connection_error'>
+  motors: Record<string, 'stopped' | 'forward' | 'reverse' | 'phase_loss' | 'phase_sequence_error' | 'simultaneous_fault' | 'connection_error' | 'power_off' | 'protection_trip' | 'undetermined'>
+  protections: Record<string, OperationProtectionState>; interlocks: Record<string, OperationInterlockState>; active_faults: string[]
   faults: OperationFault[]; stable: boolean; elapsed_ms: number; events: string[]
 }
 export type OperationCheckResult = {
   gradable: boolean; overall_passed: boolean | null; passed_count: number; total_count: number
   results: { test_id: string; label: string; passed: boolean; message: string }[]; message: string
 }
-export type OperationProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_passed: boolean | null; last_gradable: boolean | null; last_passed_count: number; total_count: number }
+export type OperationProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_passed: boolean | null; last_gradable: boolean | null; last_passed_count: number; total_count: number; manual_run_count: number; last_run_at: string | null; forward_seen: boolean; reverse_seen: boolean; interlock_seen: boolean; protection_trip_seen: boolean }
 
 export type ReloadStatistics = {
   loaded: number

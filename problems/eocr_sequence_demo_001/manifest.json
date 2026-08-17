@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "eocr_sequence_demo_001",
+  "title": "자기유지·타이머·EOCR 보호 연습",
+  "version": 1,
+  "problem_type": "practice",
+  "status": "reviewed",
+  "difficulty": "beginner",
+  "estimated_minutes": 15,
+  "tags": [
+    "자체제작",
+    "자기유지",
+    "타이머",
+    "EOCR"
+  ],
+  "source": {
+    "type": "original",
+    "name": "프로그램 논리 동작시험 검증용 자체 제작 문제",
+    "reference": "Q-net 공개문제 원본 또는 실제 시험 정답이 아님",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.7.0',
+  version: '0.8.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.7.0',
+  version: '0.8.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -137,6 +137,9 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     },
     coils: { 'MC1-COIL': false, 'T1-COIL': false }, contacts: { 'MC1-HOLD': 'open' },
     timers: { T1: { status: 'stopped', elapsed_ms: 0, delay_ms: 1000 } }, indicators: { GL: 'off' }, motors: { M1: 'stopped' },
+    protections: { EOCR: { label: 'EOCR', protection_type: 'eocr', status: 'normal', reset_mode: 'manual' } },
+    interlocks: { 'ELEC-MC1-MC2': { label: 'MC1·MC2 전기적 인터록', type: 'electrical', status: 'ready', blocked_contactor_id: null } },
+    active_faults: [],
     faults: [], stable: true, elapsed_ms: 0, events: ['동작시험 세션 시작'],
   }
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -211,12 +214,14 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     })
     if (url.endsWith('/operation-sessions') && init?.method === 'POST') return response(operationState, 201)
     if (url.endsWith('/actions') && init?.method === 'POST') {
-      const body = JSON.parse(String(init.body)) as { action: string; value?: boolean; control_id?: string; milliseconds?: number }
+      const body = JSON.parse(String(init.body)) as { action: string; value?: boolean; control_id?: string; milliseconds?: number; target_id?: string; fault_type?: string }
       if (body.action === 'set_power') operationState = { ...operationState, powered: Boolean(body.value), power_state: body.value ? 'on' : 'off', events: [...operationState.events, body.value ? '전원 ON' : '전원 OFF'] }
       if (body.action === 'press_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: true } }, coils: body.control_id === 'PB1' ? { 'MC1-COIL': true, 'T1-COIL': true } : operationState.coils, motors: body.control_id === 'PB1' ? { M1: 'forward' } : operationState.motors, events: [...operationState.events, `${body.control_id} 작동`] }
       if (body.action === 'release_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: false } }, events: [...operationState.events, `${body.control_id} 복귀`] }
       if (body.action === 'toggle_control' && body.control_id) operationState = { ...operationState, controls: { ...operationState.controls, [body.control_id]: { ...operationState.controls[body.control_id], active: !operationState.controls[body.control_id].active } } }
       if (body.action === 'advance_time') operationState = { ...operationState, elapsed_ms: operationState.elapsed_ms + (body.milliseconds ?? 0), timers: { T1: { status: 'completed', elapsed_ms: 1000, delay_ms: 1000 } }, indicators: { GL: 'on' } }
+      if (body.action === 'trigger_fault' && body.target_id === 'EOCR') operationState = { ...operationState, coils: { 'MC1-COIL': false, 'T1-COIL': false }, motors: { M1: 'protection_trip' }, protections: { EOCR: { ...operationState.protections.EOCR, status: 'reset_required' } }, active_faults: ['EOCR'], events: [...operationState.events, 'EOCR가 과부하로 트립되었습니다.'] }
+      if (body.action === 'reset_fault' && body.target_id === 'EOCR') operationState = { ...operationState, motors: { M1: 'stopped' }, protections: { EOCR: { ...operationState.protections.EOCR, status: 'normal' } }, active_faults: [], events: [...operationState.events, 'EOCR를 복귀했습니다.'] }
       return response(operationState)
     }
     if (url.endsWith('/run-check') && init?.method === 'POST') return response({ gradable: true, overall_passed: true, passed_count: 2, total_count: 2, results: [{ test_id: 'A', label: '자기유지', passed: true, message: '정상' }, { test_id: 'B', label: '타이머', passed: true, message: '정상' }], message: '모든 시험 조건이 정상적으로 작동했습니다.' })

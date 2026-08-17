@@ -181,6 +181,10 @@
         "timers": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationTimer" } },
         "indicators": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationIndicator" } },
         "motors": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/operationMotor" } },
+        "contactors": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationContactor" } },
+        "interlocks": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationInterlock" } },
+        "protection_devices": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationProtectionDevice" } },
+        "direction_change_policy": { "enum": ["current_direction_first", "first_input_first", "block_both", "stop_before_reverse"] },
         "internal_connections": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/terminalPair" } }
       }
     },
@@ -228,6 +232,39 @@
         "phase_terminal_ids": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
         "phase_source_terminal_ids": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
         "forward_phase_order": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "integer", "minimum": 0, "maximum": 2 } }
+      }
+    },
+    "operationContactor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contactor_id", "label", "coil_id", "role", "start_control_id", "motor_id"],
+      "properties": {
+        "contactor_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" },
+        "coil_id": { "$ref": "#/$defs/id" }, "role": { "enum": ["forward", "reverse", "general"] },
+        "start_control_id": { "type": ["string", "null"], "maxLength": 80 },
+        "motor_id": { "type": ["string", "null"], "maxLength": 80 }
+      }
+    },
+    "operationInterlock": {
+      "type": "object", "additionalProperties": false,
+      "required": ["interlock_id", "label", "type", "contactor_ids", "contact_ids", "policy"],
+      "properties": {
+        "interlock_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["electrical", "mechanical"] },
+        "contactor_ids": { "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "contact_ids": { "type": "array", "maxItems": 10, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "policy": { "const": "prevent_simultaneous_activation" }
+      }
+    },
+    "operationProtectionDevice": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protection_device_id", "label", "protection_type", "protected_coil_ids", "protected_motor_ids", "reset_mode", "allowed_fault_types"],
+      "properties": {
+        "protection_device_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" },
+        "protection_type": { "const": "eocr" },
+        "protected_coil_ids": { "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "protected_motor_ids": { "type": "array", "maxItems": 10, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "reset_mode": { "enum": ["manual", "automatic", "restart_required"] },
+        "allowed_fault_types": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "const": "overload" } }
       }
     }
   }
