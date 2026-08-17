@@ -53,6 +53,26 @@ describe('제어함 결선', () => {
     expect(screen.getByLabelText('X1-1 상대 단자 목록')).toHaveTextContent('MC1-4')
   })
 
+  it('connects an external device lead to a freely selected TB terminal', async () => {
+    const tbPin = { terminal_id: 'TB5-01', label: '1', number: 1, side: 'bottom' as const, x: 80, y: 100, max_connections: 2, enabled: true, terminal_role: 'free_junction' as const }
+    const board: BoardDefinition = {
+      ...wiringBoard,
+      items: [{ item_id: 'TB5', label: 'TB5', item_type: 'terminal_block', socket_type_id: null, row: 0, x: 55, y: 40, width: 50, height: 60, pins: [tbPin], label_area: { x: 60, y: 55, width: 40, height: 22 } }, ...wiringBoard.items],
+    }
+    const detail = {
+      ...trainingDetail,
+      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [{ device_id: 'PB0', label: 'PB0 정지', placement: 'top' as const, terminals: [{ terminal_id: 'PB0-1', label: '1', terminal_role: 'external' as const, operation_terminal_id: 'TB5-05', max_connections: 1 as const, wire_color: 'yellow' as const }] }] },
+    }
+    installApiMock({ board })
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
+    await screen.findByRole('region', { name: '외부 기구선' })
+    await user.click(screen.getByRole('button', { name: /PB0-1 외부 기구선/ }))
+    await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
+    expect(screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
+  })
+
   it('connects X1-1 to MC2-5 directly through an empty row gap', () => {
     const board = {
       ...wiringBoard,

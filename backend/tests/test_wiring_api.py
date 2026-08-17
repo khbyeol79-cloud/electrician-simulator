@@ -94,3 +94,37 @@ def test_every_terminal_including_terminal_blocks_allows_at_most_two_connections
         rejected_tb = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_terminal_block})
         assert rejected_tb.status_code == 422
         assert "최대 연결 수" in rejected_tb.text
+
+
+def test_alternative_tb_numbers_are_accepted_by_electrical_network(tmp_path):
+    alternative = [
+        {"from": "EXT01-1", "to": "TB5-11", "wire_color": "yellow"},
+        {"from": "TB5-11", "to": "MCCB-L1", "wire_color": "brown"},
+        {"from": "EXT02-1", "to": "TB5-12", "wire_color": "yellow"},
+        {"from": "TB5-12", "to": "MCCB-L2", "wire_color": "black"},
+        {"from": "EXT03-1", "to": "TB5-13", "wire_color": "yellow"},
+        {"from": "TB5-13", "to": "MCCB-L3", "wire_color": "gray"},
+        {"from": "F-2", "to": "X1-6", "wire_color": "yellow"},
+        {"from": "X1-6", "to": "MC1-5", "wire_color": "yellow"},
+        {"from": "X1-1", "to": "MC1-4", "wire_color": "yellow"},
+        {"from": "X2-2", "to": "T1-7", "wire_color": "yellow"},
+        {"from": "EXT04-1", "to": "TB6-10", "wire_color": "yellow"},
+        {"from": "TB6-10", "to": "MC2-12", "wire_color": "yellow"},
+    ]
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        response = client.post(
+            "/api/problems/training_socket_demo_001/wiring-attempts/submit",
+            json={"problem_version": 1, "connections": alternative},
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["overall_correct"] is True
+        assert payload["electrically_equivalent"] is True
+        assert payload["used_alternative_tb_numbers"] is True
+        assert payload["correct_net_count"] == payload["required_net_count"] == 7
+        setup = client.get("/api/problems/training_socket_demo_001/operation-setup").json()
+        snapshot_edges = {
+            tuple(sorted((item["from"], item["to"])))
+            for item in setup["wiring_snapshot"]["connections"]
+        }
+        assert tuple(sorted(("EXT01-1", "TB5-11"))) in snapshot_edges

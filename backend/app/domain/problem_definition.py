@@ -137,6 +137,34 @@ class SocketQuestion(BaseModel):
     answer_slots: list[AnswerSlot] = Field(min_length=1, max_length=4)
 
 
+class ExternalWiringTerminal(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    terminal_id: str = Field(min_length=1, max_length=80)
+    label: str = Field(min_length=1, max_length=80)
+    terminal_role: Literal["external"] = "external"
+    operation_terminal_id: str | None = Field(default=None, max_length=80)
+    max_connections: Literal[1, 2] = 1
+    wire_color: Literal["brown", "black", "gray", "yellow"] = "yellow"
+
+
+class ExternalWiringDevice(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    device_id: str = Field(min_length=1, max_length=80)
+    label: str = Field(min_length=1, max_length=120)
+    placement: Literal["top", "bottom"] = "top"
+    terminals: list[ExternalWiringTerminal] = Field(min_length=1, max_length=20)
+
+
+class WiringSemantics(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"] = "1.0"
+    extra_jumper_policy: Literal["ignore", "warning", "reject"] = "warning"
+    external_devices: list[ExternalWiringDevice] = Field(default_factory=list, max_length=50)
+
+
 class ProblemDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -154,3 +182,4 @@ class ProblemDefinition(BaseModel):
     device_layout: DeviceLayoutDefinition | None = None
     mounting: MountingDefinition | None = None
     operation: OperationDefinition | None = None
+    wiring_semantics: WiringSemantics | None = None

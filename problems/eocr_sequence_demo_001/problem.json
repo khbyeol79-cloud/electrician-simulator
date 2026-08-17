@@ -920,5 +920,181 @@
       }
     ],
     "direction_change_policy": "block_both"
+  },
+  "wiring_semantics": {
+    "schema_version": "1.0",
+    "extra_jumper_policy": "warning",
+    "external_devices": [
+      {
+        "device_id": "PWR",
+        "label": "외부 전원",
+        "placement": "top",
+        "terminals": [
+          {
+            "terminal_id": "PWR-L",
+            "label": "L",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-04",
+            "max_connections": 1,
+            "wire_color": "brown"
+          },
+          {
+            "terminal_id": "PWR-N",
+            "label": "N",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB6-01",
+            "max_connections": 1,
+            "wire_color": "black"
+          },
+          {
+            "terminal_id": "PWR-L1",
+            "label": "L1",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-01",
+            "max_connections": 1,
+            "wire_color": "brown"
+          },
+          {
+            "terminal_id": "PWR-L2",
+            "label": "L2",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-02",
+            "max_connections": 1,
+            "wire_color": "black"
+          },
+          {
+            "terminal_id": "PWR-L3",
+            "label": "L3",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-03",
+            "max_connections": 1,
+            "wire_color": "gray"
+          }
+        ]
+      },
+      {
+        "device_id": "PB0",
+        "label": "PB0 정지",
+        "placement": "top",
+        "terminals": [
+          {
+            "terminal_id": "PB0-1",
+            "label": "1",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-05",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "PB0-2",
+            "label": "2",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-06",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          }
+        ]
+      },
+      {
+        "device_id": "PB1",
+        "label": "PB1 기동",
+        "placement": "top",
+        "terminals": [
+          {
+            "terminal_id": "PB1-1",
+            "label": "1",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-07",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "PB1-2",
+            "label": "2",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-08",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          }
+        ]
+      },
+      {
+        "device_id": "LS1",
+        "label": "LS1",
+        "placement": "top",
+        "terminals": [
+          {
+            "terminal_id": "LS1-1",
+            "label": "1",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-09",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "LS1-2",
+            "label": "2",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB5-10",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          }
+        ]
+      },
+      {
+        "device_id": "GL",
+        "label": "GL 녹색 표시등",
+        "placement": "bottom",
+        "terminals": [
+          {
+            "terminal_id": "GL-1",
+            "label": "1",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB6-02",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "GL-2",
+            "label": "2",
+            "terminal_role": "external",
+            "operation_terminal_id": "TB6-03",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          }
+        ]
+      },
+      {
+        "device_id": "M1",
+        "label": "M1 모터",
+        "placement": "bottom",
+        "terminals": [
+          {
+            "terminal_id": "M1-U",
+            "label": "U",
+            "terminal_role": "external",
+            "operation_terminal_id": "EOCR-U",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "M1-V",
+            "label": "V",
+            "terminal_role": "external",
+            "operation_terminal_id": "EOCR-V",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          },
+          {
+            "terminal_id": "M1-W",
+            "label": "W",
+            "terminal_role": "external",
+            "operation_terminal_id": "EOCR-W",
+            "max_connections": 1,
+            "wire_color": "yellow"
+          }
+        ]
+      }
+    ]
   }
 }

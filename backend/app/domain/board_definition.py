@@ -24,6 +24,7 @@ class BoardPin(BaseModel):
     y: float
     max_connections: int = Field(default=2, ge=1, le=10)
     enabled: bool = True
+    terminal_role: Literal["functional", "free_junction"] = "functional"
 
 
 class BoardItem(BaseModel):

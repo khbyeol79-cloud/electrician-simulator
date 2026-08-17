@@ -37,13 +37,14 @@ class OperationEngine:
 
     def __init__(self, *, session_id: str, problem_id: str, wiring_attempt_id: int,
                  circuit: CircuitDefinition, definition: OperationDefinition,
-                 connections: list[WiringConnection]):
+                 connections: list[WiringConnection], terminal_aliases: dict[str, str] | None = None):
         self.session_id = session_id
         self.problem_id = problem_id
         self.wiring_attempt_id = wiring_attempt_id
         self.circuit = circuit
         self.definition = definition
         self.connections = connections
+        self.terminal_aliases = terminal_aliases or {}
         self.powered = False
         self.tripped = False
         self.elapsed_ms = 0
@@ -122,20 +123,23 @@ class OperationEngine:
     def _conductive_graph(self) -> ConductiveGraph:
         graph = ConductiveGraph([(item.from_terminal, item.to) for item in self.connections])
         for item in self.definition.internal_connections:
-            graph.add(item.from_terminal, item.to)
+            graph.add(self._terminal(item.from_terminal), self._terminal(item.to))
         for control in self.definition.controls:
             active = self.controls[control.control_id]
             if active if control.contact_type == "NO" else not active:
-                graph.add(control.terminal_a_id, control.terminal_b_id)
+                graph.add(self._terminal(control.terminal_a_id), self._terminal(control.terminal_b_id))
         for contact in self.circuit.contacts:
             active = self._contact_active(contact)
             if contact.contact_type == "CHANGEOVER":
                 target = contact.no_terminal_id if active else contact.nc_terminal_id
                 if target:
-                    graph.add(contact.common_terminal_id, target)
+                    graph.add(self._terminal(contact.common_terminal_id), self._terminal(target))
             elif active if contact.contact_type == "NO" else not active:
-                graph.add(contact.common_terminal_id, contact.switched_terminal_id)
+                graph.add(self._terminal(contact.common_terminal_id), self._terminal(contact.switched_terminal_id))
         return graph
+
+    def _terminal(self, terminal_id: str) -> str:
+        return self.terminal_aliases.get(terminal_id, terminal_id)
 
     @staticmethod
     def _load_energized(graph: ConductiveGraph, line: str, returning: str,
@@ -147,10 +151,11 @@ class OperationEngine:
     def _detect_faults(self, graph: ConductiveGraph) -> list[OperationFault]:
         faults: list[OperationFault] = []
         power = self.definition.power
-        if graph.connected(power.line_terminal_id, power.return_terminal_id):
+        if graph.connected(self._terminal(power.line_terminal_id), self._terminal(power.return_terminal_id)):
             faults.append(OperationFault(code="direct_short", message="전원과 복귀선의 직접 단락 경로가 감지되었습니다.", severity="danger", trip_required=True))
-        for index, first in enumerate(power.phase_terminal_ids):
-            for second in power.phase_terminal_ids[index + 1:]:
+        phase_terminals = [self._terminal(item) for item in power.phase_terminal_ids]
+        for index, first in enumerate(phase_terminals):
+            for second in phase_terminals[index + 1:]:
                 if graph.connected(first, second):
                     faults.append(OperationFault(code="phase_short", message="직접적인 상간 단락 경로가 감지되었습니다.", severity="danger", trip_required=True))
                     return faults
@@ -240,9 +245,9 @@ class OperationEngine:
             next_coils = {
                 coil.coil_id: bool(
                     self.powered and not self.tripped and self._load_energized(
-                        graph, self.definition.power.line_terminal_id,
-                        self.definition.power.return_terminal_id,
-                        coil.terminal_a_id, coil.terminal_b_id,
+                        graph, self._terminal(self.definition.power.line_terminal_id),
+                        self._terminal(self.definition.power.return_terminal_id),
+                        self._terminal(coil.terminal_a_id), self._terminal(coil.terminal_b_id),
                     )
                 ) for coil in self.circuit.coils
             }
@@ -295,10 +300,10 @@ class OperationEngine:
                    for item in self.definition.protection_devices)
 
     def _update_outputs(self, graph: ConductiveGraph) -> None:
-        line = self.definition.power.line_terminal_id
-        returning = self.definition.power.return_terminal_id
+        line = self._terminal(self.definition.power.line_terminal_id)
+        returning = self._terminal(self.definition.power.return_terminal_id)
         for item in self.definition.indicators:
-            self.indicators[item.indicator_id] = "on" if self.powered and self._load_energized(graph, line, returning, item.terminal_a_id, item.terminal_b_id) else "off"
+            self.indicators[item.indicator_id] = "on" if self.powered and self._load_energized(graph, line, returning, self._terminal(item.terminal_a_id), self._terminal(item.terminal_b_id)) else "off"
         for motor in self.definition.motors:
             forward = bool(motor.forward_coil_id and self.coils.get(motor.forward_coil_id))
             reverse = bool(motor.reverse_coil_id and self.coils.get(motor.reverse_coil_id))
@@ -316,7 +321,7 @@ class OperationEngine:
                     self.motors[motor.motor_id] = "connection_error"
                     continue
                 for terminal in motor.phase_terminal_ids:
-                    matches = [index for index, source in enumerate(motor.phase_source_terminal_ids) if graph.connected(source, terminal)]
+                    matches = [index for index, source in enumerate(motor.phase_source_terminal_ids) if graph.connected(self._terminal(source), self._terminal(terminal))]
                     if len(matches) != 1:
                         mapped = []
                         break

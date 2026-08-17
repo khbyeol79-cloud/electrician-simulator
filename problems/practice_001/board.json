@@ -24,17 +24,19 @@
           "x": 296.67,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-02",
           "label": "2",
           "number": null,
           "side": "bottom",
-          "x": 370.0,
+          "x": 370,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-03",
@@ -44,7 +46,8 @@
           "x": 443.33,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-04",
@@ -54,17 +57,19 @@
           "x": 516.67,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-05",
           "label": "5",
           "number": null,
           "side": "bottom",
-          "x": 590.0,
+          "x": 590,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-06",
@@ -74,7 +79,8 @@
           "x": 663.33,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-07",
@@ -84,17 +90,19 @@
           "x": 736.67,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-08",
           "label": "8",
           "number": null,
           "side": "bottom",
-          "x": 810.0,
+          "x": 810,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-09",
@@ -104,7 +112,8 @@
           "x": 883.33,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-10",
@@ -114,17 +123,19 @@
           "x": 956.67,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-11",
           "label": "11",
           "number": null,
           "side": "bottom",
-          "x": 1030.0,
+          "x": 1030,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-A-12",
@@ -134,7 +145,8 @@
           "x": 1103.33,
           "y": 150,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         }
       ],
       "label_area": {
@@ -163,17 +175,19 @@
           "x": 608.33,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-2",
           "label": "2",
           "number": 2,
           "side": "top",
-          "x": 645.0,
+          "x": 645,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-3",
@@ -183,7 +197,8 @@
           "x": 681.67,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-4",
@@ -193,17 +208,19 @@
           "x": 718.33,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-5",
           "label": "5",
           "number": 5,
           "side": "top",
-          "x": 755.0,
+          "x": 755,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-6",
@@ -213,7 +230,8 @@
           "x": 791.67,
           "y": 330,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-7",
@@ -223,17 +241,19 @@
           "x": 608.33,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-8",
           "label": "8",
           "number": 8,
           "side": "bottom",
-          "x": 645.0,
+          "x": 645,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-9",
@@ -243,7 +263,8 @@
           "x": 681.67,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-10",
@@ -253,17 +274,19 @@
           "x": 718.33,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-11",
           "label": "11",
           "number": 11,
           "side": "bottom",
-          "x": 755.0,
+          "x": 755,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         },
         {
           "terminal_id": "X3-12",
@@ -273,7 +296,8 @@
           "x": 791.67,
           "y": 510,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "functional"
         }
       ],
       "label_area": {
@@ -302,17 +326,19 @@
           "x": 296.67,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-02",
           "label": "2",
           "number": null,
           "side": "top",
-          "x": 370.0,
+          "x": 370,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-03",
@@ -322,7 +348,8 @@
           "x": 443.33,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-04",
@@ -332,17 +359,19 @@
           "x": 516.67,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-05",
           "label": "5",
           "number": null,
           "side": "top",
-          "x": 590.0,
+          "x": 590,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-06",
@@ -352,7 +381,8 @@
           "x": 663.33,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-07",
@@ -362,17 +392,19 @@
           "x": 736.67,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-08",
           "label": "8",
           "number": null,
           "side": "top",
-          "x": 810.0,
+          "x": 810,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-09",
@@ -382,7 +414,8 @@
           "x": 883.33,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-10",
@@ -392,17 +425,19 @@
           "x": 956.67,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-11",
           "label": "11",
           "number": null,
           "side": "top",
-          "x": 1030.0,
+          "x": 1030,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         },
         {
           "terminal_id": "TB-B-12",
@@ -412,7 +447,8 @@
           "x": 1103.33,
           "y": 720,
           "max_connections": 2,
-          "enabled": true
+          "enabled": true,
+          "terminal_role": "free_junction"
         }
       ],
       "label_area": {

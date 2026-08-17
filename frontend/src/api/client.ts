@@ -47,6 +47,7 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   socket_questions: SocketQuestion[]
   device_layout: DeviceLayoutDefinition | null
   operation: OperationDefinition | null
+  wiring_semantics?: WiringSemantics | null
 }
 
 export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null }
@@ -108,7 +109,7 @@ export type CircuitProgress = {
   last_overall_correct: boolean | null; last_correct_count: number; total_count: number
 }
 
-export type BoardPin = { terminal_id: string; label: string; role_label?: string | null; number: number | null; side: 'top' | 'bottom'; x: number; y: number; max_connections: number; enabled: boolean }
+export type BoardPin = { terminal_id: string; label: string; role_label?: string | null; number: number | null; side: 'top' | 'bottom'; x: number; y: number; max_connections: number; enabled: boolean; terminal_role?: 'functional' | 'free_junction' }
 export type BoardRect = { x: number; y: number; width: number; height: number }
 export type BoardItem = {
   item_id: string; label: string; item_type: 'socket_8p' | 'socket_12p' | 'terminal_block' | 'component'
@@ -122,10 +123,15 @@ export type BoardDefinition = {
   forbidden_areas: (BoardRect & { area_id: string })[]
 }
 export type WiringConnection = { from: string; to: string; wire_color: 'brown' | 'black' | 'gray' | 'yellow'; pair_display_color: string }
+export type ExternalWiringTerminal = { terminal_id: string; label: string; terminal_role: 'external'; operation_terminal_id: string | null; max_connections: 1 | 2; wire_color: WiringConnection['wire_color'] }
+export type ExternalWiringDevice = { device_id: string; label: string; placement: 'top' | 'bottom'; terminals: ExternalWiringTerminal[] }
+export type WiringSemantics = { schema_version: '1.0'; extra_jumper_policy: 'ignore' | 'warning' | 'reject'; external_devices: ExternalWiringDevice[] }
 export type WiringDraft = { problem_id: string; problem_version: number; mode: 'graphic' | 'summary'; connections: WiringConnection[]; updated_at: string | null }
 export type WiringAttemptResult = {
   attempt_id: number | null; gradable: boolean; overall_correct: boolean | null; required_count: number; correct_count: number
   missing_connections: string[]; extra_connections: string[]; forbidden_connections: string[]; message: string
+  electrically_equivalent?: boolean | null; used_alternative_tb_numbers?: boolean; required_net_count?: number; correct_net_count?: number
+  missing_net_count?: number; merged_net_count?: number; extra_connection_count?: number; terminal_capacity_errors?: string[]; warnings?: string[]
 }
 export type WiringProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_correct: boolean | null; last_gradable: boolean | null; last_correct_count: number; required_count: number }
 

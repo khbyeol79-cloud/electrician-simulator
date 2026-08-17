@@ -15,7 +15,137 @@
     }
   },
   "required_connections": [],
-  "expected_nets": [],
+  "expected_nets": [
+    {
+      "net_id": "NET_01",
+      "terminals": [
+        "MCCB-L1",
+        "PWR-L1"
+      ]
+    },
+    {
+      "net_id": "NET_02",
+      "terminals": [
+        "MCCB-L2",
+        "PWR-L2"
+      ]
+    },
+    {
+      "net_id": "NET_03",
+      "terminals": [
+        "MCCB-L3",
+        "PWR-L3"
+      ]
+    },
+    {
+      "net_id": "NET_04",
+      "terminals": [
+        "EOCR-L1",
+        "MCCB-T1"
+      ]
+    },
+    {
+      "net_id": "NET_05",
+      "terminals": [
+        "EOCR-L2",
+        "MCCB-T2"
+      ]
+    },
+    {
+      "net_id": "NET_06",
+      "terminals": [
+        "EOCR-L3",
+        "MCCB-T3"
+      ]
+    },
+    {
+      "net_id": "NET_07",
+      "terminals": [
+        "F-1",
+        "PWR-L"
+      ]
+    },
+    {
+      "net_id": "NET_08",
+      "terminals": [
+        "F-2",
+        "PB0-1"
+      ]
+    },
+    {
+      "net_id": "NET_09",
+      "terminals": [
+        "MC1-4",
+        "MC2-4",
+        "PB0-2",
+        "PB1-1",
+        "PB2-1"
+      ]
+    },
+    {
+      "net_id": "NET_10",
+      "terminals": [
+        "MC1-10",
+        "MC2-5",
+        "PB1-2"
+      ]
+    },
+    {
+      "net_id": "NET_11",
+      "terminals": [
+        "MC1-6",
+        "MC2-11",
+        "RL-1"
+      ]
+    },
+    {
+      "net_id": "NET_12",
+      "terminals": [
+        "GL-2",
+        "MC1-12",
+        "MC2-12",
+        "PWR-N",
+        "RL-2"
+      ]
+    },
+    {
+      "net_id": "NET_13",
+      "terminals": [
+        "MC1-5",
+        "MC2-10",
+        "PB2-2"
+      ]
+    },
+    {
+      "net_id": "NET_14",
+      "terminals": [
+        "GL-1",
+        "MC1-11",
+        "MC2-6"
+      ]
+    },
+    {
+      "net_id": "NET_15",
+      "terminals": [
+        "EOCR-U",
+        "M1-U"
+      ]
+    },
+    {
+      "net_id": "NET_16",
+      "terminals": [
+        "EOCR-V",
+        "M1-V"
+      ]
+    },
+    {
+      "net_id": "NET_17",
+      "terminals": [
+        "EOCR-W",
+        "M1-W"
+      ]
+    }
+  ],
   "allowed_alternatives": [],
   "forbidden_connections": [],
   "wiring_connections": [

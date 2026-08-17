@@ -392,6 +392,12 @@ class ProblemPackageValidator:
                         issues.append(self._issue("error", "unknown_board_socket_type", f"존재하지 않는 소켓 유형입니다: {item.socket_type_id}", file=manifest.files.board, problem_id=problem_id))
                     elif {pin.number for pin in item.pins if pin.number is not None} != set(socket.pins):
                         issues.append(self._issue("error", "board_socket_pin_mismatch", f"소켓 핀 배열이 카탈로그와 일치하지 않습니다: {item.item_id}", file=manifest.files.board, problem_id=problem_id))
+                for pin in item.pins:
+                    expected_role = "free_junction" if item.item_type == "terminal_block" else "functional"
+                    if pin.terminal_role != expected_role:
+                        issues.append(self._issue("error", "invalid_terminal_role", f"단자 역할이 장치 유형과 일치하지 않습니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
+                    if pin.max_connections != 2:
+                        issues.append(self._issue("error", "invalid_terminal_capacity", f"모든 제어함 단자의 최대 연결 수는 2여야 합니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
             if answer:
                 terminals = board.terminal_ids
                 for connection in [*answer.wiring_connections, *answer.wiring_forbidden_connections]:
@@ -411,6 +417,28 @@ class ProblemPackageValidator:
                             f"배선 정답이 단자 최대 연결 수를 초과합니다: {terminal_id} ({count}/{maximum})",
                             file=manifest.files.answer, problem_id=problem_id,
                         ))
+
+        if problem and problem.wiring_semantics:
+            external_terminals = [
+                terminal
+                for device in problem.wiring_semantics.external_devices
+                for terminal in device.terminals
+            ]
+            external_ids = [terminal.terminal_id for terminal in external_terminals]
+            for duplicate in {item for item in external_ids if external_ids.count(item) > 1}:
+                issues.append(self._issue("error", "duplicate_external_terminal", f"외부 기구 단자 ID가 중복됩니다: {duplicate}", file=manifest.files.problem, problem_id=problem_id))
+            board_terminal_ids = board.terminal_ids if board else set()
+            for terminal in external_terminals:
+                if terminal.terminal_id in board_terminal_ids:
+                    issues.append(self._issue("error", "external_terminal_collision", f"외부 단자와 제어함 단자 ID가 중복됩니다: {terminal.terminal_id}", file=manifest.files.problem, problem_id=problem_id))
+                if terminal.operation_terminal_id and terminal.operation_terminal_id not in board_terminal_ids:
+                    issues.append(self._issue("error", "unknown_external_bridge", f"외부 단자의 기존 동작 연결 기준 단자가 없습니다: {terminal.operation_terminal_id}", file=manifest.files.problem, problem_id=problem_id))
+            if answer and board:
+                role_by_terminal = {pin.terminal_id: pin.terminal_role for item in board.items for pin in item.pins}
+                for net in answer.expected_nets:
+                    for terminal_id in net.terminals:
+                        if role_by_terminal.get(terminal_id) == "free_junction":
+                            issues.append(self._issue("error", "free_junction_in_expected_net", "정답 네트워크에는 자유 TB 단자번호를 넣을 수 없습니다.", file=manifest.files.answer, problem_id=problem_id))
 
         if problem and problem.mounting:
             mounting = problem.mounting

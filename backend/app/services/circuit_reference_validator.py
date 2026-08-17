@@ -46,6 +46,16 @@ class CircuitReferenceValidator:
 
         devices = {item.device_id: item for item in circuit.devices}
         terminals = {item.terminal_id: item for item in circuit.terminals}
+        external_terminal_ids = {
+            terminal.terminal_id
+            for device in (problem.wiring_semantics.external_devices if problem.wiring_semantics else [])
+            for terminal in device.terminals
+        }
+        wiring_terminal_ids = {
+            terminal
+            for connection in answer.wiring_connections
+            for terminal in (connection.from_terminal, connection.to)
+        }
         contacts = {item.contact_id: item for item in circuit.contacts}
         coils = {item.coil_id: item for item in circuit.coils}
         questions = {item.question_id: item for item in problem.socket_questions}
@@ -140,7 +150,7 @@ class CircuitReferenceValidator:
                     issues.append(self._issue("invalid_answer_pin", f"답안 핀 번호가 대상 소켓에 없습니다: {pin}", "answer.socket_pin_answers", problem_id))
 
         def check_terminal(terminal_id: str, code: str, field: str):
-            if terminal_id not in terminals:
+            if terminal_id not in terminals and terminal_id not in external_terminal_ids and terminal_id not in wiring_terminal_ids:
                 issues.append(self._issue(code, f"답안이 존재하지 않는 단자를 참조합니다: {terminal_id}", f"answer.{field}", problem_id))
 
         for index, connection in enumerate(answer.required_connections):
@@ -149,6 +159,20 @@ class CircuitReferenceValidator:
         for index, net in enumerate(answer.expected_nets):
             for terminal_id in net.terminals:
                 check_terminal(terminal_id, "unknown_expected_net_terminal", f"expected_nets.{index}.terminals")
+                if terminal_id.startswith(("TB5-", "TB6-")):
+                    issues.append(self._issue("free_junction_in_expected_net", "정답 네트워크에는 자유 TB 단자번호를 넣을 수 없습니다.", f"answer.expected_nets.{index}.terminals", problem_id))
+        net_terminal_counts = Counter(terminal for net in answer.expected_nets for terminal in net.terminals)
+        for terminal_id, count in net_terminal_counts.items():
+            if count > 1:
+                issues.append(self._issue("duplicate_expected_net_terminal", f"기능 단자가 여러 정답 네트워크에 중복됩니다: {terminal_id}", "answer.expected_nets", problem_id))
+        if problem.wiring_semantics:
+            external_ids = [
+                terminal.terminal_id
+                for device in problem.wiring_semantics.external_devices
+                for terminal in device.terminals
+            ]
+            for duplicate in self._duplicates(external_ids):
+                issues.append(self._issue("duplicate_external_terminal", f"외부 기구 단자 ID가 중복됩니다: {duplicate}", "wiring_semantics.external_devices", problem_id))
         for index, connection in enumerate(answer.forbidden_connections):
             check_terminal(connection.from_terminal, "unknown_forbidden_terminal", f"forbidden_connections.{index}.from")
             check_terminal(connection.to, "unknown_forbidden_terminal", f"forbidden_connections.{index}.to")

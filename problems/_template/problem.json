@@ -37,5 +37,10 @@
   "socket_questions": [],
   "device_layout": null,
   "mounting": null,
-  "operation": null
+  "operation": null,
+  "wiring_semantics": {
+    "schema_version": "1.0",
+    "extra_jumper_policy": "warning",
+    "external_devices": []
+  }
 }

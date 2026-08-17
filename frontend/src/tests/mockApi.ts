@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.8.3',
+  version: '0.9.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.8.3',
+  version: '0.9.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -125,7 +125,7 @@ function response(data: unknown, status = 200): Response {
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
   const problems = options?.problems ?? [problemSummary]
   let operationState: OperationSessionState = {
     session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
@@ -191,7 +191,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       conductors: [{ conductor_id: 'control_top', section_id: 'control', points: [{ x: 540, y: 150 }, { x: 1500, y: 150 }], line_style: 'control', junctions: [{ x: 860, y: 150 }] }],
     })
     if (url === '/api/problems/training_socket_demo_001/circuit-progress') return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, total_count: 1 })
-    if (url.endsWith('/board')) return response(wiringBoard)
+    if (url.endsWith('/board')) return response(options?.board ?? wiringBoard)
     if (url.endsWith('/wiring-draft') && (!init?.method || init.method === 'GET')) return response(options?.wiringDraft ? { problem_id: 'training_socket_demo_001', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, updated_at: null } : null)
     if (url.endsWith('/wiring-draft') && init?.method === 'PUT') {
       const body = JSON.parse(String(init.body))

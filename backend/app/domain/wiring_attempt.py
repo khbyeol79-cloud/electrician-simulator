@@ -56,6 +56,15 @@ class WiringAttemptResult(BaseModel):
     extra_connections: list[str]
     forbidden_connections: list[str]
     message: str
+    electrically_equivalent: bool | None = None
+    used_alternative_tb_numbers: bool = False
+    required_net_count: int = 0
+    correct_net_count: int = 0
+    missing_net_count: int = 0
+    merged_net_count: int = 0
+    extra_connection_count: int = 0
+    terminal_capacity_errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class WiringProgress(BaseModel):

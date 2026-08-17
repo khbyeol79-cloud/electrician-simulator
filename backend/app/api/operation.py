@@ -103,6 +103,13 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
     if snapshot is None:
         raise HTTPException(status_code=409, detail="정상 결선을 제출한 후 동작시험을 진행해 주세요.")
     session_id = token_urlsafe(24)
+    submitted_terminal_ids = {terminal for item in snapshot.connections for terminal in item.key}
+    terminal_aliases = {
+        terminal.operation_terminal_id: terminal.terminal_id
+        for device in (package.problem.wiring_semantics.external_devices if package.problem.wiring_semantics else [])
+        for terminal in device.terminals
+        if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
+    }
     try:
         engine = OperationEngine(
             session_id=session_id,
@@ -111,6 +118,7 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
             circuit=package.problem.circuit,
             definition=package.problem.operation,
             connections=snapshot.connections,
+            terminal_aliases=terminal_aliases,
         )
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"동작 회로 정의를 확인해 주세요. {exc}") from exc
@@ -195,6 +203,13 @@ def run_operation_check(session_id: str, request: Request):
     results: list[OperationCheckItem] = []
     all_fault_codes: list[str] = []
     for test in tests:
+        submitted_terminal_ids = {terminal for item in manual.connections for terminal in item.key}
+        terminal_aliases = {
+            terminal.operation_terminal_id: terminal.terminal_id
+            for device in (package.problem.wiring_semantics.external_devices if package.problem.wiring_semantics else [])
+            for terminal in device.terminals
+            if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
+        }
         isolated = OperationEngine(
             session_id="isolated-check",
             problem_id=manual.problem_id,
@@ -202,6 +217,7 @@ def run_operation_check(session_id: str, request: Request):
             circuit=package.problem.circuit,
             definition=package.problem.operation,
             connections=manual.connections,
+            terminal_aliases=terminal_aliases,
         )
         passed = True
         try:

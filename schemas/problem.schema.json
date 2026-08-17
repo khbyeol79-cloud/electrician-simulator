@@ -65,6 +65,12 @@
         { "$ref": "#/$defs/operationDefinition" },
         { "type": "null" }
       ]
+    },
+    "wiring_semantics": {
+      "anyOf": [
+        { "$ref": "#/$defs/wiringSemantics" },
+        { "type": "null" }
+      ]
     }
   },
   "$defs": {
@@ -73,6 +79,32 @@
     "wireColors": {
       "type": "object", "additionalProperties": false, "required": ["L1", "L2", "L3", "control"],
       "properties": { "L1": { "const": "brown" }, "L2": { "const": "black" }, "L3": { "const": "gray" }, "control": { "const": "yellow" } }
+    },
+    "externalWiringTerminal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["terminal_id", "label", "terminal_role", "operation_terminal_id", "max_connections", "wire_color"],
+      "properties": {
+        "terminal_id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "terminal_role": { "const": "external" }, "operation_terminal_id": { "type": ["string", "null"], "minLength": 1, "maxLength": 80 },
+        "max_connections": { "enum": [1, 2] }, "wire_color": { "enum": ["brown", "black", "gray", "yellow"] }
+      }
+    },
+    "externalWiringDevice": {
+      "type": "object", "additionalProperties": false,
+      "required": ["device_id", "label", "placement", "terminals"],
+      "properties": {
+        "device_id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "placement": { "enum": ["top", "bottom"] },
+        "terminals": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/externalWiringTerminal" } }
+      }
+    },
+    "wiringSemantics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "extra_jumper_policy", "external_devices"],
+      "properties": {
+        "schema_version": { "const": "1.0" }, "extra_jumper_policy": { "enum": ["ignore", "warning", "reject"] },
+        "external_devices": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/externalWiringDevice" } }
+      }
     },
     "boardPosition": {
       "type": "object", "additionalProperties": false, "required": ["row", "column", "x", "y"],

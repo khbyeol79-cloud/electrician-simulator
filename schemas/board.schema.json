@@ -28,7 +28,8 @@
         "terminal_id": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$" },
         "label": { "type": "string" }, "role_label": { "type": ["string", "null"] }, "number": { "type": ["integer", "null"], "minimum": 1 },
         "side": { "enum": ["top", "bottom"] }, "x": { "type": "number" }, "y": { "type": "number" },
-        "max_connections": { "type": "integer", "minimum": 1, "maximum": 10 }, "enabled": { "type": "boolean" }
+        "max_connections": { "type": "integer", "minimum": 1, "maximum": 10 }, "enabled": { "type": "boolean" },
+        "terminal_role": { "enum": ["functional", "free_junction"] }
       }
     },
     "item": {

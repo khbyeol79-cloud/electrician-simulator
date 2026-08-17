@@ -1,6 +1,6 @@
 # 전기기능사 시퀀스 결선 시뮬레이터
 
-Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.8.3이며 데이터 기반 회로도 분석, 제어함 결선, 정·역회전 및 EOCR 논리 동작시험을 포함합니다.
+Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.9.0이며 TB 번호 자유 선택, 전기적 연결관계 채점, 데이터 기반 회로도 분석과 논리 동작시험을 포함합니다.
 
 회로도 분석 → 제어함 결선 → 동작시험의 3단계로 진행합니다. 0.8.0에서는 가장 최근의 정상 결선 제출 스냅샷을 이용해 전원, PB·LS, 릴레이, ON delay 타이머, MC1·MC2 자기유지와 인터록, EOCR 트립, 표시등과 3상 모터 방향을 계산합니다. 기구 위치는 문제지의 공개 조건이며 동작시험 화면에 자동으로 삽입됩니다.
 
@@ -32,6 +32,11 @@ Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화�
 - 8P·12P 소켓번호 입력과 임시 답안 복원
 - 검증 상태를 확인하는 서버 채점과 SQLite 제출 기록
 - 실제 제어함 그래픽·요약 결선, 자동 직교 경로와 전선 색상 변경
+- PB·LS·표시등·모터·전원 등 문제별 외부 기구선의 TB 배정
+- 외부선 클릭·키보드 선택·드래그 후 원하는 TB5·TB6 단자에 연결
+- `functional`·`free_junction`·`external` 단자 역할과 기능 단자 네트워크 서명
+- 정답 예시와 다른 TB 번호·점퍼 길이를 허용하는 전기적 동등성 채점
+- 누락 네트워크·잘못 합쳐진 회로·불필요한 기능 연결·고립 TB 점퍼·루프 구분
 - 한 단자에 연결된 여러 전선의 좌우 분리 표시와 요약 모드 `+N` 연결 목록
 - 일반 기구와 TB5·TB6을 포함한 모든 단자는 한 번호당 최대 두 가닥까지만 연결
 - 세 갈래 이상 분기할 때 인접 단자 점퍼와 기구 단자를 이용해 단자별 두 가닥 이하로 분산
@@ -214,7 +219,7 @@ problems/problem_001/
 └─ assets/
 ```
 
-작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, 고정 기구 배치는 `docs/device-layout.md`, 동작 정의는 `docs/operation-simulation.md`에서 확인할 수 있습니다. `docs/mounting-problem-authoring.md`는 0.6.0 호환 데이터 설명으로만 유지합니다. 문제 검증 명령은 다음과 같습니다.
+작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, TB 자유 선택과 네트워크 채점은 `docs/wiring-network-grading.md`, 고정 기구 배치는 `docs/device-layout.md`, 동작 정의는 `docs/operation-simulation.md`에서 확인할 수 있습니다. `docs/mounting-problem-authoring.md`는 0.6.0 호환 데이터 설명으로만 유지합니다. 문제 검증 명령은 다음과 같습니다.
 
 ```powershell
 .venv\Scripts\python.exe -m tools.validate_problem problems\practice_001
