@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,7 @@ from app.domain import (
     SchematicDiagram,
 )
 from app.services.catalog_service import CatalogService
+from app.services.board_layout_service import align_board_rows
 from app.services.circuit_reference_validator import CircuitReferenceValidator
 from app.services.diagram_reference_validator import DiagramReferenceValidator
 
@@ -266,7 +268,7 @@ class ProblemPackageValidator:
             board_data, "board.json", issues, problem_id
         ):
             try:
-                board = BoardDefinition.model_validate(board_data)
+                board = align_board_rows(BoardDefinition.model_validate(board_data))
             except ValidationError as exc:
                 issues.append(
                     self._issue(
@@ -395,6 +397,20 @@ class ProblemPackageValidator:
                 for connection in [*answer.wiring_connections, *answer.wiring_forbidden_connections]:
                     if connection.from_terminal not in terminals or connection.to not in terminals:
                         issues.append(self._issue("error", "unknown_board_answer_terminal", "배선 답안이 보드에 없는 단자를 참조합니다.", file=manifest.files.answer, problem_id=problem_id))
+                pin_limits = {pin.terminal_id: pin.max_connections for item in board.items for pin in item.pins}
+                answer_counts = Counter(
+                    terminal_id
+                    for connection in answer.wiring_connections
+                    for terminal_id in (connection.from_terminal, connection.to)
+                )
+                for terminal_id, count in answer_counts.items():
+                    maximum = pin_limits.get(terminal_id)
+                    if maximum is not None and count > maximum:
+                        issues.append(self._issue(
+                            "error", "answer_terminal_capacity_exceeded",
+                            f"배선 정답이 단자 최대 연결 수를 초과합니다: {terminal_id} ({count}/{maximum})",
+                            file=manifest.files.answer, problem_id=problem_id,
+                        ))
 
         if problem and problem.mounting:
             mounting = problem.mounting

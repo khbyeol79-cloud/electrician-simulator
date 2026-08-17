@@ -272,7 +272,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_common",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -281,7 +281,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_nc",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -290,7 +290,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_common",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -299,7 +299,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_no",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -308,7 +308,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_common",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -317,7 +317,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "contact_no",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -326,7 +326,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "load",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -335,7 +335,7 @@
         "pin_number": null,
         "terminal_type": "external_terminal",
         "electrical_role": "load",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -344,7 +344,7 @@
         "pin_number": null,
         "terminal_type": "power_terminal",
         "electrical_role": "line",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -353,7 +353,7 @@
         "pin_number": null,
         "terminal_type": "power_terminal",
         "electrical_role": "line",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -362,7 +362,7 @@
         "pin_number": null,
         "terminal_type": "power_terminal",
         "electrical_role": "line",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -371,7 +371,7 @@
         "pin_number": null,
         "terminal_type": "power_terminal",
         "electrical_role": "control",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {
@@ -380,7 +380,7 @@
         "pin_number": null,
         "terminal_type": "power_terminal",
         "electrical_role": "neutral",
-        "max_connections": 3,
+        "max_connections": 2,
         "enabled": true
       },
       {

@@ -7,6 +7,7 @@
   "properties": {
     "schema_version": { "const": "1.0" },
     "board_id": { "type": "string", "minLength": 1 },
+    "layout_mode": { "enum": ["auto_rows", "fixed"] },
     "width": { "type": "number", "exclusiveMinimum": 0 },
     "height": { "type": "number", "exclusiveMinimum": 0 },
     "routing_margin": { "type": "number", "minimum": 0 },

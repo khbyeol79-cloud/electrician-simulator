@@ -27,6 +27,9 @@ def test_board_is_public_but_answer_is_not(tmp_path):
         assert payload["board_id"] == "training_wiring_board_v1"
         assert any(item["item_id"] == "X1" for item in payload["items"])
         eocr = next(item for item in payload["items"] if item["item_id"] == "EOCR")
+        fuse = next(item for item in payload["items"] if item["item_id"] == "F")
+        tb5 = next(item for item in payload["items"] if item["item_id"] == "TB5")
+        tb6 = next(item for item in payload["items"] if item["item_id"] == "TB6")
         assert eocr["item_type"] == "socket_12p"
         assert eocr["socket_type_id"] == "socket_12p_base"
         assert [(pin["number"], pin["role_label"]) for pin in eocr["pins"]] == [
@@ -36,6 +39,12 @@ def test_board_is_public_but_answer_is_not(tmp_path):
         mc1 = next(item for item in payload["items"] if item["item_id"] == "MC1")
         assert {pin["number"]: pin["role_label"] for pin in mc1["pins"]}[6] == "A1"
         assert {pin["number"]: pin["role_label"] for pin in mc1["pins"]}[12] == "A2"
+        assert all(pin["max_connections"] == 2 for item in payload["items"] for pin in item["pins"])
+        assert fuse["x"] - (eocr["x"] + eocr["width"]) >= 24
+        for item in payload["items"]:
+            if item["item_type"] != "terminal_block":
+                assert item["x"] >= max(tb5["x"], tb6["x"])
+                assert item["x"] + item["width"] <= min(tb5["x"] + tb5["width"], tb6["x"] + tb6["width"])
         assert "wiring_connections" not in response.text
         assert "W-001" not in response.text
 
@@ -66,7 +75,7 @@ def test_wiring_validation_and_unverified_problem(tmp_path):
         assert unverified.json()["gradable"] is False
 
 
-def test_normal_terminal_allows_two_connections_and_terminal_block_uses_its_configured_exception(tmp_path):
+def test_every_terminal_including_terminal_blocks_allows_at_most_two_connections(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         three_on_socket = [
             {"from": "X1-1", "to": "MC1-4", "wire_color": "yellow"},
@@ -82,5 +91,6 @@ def test_normal_terminal_allows_two_connections_and_terminal_block_uses_its_conf
             {"from": "TB5-01", "to": "EOCR-L1", "wire_color": "brown"},
             {"from": "TB5-01", "to": "F-1", "wire_color": "brown"},
         ]
-        accepted = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_terminal_block})
-        assert accepted.status_code == 200
+        rejected_tb = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_terminal_block})
+        assert rejected_tb.status_code == 422
+        assert "최대 연결 수" in rejected_tb.text

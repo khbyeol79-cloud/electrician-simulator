@@ -23,7 +23,7 @@
           "side": "bottom",
           "x": 139.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -33,7 +33,7 @@
           "side": "bottom",
           "x": 198.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -43,7 +43,7 @@
           "side": "bottom",
           "x": 257.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -53,7 +53,7 @@
           "side": "bottom",
           "x": 316.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -63,7 +63,7 @@
           "side": "bottom",
           "x": 375.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -73,7 +73,7 @@
           "side": "bottom",
           "x": 434.5,
           "y": 115,
-          "max_connections": 6,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -83,7 +83,7 @@
           "side": "bottom",
           "x": 493.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -93,7 +93,7 @@
           "side": "bottom",
           "x": 552.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -103,7 +103,7 @@
           "side": "bottom",
           "x": 611.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -113,7 +113,7 @@
           "side": "bottom",
           "x": 670.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -123,7 +123,7 @@
           "side": "bottom",
           "x": 729.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -133,7 +133,7 @@
           "side": "bottom",
           "x": 788.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -143,7 +143,7 @@
           "side": "bottom",
           "x": 847.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -153,7 +153,7 @@
           "side": "bottom",
           "x": 906.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -163,7 +163,7 @@
           "side": "bottom",
           "x": 965.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -173,7 +173,7 @@
           "side": "bottom",
           "x": 1024.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -183,7 +183,7 @@
           "side": "bottom",
           "x": 1083.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -193,7 +193,7 @@
           "side": "bottom",
           "x": 1142.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -203,7 +203,7 @@
           "side": "bottom",
           "x": 1201.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -213,7 +213,7 @@
           "side": "bottom",
           "x": 1260.5,
           "y": 115,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         }
       ],
@@ -1209,7 +1209,7 @@
           "side": "top",
           "x": 139.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1219,7 +1219,7 @@
           "side": "top",
           "x": 198.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1229,7 +1229,7 @@
           "side": "top",
           "x": 257.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1239,7 +1239,7 @@
           "side": "top",
           "x": 316.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1249,7 +1249,7 @@
           "side": "top",
           "x": 375.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1259,7 +1259,7 @@
           "side": "top",
           "x": 434.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1269,7 +1269,7 @@
           "side": "top",
           "x": 493.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1279,7 +1279,7 @@
           "side": "top",
           "x": 552.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1289,7 +1289,7 @@
           "side": "top",
           "x": 611.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1299,7 +1299,7 @@
           "side": "top",
           "x": 670.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1309,7 +1309,7 @@
           "side": "top",
           "x": 729.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1319,7 +1319,7 @@
           "side": "top",
           "x": 788.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1329,7 +1329,7 @@
           "side": "top",
           "x": 847.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1339,7 +1339,7 @@
           "side": "top",
           "x": 906.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1349,7 +1349,7 @@
           "side": "top",
           "x": 965.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1359,7 +1359,7 @@
           "side": "top",
           "x": 1024.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1369,7 +1369,7 @@
           "side": "top",
           "x": 1083.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1379,7 +1379,7 @@
           "side": "top",
           "x": 1142.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1389,7 +1389,7 @@
           "side": "top",
           "x": 1201.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         },
         {
@@ -1399,7 +1399,7 @@
           "side": "top",
           "x": 1260.5,
           "y": 785,
-          "max_connections": 3,
+          "max_connections": 2,
           "enabled": true
         }
       ],

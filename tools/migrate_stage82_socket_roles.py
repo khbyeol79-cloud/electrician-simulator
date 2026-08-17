@@ -152,9 +152,9 @@ def update_base_operation(problem_id: str) -> None:
         ("MCCB-T1", "EOCR-L1", "brown"), ("MCCB-T2", "EOCR-L2", "black"), ("MCCB-T3", "EOCR-L3", "gray"),
         ("TB5-04", "F-1", "yellow"), ("F-2", "TB5-05", "yellow"),
         ("TB5-06", "TB5-07", "yellow"), ("TB5-08", "MC1-6", "yellow"), ("MC1-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
-        ("TB5-08", "T1-2", "yellow"), ("T1-7", "TB6-01", "yellow"),
-        ("TB5-06", "T1-1", "yellow"), ("T1-3", "TB6-02", "yellow"), ("TB6-03", "TB6-01", "yellow"),
+        ("TB5-06", "MC1-4", "yellow"), ("MC1-10", "MC1-6", "yellow"),
+        ("MC1-10", "T1-2", "yellow"), ("T1-7", "MC1-12", "yellow"),
+        ("TB5-07", "T1-1", "yellow"), ("T1-3", "TB6-02", "yellow"), ("TB6-03", "T1-7", "yellow"),
     ]
     answer["wiring_connections"] = [wire(index, *pair) for index, pair in enumerate(pairs, 1)]
     write_json(folder / "problem.json", problem)
@@ -179,9 +179,9 @@ def update_forward_reverse() -> None:
         ("MCCB-T1", "EOCR-L1", "brown"), ("MCCB-T2", "EOCR-L2", "black"), ("MCCB-T3", "EOCR-L3", "gray"),
         ("TB5-04", "F-1", "yellow"), ("F-2", "TB5-05", "yellow"),
         ("TB5-06", "TB5-07", "yellow"), ("TB5-08", "MC2-5", "yellow"), ("MC2-11", "MC1-6", "yellow"), ("MC1-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
+        ("TB5-07", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
         ("TB5-06", "TB5-09", "yellow"), ("TB5-10", "MC1-5", "yellow"), ("MC1-11", "MC2-6", "yellow"), ("MC2-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC2-4", "yellow"), ("MC2-10", "TB5-10", "yellow"),
+        ("TB5-09", "MC2-4", "yellow"), ("MC2-10", "TB5-10", "yellow"),
     ]
     answer["wiring_connections"] = [wire(index, *pair) for index, pair in enumerate(pairs, 1)]
     write_json(folder / "problem.json", problem)
@@ -195,7 +195,7 @@ def main() -> None:
     update_base_operation("operation_demo_001")
     update_base_operation("eocr_sequence_demo_001")
     update_forward_reverse()
-    print("EOCR·MC 소켓 역할과 동작시험 배선을 0.8.2 기준으로 갱신했습니다.")
+    print("EOCR·MC 소켓 역할과 동작시험 배선을 갱신했습니다.")
 
 
 if __name__ == "__main__":

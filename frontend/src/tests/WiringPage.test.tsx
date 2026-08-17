@@ -203,6 +203,8 @@ describe('제어함 결선', () => {
     const wire = screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })
     expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#e0a500' })
     await user.click(wire)
+    expect(wire).toHaveClass('selected')
+    expect(wire.querySelector('.wire-depth')).not.toBeInTheDocument()
     await user.selectOptions(screen.getByLabelText('물리 전선 색상'), 'black')
     expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#171b22' })
   })

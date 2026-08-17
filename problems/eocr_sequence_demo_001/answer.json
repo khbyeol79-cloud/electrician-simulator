@@ -94,24 +94,24 @@
     {
       "connection_id": "W-013",
       "from": "MC1-10",
-      "to": "TB5-08",
+      "to": "MC1-6",
       "wire_color": "yellow"
     },
     {
       "connection_id": "W-014",
-      "from": "TB5-08",
+      "from": "MC1-10",
       "to": "T1-2",
       "wire_color": "yellow"
     },
     {
       "connection_id": "W-015",
       "from": "T1-7",
-      "to": "TB6-01",
+      "to": "MC1-12",
       "wire_color": "yellow"
     },
     {
       "connection_id": "W-016",
-      "from": "TB5-06",
+      "from": "TB5-07",
       "to": "T1-1",
       "wire_color": "yellow"
     },
@@ -124,7 +124,7 @@
     {
       "connection_id": "W-018",
       "from": "TB6-03",
-      "to": "TB6-01",
+      "to": "T1-7",
       "wire_color": "yellow"
     }
   ],

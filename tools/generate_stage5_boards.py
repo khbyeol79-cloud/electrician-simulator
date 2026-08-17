@@ -37,7 +37,7 @@ def socket(item_id, label, socket_type, row, x, y, width, height, terminal_ids=N
 
 
 def terminal_block(item_id, label, row, x, y, width, count, side):
-    pins = [pin(f"{item_id}-{index:02d}", str(index), None, side, round(x + width * (index - .5) / count, 2), y if side == "top" else y + 70, 3) for index in range(1, count + 1)]
+    pins = [pin(f"{item_id}-{index:02d}", str(index), None, side, round(x + width * (index - .5) / count, 2), y if side == "top" else y + 70, 2) for index in range(1, count + 1)]
     return {"item_id": item_id, "label": label, "item_type": "terminal_block", "socket_type_id": None, "row": row, "x": x, "y": y, "width": width, "height": 70, "pins": pins, "label_area": rect(x + width * .39, y + 20, width * .22, 30)}
 
 

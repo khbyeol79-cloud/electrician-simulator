@@ -93,7 +93,7 @@
     },
     {
       "connection_id": "W-013",
-      "from": "TB5-06",
+      "from": "TB5-07",
       "to": "MC1-4",
       "wire_color": "yellow"
     },
@@ -129,7 +129,7 @@
     },
     {
       "connection_id": "W-019",
-      "from": "TB5-06",
+      "from": "TB5-09",
       "to": "MC2-4",
       "wire_color": "yellow"
     },

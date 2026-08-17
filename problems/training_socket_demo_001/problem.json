@@ -2,62 +2,292 @@
   "schema_version": "1.0",
   "problem_id": "training_socket_demo_001",
   "description": "프로그램의 접점 선택과 소켓번호 입력·채점을 확인하기 위한 가상 회로입니다. 실제 전기기능사 시험 정답으로 사용하지 마십시오.",
-  "instructions": ["제어회로의 VR1 접점을 선택하십시오.", "위쪽과 아래쪽 소켓번호를 선택한 뒤 제출하십시오."],
-  "learning_objectives": ["SVG 회로 요소 선택", "8P 가상 소켓번호 입력", "채점 결과 확인"],
-  "power_supply": { "system": "3P3W_AC_220V", "voltage": 220, "frequency": 60, "wire_colors": { "L1": "brown", "L2": "black", "L3": "gray", "control": "yellow" } },
-  "schematic": { "file": "schematic.svg", "format": "svg", "view_box": "0 0 1600 900" },
-  "board": { "layout_id": "virtual_training_board_v1" },
+  "instructions": [
+    "제어회로의 VR1 접점을 선택하십시오.",
+    "위쪽과 아래쪽 소켓번호를 선택한 뒤 제출하십시오."
+  ],
+  "learning_objectives": [
+    "SVG 회로 요소 선택",
+    "8P 가상 소켓번호 입력",
+    "채점 결과 확인"
+  ],
+  "power_supply": {
+    "system": "3P3W_AC_220V",
+    "voltage": 220,
+    "frequency": 60,
+    "wire_colors": {
+      "L1": "brown",
+      "L2": "black",
+      "L3": "gray",
+      "control": "yellow"
+    }
+  },
+  "schematic": {
+    "file": "schematic.svg",
+    "format": "svg",
+    "view_box": "0 0 1600 900"
+  },
+  "board": {
+    "layout_id": "virtual_training_board_v1"
+  },
   "available_devices": [],
   "circuit": {
     "schema_version": "1.0",
     "definition_status": "structure_only",
     "devices": [
-      { "device_id": "VR1", "device_type_id": "auxiliary_relay_8p", "label": "VR1 (가상)", "socket_type_id": "socket_8p_base", "board_position": { "row": 1, "column": 1, "x": 0.65, "y": 0.5 }, "installed_initially": false }
+      {
+        "device_id": "VR1",
+        "device_type_id": "auxiliary_relay_8p",
+        "label": "VR1 (가상)",
+        "socket_type_id": "socket_8p_base",
+        "board_position": {
+          "row": 1,
+          "column": 1,
+          "x": 0.65,
+          "y": 0.5
+        },
+        "installed_initially": false
+      }
     ],
     "terminals": [
-      { "terminal_id": "VR1-2", "device_id": "VR1", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-      { "terminal_id": "VR1-3", "device_id": "VR1", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
-      { "terminal_id": "VR1-6", "device_id": "VR1", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-      { "terminal_id": "VR1-7", "device_id": "VR1", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true }
+      {
+        "terminal_id": "VR1-2",
+        "device_id": "VR1",
+        "pin_number": 2,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-3",
+        "device_id": "VR1",
+        "pin_number": 3,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_no",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-6",
+        "device_id": "VR1",
+        "pin_number": 6,
+        "terminal_type": "socket_pin",
+        "electrical_role": "contact_common",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "VR1-7",
+        "device_id": "VR1",
+        "pin_number": 7,
+        "terminal_type": "socket_pin",
+        "electrical_role": "coil",
+        "max_connections": 2,
+        "enabled": true
+      }
     ],
     "contacts": [
-      { "contact_id": "VR1-C1", "owner_device_id": "VR1", "contact_type": "NO", "common_terminal_id": "VR1-6", "switched_terminal_id": "VR1-3", "controlled_by_coil_id": "VR1-COIL", "normal_state": "open" }
+      {
+        "contact_id": "VR1-C1",
+        "owner_device_id": "VR1",
+        "contact_type": "NO",
+        "common_terminal_id": "VR1-6",
+        "switched_terminal_id": "VR1-3",
+        "controlled_by_coil_id": "VR1-COIL",
+        "normal_state": "open"
+      }
     ],
     "coils": [
-      { "coil_id": "VR1-COIL", "owner_device_id": "VR1", "terminal_a_id": "VR1-2", "terminal_b_id": "VR1-7", "rated_voltage": 220, "voltage_type": "AC", "frequency": 60 }
+      {
+        "coil_id": "VR1-COIL",
+        "owner_device_id": "VR1",
+        "terminal_a_id": "VR1-2",
+        "terminal_b_id": "VR1-7",
+        "rated_voltage": 220,
+        "voltage_type": "AC",
+        "frequency": 60
+      }
     ]
   },
   "socket_questions": [
-    { "question_id": "SQ-VR1-C1", "target_element_type": "contact", "target_element_id": "VR1-C1", "display_label": "VR1 (가상)", "answer_slots": [ { "slot_id": "upper", "position": "above" }, { "slot_id": "lower", "position": "below" } ] }
+    {
+      "question_id": "SQ-VR1-C1",
+      "target_element_type": "contact",
+      "target_element_id": "VR1-C1",
+      "display_label": "VR1 (가상)",
+      "answer_slots": [
+        {
+          "slot_id": "upper",
+          "position": "above"
+        },
+        {
+          "slot_id": "lower",
+          "position": "below"
+        }
+      ]
+    }
   ],
   "device_layout": {
     "schema_version": "1.0",
     "fixed_placements": [
-      { "mount_device_id": "DEVICE-X1", "label": "X1 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "socket_id": "X1", "socket_type_id": "socket_8p_base" },
-      { "mount_device_id": "DEVICE-X2", "label": "X2 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "socket_id": "X2", "socket_type_id": "socket_8p_base" },
-      { "mount_device_id": "DEVICE-T1", "label": "T1 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "socket_id": "T1", "socket_type_id": "socket_8p_base" },
-      { "mount_device_id": "DEVICE-T2", "label": "T2 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "socket_id": "T2", "socket_type_id": "socket_8p_base" },
-      { "mount_device_id": "DEVICE-MC1", "label": "MC1 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC1", "socket_type_id": "socket_12p_base" },
-      { "mount_device_id": "DEVICE-MC2", "label": "MC2 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "MC2", "socket_type_id": "socket_12p_base" }
+      {
+        "mount_device_id": "DEVICE-X1",
+        "label": "X1 보조릴레이",
+        "device_type_id": "auxiliary_relay_8p",
+        "graphic_type": "relay",
+        "socket_id": "X1",
+        "socket_type_id": "socket_8p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-X2",
+        "label": "X2 보조릴레이",
+        "device_type_id": "auxiliary_relay_8p",
+        "graphic_type": "relay",
+        "socket_id": "X2",
+        "socket_type_id": "socket_8p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-T1",
+        "label": "T1 타이머",
+        "device_type_id": "timer_8p",
+        "graphic_type": "timer",
+        "socket_id": "T1",
+        "socket_type_id": "socket_8p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-T2",
+        "label": "T2 타이머",
+        "device_type_id": "timer_8p",
+        "graphic_type": "timer",
+        "socket_id": "T2",
+        "socket_type_id": "socket_8p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-MC1",
+        "label": "MC1 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "socket_id": "MC1",
+        "socket_type_id": "socket_12p_base"
+      },
+      {
+        "mount_device_id": "DEVICE-MC2",
+        "label": "MC2 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "socket_id": "MC2",
+        "socket_type_id": "socket_12p_base"
+      }
     ]
   },
   "mounting": {
     "schema_version": "1.0",
     "available_devices": [
-      { "mount_device_id": "DEVICE-X1", "label": "X1 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "compatible_socket_type_ids": ["socket_8p_base"] },
-      { "mount_device_id": "DEVICE-X2", "label": "X2 보조릴레이", "device_type_id": "auxiliary_relay_8p", "graphic_type": "relay", "compatible_socket_type_ids": ["socket_8p_base"] },
-      { "mount_device_id": "DEVICE-T1", "label": "T1 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "compatible_socket_type_ids": ["socket_8p_base"] },
-      { "mount_device_id": "DEVICE-T2", "label": "T2 타이머", "device_type_id": "timer_8p", "graphic_type": "timer", "compatible_socket_type_ids": ["socket_8p_base"] },
-      { "mount_device_id": "DEVICE-MC1", "label": "MC1 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "compatible_socket_type_ids": ["socket_12p_base"] },
-      { "mount_device_id": "DEVICE-MC2", "label": "MC2 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "compatible_socket_type_ids": ["socket_12p_base"] }
+      {
+        "mount_device_id": "DEVICE-X1",
+        "label": "X1 보조릴레이",
+        "device_type_id": "auxiliary_relay_8p",
+        "graphic_type": "relay",
+        "compatible_socket_type_ids": [
+          "socket_8p_base"
+        ]
+      },
+      {
+        "mount_device_id": "DEVICE-X2",
+        "label": "X2 보조릴레이",
+        "device_type_id": "auxiliary_relay_8p",
+        "graphic_type": "relay",
+        "compatible_socket_type_ids": [
+          "socket_8p_base"
+        ]
+      },
+      {
+        "mount_device_id": "DEVICE-T1",
+        "label": "T1 타이머",
+        "device_type_id": "timer_8p",
+        "graphic_type": "timer",
+        "compatible_socket_type_ids": [
+          "socket_8p_base"
+        ]
+      },
+      {
+        "mount_device_id": "DEVICE-T2",
+        "label": "T2 타이머",
+        "device_type_id": "timer_8p",
+        "graphic_type": "timer",
+        "compatible_socket_type_ids": [
+          "socket_8p_base"
+        ]
+      },
+      {
+        "mount_device_id": "DEVICE-MC1",
+        "label": "MC1 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "compatible_socket_type_ids": [
+          "socket_12p_base"
+        ]
+      },
+      {
+        "mount_device_id": "DEVICE-MC2",
+        "label": "MC2 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "compatible_socket_type_ids": [
+          "socket_12p_base"
+        ]
+      }
     ],
     "mount_targets": [
-      { "socket_id": "X1", "socket_type_id": "socket_8p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_8p"] },
-      { "socket_id": "X2", "socket_type_id": "socket_8p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_8p"] },
-      { "socket_id": "T1", "socket_type_id": "socket_8p_base", "enabled": true, "allowed_device_type_ids": ["timer_8p"] },
-      { "socket_id": "T2", "socket_type_id": "socket_8p_base", "enabled": true, "allowed_device_type_ids": ["timer_8p"] },
-      { "socket_id": "MC1", "socket_type_id": "socket_12p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_12p"] },
-      { "socket_id": "MC2", "socket_type_id": "socket_12p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_12p"] }
+      {
+        "socket_id": "X1",
+        "socket_type_id": "socket_8p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "auxiliary_relay_8p"
+        ]
+      },
+      {
+        "socket_id": "X2",
+        "socket_type_id": "socket_8p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "auxiliary_relay_8p"
+        ]
+      },
+      {
+        "socket_id": "T1",
+        "socket_type_id": "socket_8p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "timer_8p"
+        ]
+      },
+      {
+        "socket_id": "T2",
+        "socket_type_id": "socket_8p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "timer_8p"
+        ]
+      },
+      {
+        "socket_id": "MC1",
+        "socket_type_id": "socket_12p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "auxiliary_relay_12p"
+        ]
+      },
+      {
+        "socket_id": "MC2",
+        "socket_type_id": "socket_12p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "auxiliary_relay_12p"
+        ]
+      }
     ]
   }
 }

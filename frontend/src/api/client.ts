@@ -116,7 +116,7 @@ export type BoardItem = {
   pins: BoardPin[]; label_area: BoardRect
 }
 export type BoardDefinition = {
-  schema_version: '1.0'; board_id: string; width: number; height: number; routing_margin: number
+  schema_version: '1.0'; board_id: string; layout_mode?: 'auto_rows' | 'fixed'; width: number; height: number; routing_margin: number
   items: BoardItem[]
   routing_channels: (BoardRect & { channel_id: string; channel_type: 'horizontal' | 'left_outer' | 'right_outer' })[]
   forbidden_areas: (BoardRect & { area_id: string })[]

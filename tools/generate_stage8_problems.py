@@ -64,7 +64,7 @@ def update_identity(target: Path, problem_id: str, title: str, tags: list[str]) 
     answer["problem_id"] = problem_id
     answer["verification"] = {
         "status": "reviewed",
-        "verified_by": "0.8.2 자동 회귀시험",
+        "verified_by": "0.8.3 자동 회귀시험",
         "verified_at": "2026-08-16T00:00:00+09:00",
         "notes": "프로그램 기능 확인용 자체 제작 정답이며 실제 시험 답안이 아닙니다.",
     }
@@ -78,17 +78,12 @@ def generate_forward_reverse() -> None:
         target, problem_id, "정·역회전 자기유지·인터록·EOCR 연습", ["정역회전", "인터록", "EOCR"]
     )
     board = read_json(target / "board.json")
-    for item in board["items"]:
-        for pin in item["pins"]:
-            if pin["terminal_id"] == "TB5-06":
-                pin["max_connections"] = 6
     circuit = problem["circuit"]
     circuit["devices"].extend([
         {"device_id": "MC2", "device_type_id": "auxiliary_relay_12p", "label": "MC2", "socket_type_id": "socket_12p_base", "board_position": {"row": 2, "column": 2, "x": 0.6, "y": 0.65}, "installed_initially": True},
         {"device_id": "PB2", "device_type_id": "push_button", "label": "PB2", "socket_type_id": None, "board_position": {"row": 0, "column": 2, "x": 0.2, "y": 0.1}, "installed_initially": True},
     ])
     by_terminal = {item["terminal_id"]: item for item in circuit["terminals"]}
-    by_terminal["TB5-06"]["max_connections"] = 6
     mc2_roles = {1: "line", 2: "line", 3: "line", 4: "contact_common", 5: "contact_common", 6: "coil", 7: "load", 8: "load", 9: "load", 10: "contact_no", 11: "contact_nc", 12: "coil"}
     circuit["terminals"] = list(by_terminal.values()) + [terminal(f"MC2-{number}", "MC2", number, role) for number, role in mc2_roles.items()]
     contacts = list(circuit["contacts"])
@@ -134,9 +129,9 @@ def generate_forward_reverse() -> None:
         ("MCCB-T1", "EOCR-L1", "brown"), ("MCCB-T2", "EOCR-L2", "black"), ("MCCB-T3", "EOCR-L3", "gray"),
         ("TB5-04", "F-1", "yellow"), ("F-2", "TB5-05", "yellow"),
         ("TB5-06", "TB5-07", "yellow"), ("TB5-08", "MC2-5", "yellow"), ("MC2-11", "MC1-6", "yellow"), ("MC1-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
+        ("TB5-07", "MC1-4", "yellow"), ("MC1-10", "TB5-08", "yellow"),
         ("TB5-06", "TB5-09", "yellow"), ("TB5-10", "MC1-5", "yellow"), ("MC1-11", "MC2-6", "yellow"), ("MC2-12", "TB6-01", "yellow"),
-        ("TB5-06", "MC2-4", "yellow"), ("MC2-10", "TB5-10", "yellow"),
+        ("TB5-09", "MC2-4", "yellow"), ("MC2-10", "TB5-10", "yellow"),
     ]
     answer["wiring_connections"] = [connection(index, a, b, color) for index, (a, b, color) in enumerate(pairs, 1)]
     answer["operation_tests"] = [
@@ -186,7 +181,7 @@ def generate_eocr_sequence() -> None:
 def main() -> None:
     generate_forward_reverse()
     generate_eocr_sequence()
-    print("0.8.2 자체 제작 문제 2개를 생성했습니다.")
+    print("0.8.3 자체 제작 문제 2개를 생성했습니다.")
 
 
 if __name__ == "__main__":

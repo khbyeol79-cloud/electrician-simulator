@@ -54,6 +54,7 @@ class BoardDefinition(BaseModel):
     model_config = ConfigDict(extra="forbid")
     schema_version: Literal["1.0"]
     board_id: str
+    layout_mode: Literal["auto_rows", "fixed"] = "auto_rows"
     width: float = Field(gt=0)
     height: float = Field(gt=0)
     routing_margin: float = Field(ge=0)

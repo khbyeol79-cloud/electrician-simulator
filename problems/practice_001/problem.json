@@ -6,7 +6,10 @@
     "문제 정보가 화면에 정상적으로 표시되는지 확인하십시오.",
     "이 문제의 실제 회로 상호작용은 다음 개발 단계에서 구현됩니다."
   ],
-  "learning_objectives": ["문제 패키지 구조 이해", "문제 선택 기능 확인"],
+  "learning_objectives": [
+    "문제 패키지 구조 이해",
+    "문제 선택 기능 확인"
+  ],
   "power_supply": {
     "system": "3P3W_AC_220V",
     "voltage": 220,
@@ -23,7 +26,9 @@
     "format": "svg",
     "view_box": "0 0 1200 700"
   },
-  "board": { "layout_id": "standard_two_motor_v1" },
+  "board": {
+    "layout_id": "standard_two_motor_v1"
+  },
   "available_devices": [],
   "circuit": {
     "schema_version": "1.0",
@@ -37,16 +42,38 @@
   "device_layout": {
     "schema_version": "1.0",
     "fixed_placements": [
-      { "mount_device_id": "DEVICE-X3", "label": "X3 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "socket_id": "X3", "socket_type_id": "socket_12p_base" }
+      {
+        "mount_device_id": "DEVICE-X3",
+        "label": "X3 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "socket_id": "X3",
+        "socket_type_id": "socket_12p_base"
+      }
     ]
   },
   "mounting": {
     "schema_version": "1.0",
     "available_devices": [
-      { "mount_device_id": "DEVICE-X3", "label": "X3 12P 릴레이", "device_type_id": "auxiliary_relay_12p", "graphic_type": "contactor", "compatible_socket_type_ids": ["socket_12p_base"] }
+      {
+        "mount_device_id": "DEVICE-X3",
+        "label": "X3 12P 릴레이",
+        "device_type_id": "auxiliary_relay_12p",
+        "graphic_type": "contactor",
+        "compatible_socket_type_ids": [
+          "socket_12p_base"
+        ]
+      }
     ],
     "mount_targets": [
-      { "socket_id": "X3", "socket_type_id": "socket_12p_base", "enabled": true, "allowed_device_type_ids": ["auxiliary_relay_12p"] }
+      {
+        "socket_id": "X3",
+        "socket_type_id": "socket_12p_base",
+        "enabled": true,
+        "allowed_device_type_ids": [
+          "auxiliary_relay_12p"
+        ]
+      }
     ]
   }
 }

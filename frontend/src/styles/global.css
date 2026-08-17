@@ -234,7 +234,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .board-wire .wire-visible { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(1px 1.5px 1px rgba(0,0,0,.28)); }
 .board-wire .wire-hit { fill: none; stroke: transparent; stroke-width: 18; cursor: pointer; vector-effect: non-scaling-stroke; }
 .board-wire.selected .wire-depth { stroke: rgba(18,101,232,.7); stroke-width: 11; }
-.board-wire.selected .wire-visible { stroke-width: 7; filter: drop-shadow(0 0 4px #1265e8); }
+.board-wire.selected .wire-visible { stroke-width: 7; filter: none; }
+.board-wire.editable:focus { outline: none; }
+.board-wire.editable:focus-visible .wire-visible { stroke-width: 7; }
 .board-pin { cursor: pointer; outline: none; }
 .board-pin > circle:first-of-type { fill: #e5e9ed; stroke: #182431; stroke-width: 2.3; }
 .board-pin > circle:nth-of-type(2) { fill: #727f8b; stroke: #fff; stroke-width: 1; }
