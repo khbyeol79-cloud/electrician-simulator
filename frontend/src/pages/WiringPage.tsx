@@ -20,6 +20,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   const [mode, setMode] = useState<'graphic' | 'summary'>('graphic')
   const [selectedPin, setSelectedPin] = useState<string | null>(null)
   const [selectedWire, setSelectedWire] = useState<number | null>(null)
+  const [selectedSummaryTerminal, setSelectedSummaryTerminal] = useState<string | null>(null)
   const [zoom, setZoom] = useState(1)
   const [progress, setProgress] = useState<WiringProgress>()
   const [result, setResult] = useState<WiringAttemptResult>()
@@ -31,6 +32,11 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   const suppressClick = useRef(false)
 
   const selectedConnection = selectedWire === null ? undefined : connections[selectedWire]
+  const selectedSummaryConnections = useMemo(() => selectedSummaryTerminal === null ? [] : connections.flatMap((connection, connectionIndex) => {
+    if (connection.from === selectedSummaryTerminal) return [{ connectionIndex, other: connection.to }]
+    if (connection.to === selectedSummaryTerminal) return [{ connectionIndex, other: connection.from }]
+    return []
+  }), [connections, selectedSummaryTerminal])
   const connectionKeys = useMemo(() => new Set(connections.map((item) => [item.from, item.to].sort().join('|'))), [connections])
   const analyzedQuestionCount = useMemo(() => problem?.socket_questions.filter((question) =>
     question.answer_slots.every((slot) => Boolean(circuitDraft[question.question_id]?.[slot.slot_id])),
@@ -40,7 +46,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     if (!problem) return
     const controller = new AbortController()
     setLoading(true); setReady(false); setError(undefined); setNotice(undefined); setResult(undefined)
-    setSelectedPin(null); setSelectedWire(null); setHistory([]); setFuture([])
+    setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null); setHistory([]); setFuture([])
     setCircuitDraft(restoreCircuitDraft(problem.problem_id, problem.version))
     Promise.all([getBoard(problem.problem_id, controller.signal), getWiringDraft(problem.problem_id, controller.signal), getWiringProgress(problem.problem_id, controller.signal), getDiagram(problem.problem_id, controller.signal)])
       .then(([nextBoard, draft, nextProgress, nextDiagram]) => {
@@ -62,7 +68,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
 
   const commit = (next: WiringConnection[]) => {
     setHistory((values) => [...values.slice(-29), connections]); setFuture([]); setConnections(next)
-    setResult(undefined); setNotice(undefined); setSelectedWire(null)
+    setResult(undefined); setNotice(undefined); setSelectedWire(null); setSelectedSummaryTerminal(null)
   }
   const connect = (from: string, to: string) => {
     if (from === to) { setNotice('같은 단자끼리는 연결할 수 없습니다.'); return }
@@ -73,7 +79,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   }
   const pinClick = (terminalId: string) => {
     if (suppressClick.current) { suppressClick.current = false; return }
-    if (!selectedPin) { setSelectedPin(terminalId); setSelectedWire(null); setNotice(undefined); return }
+    if (!selectedPin) { setSelectedPin(terminalId); setSelectedWire(null); setSelectedSummaryTerminal(null); setNotice(undefined); return }
     if (selectedPin === terminalId) { setSelectedPin(null); return }
     connect(selectedPin, terminalId)
   }
@@ -87,11 +93,11 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   }
   const undo = () => {
     const previous = history.at(-1); if (!previous) return
-    setFuture((values) => [connections, ...values]); setConnections(previous); setHistory((values) => values.slice(0, -1)); setSelectedWire(null)
+    setFuture((values) => [connections, ...values]); setConnections(previous); setHistory((values) => values.slice(0, -1)); setSelectedWire(null); setSelectedSummaryTerminal(null)
   }
   const redo = () => {
     const next = future[0]; if (!next) return
-    setHistory((values) => [...values, connections]); setConnections(next); setFuture((values) => values.slice(1)); setSelectedWire(null)
+    setHistory((values) => [...values, connections]); setConnections(next); setFuture((values) => values.slice(1)); setSelectedWire(null); setSelectedSummaryTerminal(null)
   }
   const reset = async () => {
     if (!window.confirm('현재 문제의 모든 결선을 초기화하시겠습니까?')) return
@@ -118,7 +124,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       if ((event.key === 'Delete' || event.key === 'Backspace') && selectedWire !== null) { event.preventDefault(); removeSelected() }
-      if (event.key === 'Escape') { setSelectedPin(null); setSelectedWire(null) }
+      if (event.key === 'Escape') { setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null) }
     }
     window.addEventListener('keydown', keydown)
     return () => window.removeEventListener('keydown', keydown)
@@ -126,7 +132,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
 
   useEffect(() => {
     const resetFromHeader = () => {
-      setConnections([]); setHistory([]); setFuture([]); setSelectedPin(null); setSelectedWire(null); setResult(undefined); setNotice(undefined)
+      setConnections([]); setHistory([]); setFuture([]); setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null); setResult(undefined); setNotice(undefined)
       if (problem) void deleteWiringDraft(problem.problem_id).catch(() => undefined)
     }
     window.addEventListener('electrician:reset-wiring', resetFromHeader)
@@ -148,14 +154,14 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     {!loading && !error && board && <div className="wiring-layout">
       <div className="wiring-stage">
         <div className="wiring-toolbar" aria-label="결선 편집 도구">
-          <button className={mode === 'graphic' ? 'active' : ''} onClick={() => setMode('graphic')}>그래픽 모드</button><button className={mode === 'summary' ? 'active' : ''} onClick={() => setMode('summary')}>요약 모드</button>
+          <button className={mode === 'graphic' ? 'active' : ''} onClick={() => { setMode('graphic'); setSelectedSummaryTerminal(null) }}>그래픽 모드</button><button className={mode === 'summary' ? 'active' : ''} onClick={() => setMode('summary')}>요약 모드</button>
           <span className="toolbar-separator" /><button aria-label="확대" onClick={() => setZoom((value) => Math.min(1.35, value + .1))}>＋</button><button aria-label="축소" onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button>
           <span className="toolbar-separator" /><button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={selectedWire === null} onClick={removeSelected}>선택 전선 삭제</button><button className="danger" onClick={() => void reset()}>전체 초기화</button>
         </div>
-        <WiringBoard board={board} connections={connections} mode={mode} selectedPin={selectedPin} selectedWire={selectedWire} zoom={zoom} onPinClick={pinClick} onPinPointerDown={(id) => { dragStart.current = id }} onPinPointerUp={pinPointerUp} onWireSelect={(index) => { setSelectedWire(index); setSelectedPin(null) }} onClearSelection={() => { setSelectedPin(null); setSelectedWire(null) }} />
+        <WiringBoard board={board} connections={connections} mode={mode} selectedPin={selectedPin} selectedWire={selectedWire} selectedSummaryTerminal={selectedSummaryTerminal} zoom={zoom} onPinClick={pinClick} onPinPointerDown={(id) => { dragStart.current = id }} onPinPointerUp={pinPointerUp} onWireSelect={(index) => { setSelectedWire(index); setSelectedPin(null); setSelectedSummaryTerminal(null) }} onSummarySelect={(terminalId, connectionIndices) => { setSelectedSummaryTerminal(terminalId); setSelectedWire(connectionIndices[0] ?? null); setSelectedPin(null) }} onClearSelection={() => { setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null) }} />
       </div>
       <aside className="wiring-panel">
-        <section><span className="panel-kicker">현재 작업</span><h3>{selectedConnection ? `${selectedConnection.from} → ${selectedConnection.to}` : selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요'}</h3><p>시작 단자와 종료 단자를 차례로 클릭하거나 드래그하여 연결합니다. 새 전선은 노란색으로 생성됩니다.</p>{selectedConnection && mode === 'summary' && <dl className="summary-connection-detail"><div><dt>연결 단자 1</dt><dd>{selectedConnection.from}</dd></div><div><dt>연결 단자 2</dt><dd>{selectedConnection.to}</dd></div></dl>}{selectedConnection && <label className="wire-color-select">물리 전선 색상<select value={selectedConnection.wire_color} onChange={(event) => changeWireColor(event.target.value as WiringConnection['wire_color'])}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section>
+        <section><span className="panel-kicker">현재 작업</span><h3>{selectedSummaryTerminal ? `${selectedSummaryTerminal} · ${selectedSummaryConnections.length}개 연결` : selectedConnection ? `${selectedConnection.from} → ${selectedConnection.to}` : selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요'}</h3><p>시작 단자와 종료 단자를 차례로 클릭하거나 드래그하여 연결합니다. 새 전선은 노란색으로 생성됩니다.</p>{selectedSummaryTerminal && mode === 'summary' && <div className="summary-connection-list" aria-label={`${selectedSummaryTerminal} 상대 단자 목록`}>{selectedSummaryConnections.map((item, index) => <button key={item.connectionIndex} type="button" className={selectedWire === item.connectionIndex ? 'selected' : ''} onClick={() => setSelectedWire(item.connectionIndex)}><span>{index + 1}번째 연결</span><strong>{item.other}</strong></button>)}</div>}{selectedConnection && !selectedSummaryTerminal && mode === 'summary' && <dl className="summary-connection-detail"><div><dt>연결 단자 1</dt><dd>{selectedConnection.from}</dd></div><div><dt>연결 단자 2</dt><dd>{selectedConnection.to}</dd></div></dl>}{selectedConnection && <label className="wire-color-select">물리 전선 색상<select value={selectedConnection.wire_color} onChange={(event) => changeWireColor(event.target.value as WiringConnection['wire_color'])}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section>
         <section className="virtual-warning"><strong>가상 학습 데이터</strong><p>이 문제는 배선 기능 확인용이며 실제 시험 정답이 아닙니다.</p></section>
         <section><span className="panel-kicker">결선 상태</span><dl><div><dt>표시 모드</dt><dd>{mode === 'graphic' ? '그래픽' : '요약'}</dd></div><div><dt>연결 수</dt><dd>{connections.length}</dd></div><div><dt>경로 방식</dt><dd>직교·빈 통로 우선</dd></div></dl>{notice && <div className="submission-notice" role="alert">{notice}</div>}{result && <div className={`wiring-result ${result.overall_correct ? 'correct' : result.gradable ? 'wrong' : 'warning'}`}><strong>{result.message}</strong><span>정상 {result.correct_count}/{result.required_count}</span>{result.gradable && <span>누락 {result.missing_connections.length} · 추가 {result.extra_connections.length} · 금지 {result.forbidden_connections.length}</span>}</div>}{result?.gradable === false && <button className="preview-operation" type="button" onClick={() => navigate('/operation')}>동작시험 화면 미리보기</button>}<button className="submit-circuit" onClick={() => void submit()}>결선 제출</button></section>
         <section><span className="panel-kicker">경로 규칙</span><p>같은 수평 통로의 단자는 최단거리로 직접 연결하고, 서로 다른 수평 통로로 이동할 때만 좌우 외곽 통로를 사용합니다.</p></section>

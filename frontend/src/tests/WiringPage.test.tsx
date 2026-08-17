@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
 import { buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
-import { pathHasSelfOverlap, routeConnection } from '../features/wiring/engine/orthogonalRouter'
+import { buildConnectionEndpointOffsets, pathHasSelfOverlap, routeConnection, routeConnections } from '../features/wiring/engine/orthogonalRouter'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
 
@@ -49,8 +49,8 @@ describe('제어함 결선', () => {
     await user.click(screen.getByRole('button', { name: '요약 모드' }))
     expect(screen.queryByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 요약 표시' }))
-    expect(screen.getByText('연결 단자 1')).toBeInTheDocument()
-    expect(screen.getByText('연결 단자 2')).toBeInTheDocument()
+    expect(screen.getByText('1번째 연결')).toBeInTheDocument()
+    expect(screen.getByLabelText('X1-1 상대 단자 목록')).toHaveTextContent('MC1-4')
   })
 
   it('connects X1-1 to MC2-5 directly through an empty row gap', () => {
@@ -139,8 +139,38 @@ describe('제어함 결선', () => {
     const summary = buildTerminalSummary(wiringBoard, [
       { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#64748b' },
     ])
-    expect(summary.get('X1-1')).toEqual({ other: 'MC1-4', slot: '4', color: deviceSummaryColor('MC1'), connectionIndex: 0 })
-    expect(summary.get('MC1-4')).toEqual({ other: 'X1-1', slot: '1', color: deviceSummaryColor('X1'), connectionIndex: 0 })
+    expect(summary.get('X1-1')).toEqual([{ other: 'MC1-4', slot: '4', color: deviceSummaryColor('MC1'), connectionIndex: 0 }])
+    expect(summary.get('MC1-4')).toEqual([{ other: 'X1-1', slot: '1', color: deviceSummaryColor('X1'), connectionIndex: 0 }])
+  })
+
+  it('separates the first and second wire to the left and right of a shared pin', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const connections = [
+      { from: 'X1-1', to: 'MC1-4', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+      { from: 'X1-1', to: 'MC2-5', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+    ]
+    const offsets = buildConnectionEndpointOffsets(connections)
+    expect(offsets).toEqual([{ from: -5, to: 0 }, { from: 5, to: 0 }])
+    const routes = routeConnections(board, connections)
+    expect(routes[0].points[0]).toEqual({ x: 807.5, y: 370 })
+    expect(routes[1].points[0]).toEqual({ x: 817.5, y: 370 })
+  })
+
+  it('shows +1 for two wires on one summary slot and lists both relative terminals', async () => {
+    installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
+    await user.click(screen.getByRole('button', { name: 'MC1-4 단자' }))
+    await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
+    await user.click(screen.getByRole('button', { name: 'MC1-5 단자' }))
+    await user.click(screen.getByRole('button', { name: '요약 모드' }))
+    expect(screen.getByText('+1')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'X1-1에서 MC1-4, MC1-5로 연결된 요약 표시' }))
+    const list = screen.getByLabelText('X1-1 상대 단자 목록')
+    expect(within(list).getByText('MC1-4')).toBeInTheDocument()
+    expect(within(list).getByText('MC1-5')).toBeInTheDocument()
   })
 
   it('assigns distinct summary colors including T1, TB5 and TB6', () => {

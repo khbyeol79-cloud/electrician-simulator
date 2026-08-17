@@ -8,6 +8,7 @@ import type {
 } from '../../../api/client'
 
 export type RoutedWire = WiringConnection & { points: DiagramPoint[] }
+export type ConnectionEndpointOffset = { from: number; to: number }
 
 type HorizontalLane = BoardRect & {
   channel_id: string
@@ -128,14 +129,21 @@ function routeCost(points: DiagramPoint[]) {
     total + Math.abs(point.x - points[index].x) + Math.abs(point.y - points[index].y), 0)
 }
 
-export function routeConnection(board: BoardDefinition, connection: WiringConnection, laneIndex = 0): RoutedWire {
+export function routeConnection(
+  board: BoardDefinition,
+  connection: WiringConnection,
+  laneIndex = 0,
+  endpointOffset: ConnectionEndpointOffset = { from: 0, to: 0 },
+): RoutedWire {
   const start = findPin(board, connection.from)
   const end = findPin(board, connection.to)
   if (!start || !end) throw new Error('연결 단자의 좌표를 찾을 수 없습니다.')
+  const startPin = { ...start.pin, x: start.pin.x + endpointOffset.from }
+  const endPin = { ...end.pin, x: end.pin.x + endpointOffset.to }
 
   const lanes = horizontalLanes(board)
-  const startLane = laneForPin(lanes, start.pin)
-  const endLane = laneForPin(lanes, end.pin)
+  const startLane = laneForPin(lanes, startPin)
+  const endLane = laneForPin(lanes, endPin)
   if (!startLane || !endLane) throw new Error('단자와 연결할 배선 통로를 찾을 수 없습니다.')
   const startY = laneY(startLane, laneIndex)
   const endY = laneY(endLane, laneIndex)
@@ -143,14 +151,14 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   let candidates: DiagramPoint[][]
   if (startLane.channel_id === endLane.channel_id) {
     candidates = [compact([
-      { x: start.pin.x, y: start.pin.y }, { x: start.pin.x, y: startY },
-      { x: end.pin.x, y: endY }, { x: end.pin.x, y: end.pin.y },
+      { x: startPin.x, y: startPin.y }, { x: startPin.x, y: startY },
+      { x: endPin.x, y: endY }, { x: endPin.x, y: endPin.y },
     ])]
   } else {
     const outer = outerXs(board, laneIndex)
     candidates = [
-      viaOuter(start.pin, end.pin, startY, endY, outer.left),
-      viaOuter(start.pin, end.pin, startY, endY, outer.right),
+      viaOuter(startPin, endPin, startY, endY, outer.left),
+      viaOuter(startPin, endPin, startY, endY, outer.right),
     ].sort((left, right) => routeCost(left) - routeCost(right))
   }
 
@@ -159,6 +167,29 @@ export function routeConnection(board: BoardDefinition, connection: WiringConnec
   return { ...connection, points }
 }
 
+export function buildConnectionEndpointOffsets(connections: WiringConnection[]) {
+  const offsets: ConnectionEndpointOffset[] = connections.map(() => ({ from: 0, to: 0 }))
+  const terminalUses = new Map<string, { connectionIndex: number; endpoint: 'from' | 'to' }[]>()
+  connections.forEach((connection, connectionIndex) => {
+    const fromUses = terminalUses.get(connection.from) ?? []
+    fromUses.push({ connectionIndex, endpoint: 'from' })
+    terminalUses.set(connection.from, fromUses)
+    const toUses = terminalUses.get(connection.to) ?? []
+    toUses.push({ connectionIndex, endpoint: 'to' })
+    terminalUses.set(connection.to, toUses)
+  })
+  terminalUses.forEach((uses) => {
+    if (uses.length < 2) return
+    const halfSpan = Math.min(8, 5 + Math.max(0, uses.length - 2))
+    const step = (halfSpan * 2) / (uses.length - 1)
+    uses.forEach((use, index) => {
+      offsets[use.connectionIndex][use.endpoint] = -halfSpan + step * index
+    })
+  })
+  return offsets
+}
+
 export function routeConnections(board: BoardDefinition, connections: WiringConnection[]) {
-  return connections.map((connection, index) => routeConnection(board, connection, index % 5))
+  const offsets = buildConnectionEndpointOffsets(connections)
+  return connections.map((connection, index) => routeConnection(board, connection, index % 5, offsets[index]))
 }
