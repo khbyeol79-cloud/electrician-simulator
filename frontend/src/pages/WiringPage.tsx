@@ -7,6 +7,7 @@ import {
 import { CircuitDiagram } from '../components/circuit/CircuitDiagram'
 import { restoreCircuitDraft, type CircuitDraft } from '../features/circuit/circuitDraft'
 import { WiringBoard } from '../features/wiring/components/WiringBoard'
+import { isFreeJunction, terminalBlockBank, terminalBlockUsage } from '../features/wiring/engine/terminalCapacity'
 import { PlaceholderPage } from './PlaceholderPage'
 
 export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
@@ -48,6 +49,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   const pinByTerminal = useMemo(() => new Map(board?.items.flatMap((item) => item.pins).map((pin) => [pin.terminal_id, pin]) ?? []), [board])
   const externalDevices = problem?.wiring_semantics?.external_devices ?? []
   const externalByTerminal = useMemo(() => new Map(externalDevices.flatMap((device) => device.terminals.map((terminal) => [terminal.terminal_id, terminal] as const))), [externalDevices])
+  const externalTerminalIds = useMemo(() => new Set(externalByTerminal.keys()), [externalByTerminal])
   const terminalConnectionCounts = useMemo(() => {
     const counts = new Map<string, number>()
     connections.forEach((connection) => {
@@ -99,7 +101,19 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     const key = [from, to].sort().join('|')
     if (connectionKeys.has(key)) { setNotice('이미 연결된 단자입니다.'); return }
     for (const terminalId of [from, to]) {
-      const maximum = pinByTerminal.get(terminalId)?.max_connections ?? externalByTerminal.get(terminalId)?.max_connections ?? 2
+      const pin = pinByTerminal.get(terminalId)
+      if (isFreeJunction(pin)) {
+        const bank = terminalBlockBank({ from, to }, terminalId, externalTerminalIds)
+        const usage = terminalBlockUsage(connections, terminalId, externalTerminalIds)
+        const maximum = pin?.max_connections ?? 2
+        if (usage[bank] >= maximum) {
+          const side = bank === 'external' ? '외부측' : '내부측'
+          setNotice(`${terminalId} 단자의 ${side}에는 전선을 최대 ${maximum}개까지 연결할 수 있습니다.`)
+          return
+        }
+        continue
+      }
+      const maximum = pin?.max_connections ?? externalByTerminal.get(terminalId)?.max_connections ?? 2
       if ((terminalConnectionCounts.get(terminalId) ?? 0) >= maximum) {
         setNotice(`${terminalId} 단자에는 전선을 최대 ${maximum}개까지 연결할 수 있습니다.`)
         return
@@ -190,7 +204,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
           <span className="toolbar-separator" /><button aria-label="확대" onClick={() => setZoom((value) => Math.min(1.35, value + .1))}>＋</button><button aria-label="축소" onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button>
           <span className="toolbar-separator" /><button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={selectedWire === null} onClick={removeSelected}>선택 전선 삭제</button><button className="danger" onClick={() => void reset()}>전체 초기화</button>
         </div>
-        {externalDevices.length > 0 && <section className="external-wiring-tray" aria-label="외부 기구선"><div className="external-wiring-heading"><strong>외부 기구선</strong><span>전선 끝을 선택하거나 TB 단자로 드래그하세요.</span></div><div className="external-device-list">{externalDevices.map((device) => <article key={device.device_id} className="external-device-card"><strong>{device.label}</strong><div>{device.terminals.map((terminal) => { const linked = connections.flatMap((item, index) => item.from === terminal.terminal_id ? [{ id: item.to, index }] : item.to === terminal.terminal_id ? [{ id: item.from, index }] : [])[0]; const count = terminalConnectionCounts.get(terminal.terminal_id) ?? 0; return <button key={terminal.terminal_id} type="button" draggable={!linked} className={selectedPin === terminal.terminal_id ? 'selected' : ''} aria-label={`${terminal.terminal_id} 외부 기구선, ${count} / ${terminal.max_connections} 연결`} onClick={() => { if (linked) { setSelectedWire(linked.index); setSelectedPin(null) } else pinClick(terminal.terminal_id) }} onDragStart={(event) => { event.dataTransfer.setData('application/x-electrician-terminal', terminal.terminal_id); event.dataTransfer.effectAllowed = 'link' }}><span className={`external-wire-swatch ${terminal.wire_color}`} />{terminal.terminal_id}<small>{linked ? `→ ${linked.id}` : '미연결'} · {count}/{terminal.max_connections}</small></button> })}</div></article>)}</div></section>}
+        {externalDevices.length > 0 && <section className="external-wiring-tray" aria-label="외부 기구선"><div className="external-wiring-heading"><strong>외부 기구선</strong><span>전선 끝을 선택하거나 TB 단자로 드래그하세요.</span><small>TB 한 번호: 외부측 2가닥 + 내부측 2가닥</small></div><div className="external-device-list">{externalDevices.map((device) => <article key={device.device_id} className="external-device-card"><strong>{device.label}</strong><div>{device.terminals.map((terminal) => { const linked = connections.flatMap((item, index) => item.from === terminal.terminal_id ? [{ id: item.to, index }] : item.to === terminal.terminal_id ? [{ id: item.from, index }] : [])[0]; const count = terminalConnectionCounts.get(terminal.terminal_id) ?? 0; return <button key={terminal.terminal_id} type="button" draggable={!linked} className={selectedPin === terminal.terminal_id ? 'selected' : ''} aria-label={`${terminal.terminal_id} 외부 기구선, ${count} / ${terminal.max_connections} 연결`} onClick={() => { if (linked) { setSelectedWire(linked.index); setSelectedPin(null) } else pinClick(terminal.terminal_id) }} onDragStart={(event) => { event.dataTransfer.setData('application/x-electrician-terminal', terminal.terminal_id); event.dataTransfer.effectAllowed = 'link' }}><span className={`external-wire-swatch ${terminal.wire_color}`} />{terminal.terminal_id}<small>{linked ? `→ ${linked.id}` : '미연결'} · {count}/{terminal.max_connections}</small></button> })}</div></article>)}</div></section>}
         <WiringBoard board={board} connections={connections} externalDevices={externalDevices} mode={mode} selectedPin={selectedPin} selectedWire={selectedWire} selectedSummaryTerminal={selectedSummaryTerminal} zoom={zoom} onPinClick={pinClick} onPinPointerDown={(id) => { dragStart.current = id }} onPinPointerUp={pinPointerUp} onExternalDrop={(externalId, targetId) => connect(externalId, targetId)} onWireSelect={(index) => { setSelectedWire(index); setSelectedPin(null); setSelectedSummaryTerminal(null) }} onSummarySelect={(terminalId, connectionIndices) => { setSelectedSummaryTerminal(terminalId); setSelectedWire(connectionIndices[0] ?? null); setSelectedPin(null) }} onClearSelection={() => { setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null) }} />
       </div>
       <aside className="wiring-panel">

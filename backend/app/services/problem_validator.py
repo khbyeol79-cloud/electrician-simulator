@@ -397,7 +397,8 @@ class ProblemPackageValidator:
                     if pin.terminal_role != expected_role:
                         issues.append(self._issue("error", "invalid_terminal_role", f"단자 역할이 장치 유형과 일치하지 않습니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
                     if pin.max_connections != 2:
-                        issues.append(self._issue("error", "invalid_terminal_capacity", f"모든 제어함 단자의 최대 연결 수는 2여야 합니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
+                        capacity_scope = "외부측·내부측 각각" if item.item_type == "terminal_block" else "전체"
+                        issues.append(self._issue("error", "invalid_terminal_capacity", f"제어함 단자의 {capacity_scope} 최대 연결 수는 2여야 합니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
             if answer:
                 terminals = board.terminal_ids
                 for connection in [*answer.wiring_connections, *answer.wiring_forbidden_connections]:

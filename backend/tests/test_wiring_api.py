@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 
 from fastapi.testclient import TestClient
 
@@ -79,7 +80,7 @@ def test_wiring_validation_and_unverified_problem(tmp_path):
         assert unverified.json()["gradable"] is False
 
 
-def test_every_terminal_including_terminal_blocks_allows_at_most_two_connections(tmp_path):
+def test_functional_terminals_allow_two_and_tb_allows_two_per_physical_side(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         three_on_socket = [
             {"from": "X1-1", "to": "MC1-4", "wire_color": "yellow"},
@@ -90,14 +91,24 @@ def test_every_terminal_including_terminal_blocks_allows_at_most_two_connections
         assert rejected.status_code == 422
         assert "최대 연결 수" in rejected.text
 
-        three_on_terminal_block = [
+        four_on_terminal_block = [
+            {"from": "EXT01-1", "to": "TB5-01", "wire_color": "brown"},
+            {"from": "EXT02-1", "to": "TB5-01", "wire_color": "brown"},
             {"from": "TB5-01", "to": "MCCB-L1", "wire_color": "brown"},
             {"from": "TB5-01", "to": "EOCR-L1", "wire_color": "brown"},
-            {"from": "TB5-01", "to": "F-1", "wire_color": "brown"},
         ]
-        rejected_tb = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": three_on_terminal_block})
-        assert rejected_tb.status_code == 422
-        assert "최대 연결 수" in rejected_tb.text
+        accepted_tb = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": four_on_terminal_block})
+        assert accepted_tb.status_code == 200
+
+        third_internal = [*four_on_terminal_block, {"from": "TB5-01", "to": "F-1", "wire_color": "brown"}]
+        rejected_internal = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": third_internal})
+        assert rejected_internal.status_code == 422
+        assert "내부측" in rejected_internal.text
+
+        third_external = [*four_on_terminal_block, {"from": "EXT03-1", "to": "TB5-01", "wire_color": "brown"}]
+        rejected_external = client.put("/api/problems/training_socket_demo_001/wiring-draft", json={"problem_version": 1, "mode": "graphic", "connections": third_external})
+        assert rejected_external.status_code == 422
+        assert "외부측" in rejected_external.text
 
 
 def test_alternative_tb_numbers_are_accepted_by_electrical_network(tmp_path):
@@ -133,6 +144,27 @@ def test_alternative_tb_numbers_are_accepted_by_electrical_network(tmp_path):
             for item in setup["wiring_snapshot"]["connections"]
         }
         assert tuple(sorted(("EXT01-1", "TB5-11"))) in snapshot_edges
+
+
+def test_forward_reverse_full_external_wiring_solution_is_accepted(tmp_path):
+    test_answer = json.loads(
+        (PROJECT_ROOT / "docs" / "test-answer-forward-reverse-0.9.3.json").read_text(encoding="utf-8")
+    )
+    paths = stage4_paths(tmp_path)
+    shutil.copytree(
+        PROJECT_ROOT / "problems" / "forward_reverse_interlock_demo_001",
+        paths.problems_dir / "forward_reverse_interlock_demo_001",
+    )
+    with TestClient(create_app(Settings(paths=paths))) as client:
+        response = client.post(
+            "/api/problems/forward_reverse_interlock_demo_001/wiring-attempts/submit",
+            json={"problem_version": test_answer["problem_version"], "connections": test_answer["connections"]},
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["overall_correct"] is True
+        assert payload["electrically_equivalent"] is True
+        assert payload["correct_net_count"] == payload["required_net_count"] == 17
 
 
 def test_lan_users_have_isolated_sqlite_drafts_and_progress(tmp_path):

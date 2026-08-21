@@ -6,6 +6,7 @@ import trainingBoardData from '../../../problems/training_socket_demo_001/board.
 import type { BoardDefinition } from '../api/client'
 import { boardItemLabelArea, buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
 import { buildConnectionEndpointOffsets, pathHasSelfOverlap, routeConnection, routeConnections } from '../features/wiring/engine/orthogonalRouter'
+import { terminalBlockBank, terminalBlockUsage } from '../features/wiring/engine/terminalCapacity'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
 
@@ -72,6 +73,19 @@ describe('제어함 결선', () => {
     await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
     expect(screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
+  })
+
+  it('counts two external and two internal TB wires in separate physical banks', () => {
+    const externalIds = new Set(['PB0-1', 'PB1-1'])
+    const connections = [
+      { from: 'PB0-1', to: 'TB5-01' },
+      { from: 'PB1-1', to: 'TB5-01' },
+      { from: 'TB5-01', to: 'MC1-4' },
+      { from: 'TB5-01', to: 'MC2-4' },
+    ]
+    expect(terminalBlockUsage(connections, 'TB5-01', externalIds)).toEqual({ external: 2, internal: 2 })
+    expect(terminalBlockBank({ from: 'PB0-1', to: 'TB5-01' }, 'TB5-01', externalIds)).toBe('external')
+    expect(terminalBlockBank({ from: 'TB5-01', to: 'MC1-4' }, 'TB5-01', externalIds)).toBe('internal')
   })
 
   it('keeps terminal-block labels away from upper and lower slot numbers', () => {

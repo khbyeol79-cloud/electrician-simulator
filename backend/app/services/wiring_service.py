@@ -49,8 +49,28 @@ class WiringService:
                     raise WiringValidationError("unknown_terminal", f"존재하지 않는 단자입니다: {terminal}")
                 if not getattr(pin, "enabled", True):
                     raise WiringValidationError("disabled_terminal", f"사용할 수 없는 단자입니다: {terminal}")
-                if counts[terminal] > pin.max_connections:
-                    raise WiringValidationError("too_many_connections", f"단자의 최대 연결 수를 초과했습니다: {terminal}")
+        for terminal, count in counts.items():
+            pin = pins.get(terminal) or external_terminals.get(terminal)
+            if pin is None:
+                continue
+            if terminal in pins and pins[terminal].terminal_role == "free_junction":
+                side_counts = Counter()
+                for connection in connections:
+                    if terminal not in connection.key:
+                        continue
+                    left, right = connection.key
+                    other = right if left == terminal else left
+                    side_counts["external" if other in external_terminals else "internal"] += 1
+                for side, side_count in side_counts.items():
+                    if side_count > pin.max_connections:
+                        side_label = "외부측" if side == "external" else "내부측"
+                        raise WiringValidationError(
+                            "too_many_connections",
+                            f"{terminal} 단자의 {side_label}에는 전선을 최대 {pin.max_connections}개까지 연결할 수 있습니다.",
+                        )
+                continue
+            if count > pin.max_connections:
+                raise WiringValidationError("too_many_connections", f"단자의 최대 연결 수를 초과했습니다: {terminal}")
         return package
 
     def save_draft(self, problem_id: str, draft: WiringDraftUpdate):
