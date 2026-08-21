@@ -4,6 +4,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { OperationTestPage } from '../pages/OperationTestPage'
 import { installApiMock, trainingDetail } from './mockApi'
+import forwardBoardData from '../../../problems/forward_reverse_interlock_demo_001/board.json'
+import forwardAnswerData from '../../../docs/test-answer-forward-reverse-0.9.3.json'
+import type { BoardDefinition, WiringConnection } from '../api/client'
 
 afterEach(() => {
   cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); window.localStorage.clear()
@@ -17,6 +20,28 @@ const readySetup = {
 }
 
 describe('동작시험', () => {
+  it('renders the forward-reverse problem preview before any wiring exists', async () => {
+    installApiMock({ board: forwardBoardData as unknown as BoardDefinition, operationSetup: { board: forwardBoardData as unknown as BoardDefinition, wiring_snapshot: null, wiring_draft: null, wiring_source: 'none', operation_ready: false, preview_allowed: true } })
+    render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)
+
+    const board = await screen.findByRole('img', { name: '동작시험 준비 제어함' })
+    expect(board.querySelectorAll('.board-wire.readonly')).toHaveLength(0)
+    expect(screen.getByRole('heading', { name: '읽기 전용 미리보기' })).toBeInTheDocument()
+  })
+
+  it('renders the accepted forward-reverse snapshot with external leads outside TB5 and TB6', async () => {
+    const connections = forwardAnswerData.connections.map((item) => ({ ...item, pair_display_color: '#64748b' })) as WiringConnection[]
+    installApiMock({ board: forwardBoardData as unknown as BoardDefinition, operationSetup: { board: forwardBoardData as unknown as BoardDefinition, wiring_snapshot: { attempt_id: 19, problem_version: 1, connections }, wiring_source: 'accepted_submission', operation_ready: true, preview_allowed: false } })
+    render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)
+
+    const board = await screen.findByRole('img', { name: '동작시험 준비 제어함' })
+    expect(board.querySelectorAll('.board-wire.readonly')).toHaveLength(44)
+    expect(board.querySelectorAll('.board-wire.external')).toHaveLength(18)
+    expect(within(board).getByText('PWR-L1')).toBeInTheDocument()
+    expect(within(board).getByText('RL-2')).toBeInTheDocument()
+    expect(within(board).getByText('M1-W')).toBeInTheDocument()
+  })
+
   it('renders accepted wiring and fixed devices as read-only', async () => {
     installApiMock({ operationSetup: readySetup })
     render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)

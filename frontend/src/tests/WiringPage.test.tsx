@@ -148,6 +148,15 @@ describe('제어함 결선', () => {
     expect(upperBundleRoute.points[1].y).toBe(429)
   })
 
+  it('skips non-board external endpoints in the internal orthogonal router', () => {
+    const routed = routeConnections(trainingBoardData as unknown as BoardDefinition, [
+      { from: 'PWR-L1', to: 'TB5-01', wire_color: 'brown', pair_display_color: '#64748b' },
+      { from: 'TB5-01', to: 'MCCB-L1', wire_color: 'brown', pair_display_color: '#64748b' },
+    ])
+    expect(routed).toHaveLength(1)
+    expect(routed[0].from).toBe('TB5-01')
+  })
+
   it('connects MCCB-L2 to TB5-13 directly along their shared top corridor', () => {
     const board = trainingBoardData as unknown as BoardDefinition
     const route = routeConnection(board, { from: 'MCCB-L2', to: 'TB5-13', wire_color: 'black', pair_display_color: '#64748b' })

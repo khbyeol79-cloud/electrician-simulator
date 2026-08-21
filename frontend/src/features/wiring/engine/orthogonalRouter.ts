@@ -190,6 +190,7 @@ export function buildConnectionEndpointOffsets(connections: WiringConnection[]) 
 }
 
 export function routeConnections(board: BoardDefinition, connections: WiringConnection[]) {
-  const offsets = buildConnectionEndpointOffsets(connections)
-  return connections.map((connection, index) => routeConnection(board, connection, index % 5, offsets[index]))
+  const routable = connections.filter((connection) => findPin(board, connection.from) && findPin(board, connection.to))
+  const offsets = buildConnectionEndpointOffsets(routable)
+  return routable.map((connection, index) => routeConnection(board, connection, index % 5, offsets[index]))
 }

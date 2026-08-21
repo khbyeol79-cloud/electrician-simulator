@@ -27,8 +27,24 @@ export function OperationBoard({
   onPointerMove?: PointerEventHandler<SVGSVGElement>
   onPointerUp?: PointerEventHandler<SVGSVGElement>
 }) {
-  const routed = routeConnections(board, connections)
+  const boardTerminalIds = new Set(board.items.flatMap((item) => item.pins.map((pin) => pin.terminal_id)))
+  const internalConnections = connections.filter((connection) => boardTerminalIds.has(connection.from) && boardTerminalIds.has(connection.to))
+  const routed = routeConnections(board, internalConnections)
   const itemMap = new Map(board.items.map((item) => [item.item_id, item]))
+  const externalWires = connections.flatMap((connection, connectionIndex) => {
+    const fromOnBoard = boardTerminalIds.has(connection.from)
+    const toOnBoard = boardTerminalIds.has(connection.to)
+    if (fromOnBoard === toOnBoard) return []
+    const boardTerminalId = fromOnBoard ? connection.from : connection.to
+    const externalTerminalId = fromOnBoard ? connection.to : connection.from
+    const owner = board.items.find((item) => item.pins.some((pin) => pin.terminal_id === boardTerminalId))
+    const pin = owner?.pins.find((candidate) => candidate.terminal_id === boardTerminalId)
+    if (!owner || !pin || owner.item_type !== 'terminal_block') return []
+    const exitsTop = pin.side === 'bottom'
+    const edgeY = exitsTop ? owner.y : owner.y + owner.height
+    const endY = exitsTop ? Math.max(10, edgeY - 34) : Math.min(board.height - 10, edgeY + 34)
+    return [{ connection, connectionIndex, externalTerminalId, points: `${pin.x},${edgeY} ${pin.x},${endY}`, labelX: pin.x, labelY: exitsTop ? endY - 3 : endY + 12 }]
+  })
 
   return <div className="wiring-board-scroll operation-board-scroll">
     <svg className="wiring-board mounting-board operation-board" role="img" aria-label="동작시험 준비 제어함" viewBox={`0 0 ${board.width} ${board.height}`} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
@@ -39,7 +55,7 @@ export function OperationBoard({
         <g className="wire-layer readonly">{routed.map((wire) => {
           const points = wire.points.map((point) => `${point.x},${point.y}`).join(' ')
           return <g key={`${wire.from}|${wire.to}`} className="board-wire readonly"><polyline className="wire-depth" points={points} /><polyline className="wire-visible" points={points} style={{ stroke: WIRE_COLORS[wire.wire_color] }} /></g>
-        })}</g>
+        })}{externalWires.map((wire) => <g key={`external-${wire.connectionIndex}`} className="board-wire readonly external"><polyline className="wire-depth" points={wire.points} /><polyline className="wire-visible" points={wire.points} style={{ stroke: WIRE_COLORS[wire.connection.wire_color] }} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor="middle">{wire.externalTerminalId}</text></g>)}</g>
         <g className="board-pin-layer readonly">{board.items.map((item) => <StaticPins key={item.item_id} item={item} />)}</g>
         <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" /><text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
         <g className="fixed-device-layer">{placements.map((placement) => {
