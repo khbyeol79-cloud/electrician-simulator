@@ -184,7 +184,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
     {loading && <div className="circuit-loading">문제별 제어함 배치를 불러오는 중입니다.</div>}
     {error && <div className="circuit-load-error" role="alert"><strong>제어함을 표시할 수 없습니다.</strong><span>{error}</span></div>}
     {!loading && !error && board && <div className="wiring-layout">
-      <div className="wiring-stage">
+      <div className={`wiring-stage${externalDevices.length > 0 ? ' has-external-wiring' : ''}`}>
         <div className="wiring-toolbar" aria-label="결선 편집 도구">
           <button className={mode === 'graphic' ? 'active' : ''} onClick={() => { setMode('graphic'); setSelectedSummaryTerminal(null) }}>그래픽 모드</button><button className={mode === 'summary' ? 'active' : ''} onClick={() => setMode('summary')}>요약 모드</button>
           <span className="toolbar-separator" /><button aria-label="확대" onClick={() => setZoom((value) => Math.min(1.35, value + .1))}>＋</button><button aria-label="축소" onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button>

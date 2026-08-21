@@ -210,7 +210,8 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-stats { display: flex; gap: 6px; }
 .wiring-stats span { padding: 6px 9px; color: #315276; border: 1px solid #d4dfeb; background: #f6f9fc; font-size: 10px; }
 .wiring-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 294px; }
-.wiring-stage { min-width: 0; min-height: 0; display: grid; grid-template-rows: 44px minmax(0, 1fr); background: #dce4ed; }
+.wiring-stage { min-width: 0; min-height: 0; display: grid; grid-template-rows: 44px minmax(0, 1fr); overflow: hidden; background: #dce4ed; }
+.wiring-stage.has-external-wiring { grid-template-rows: 44px auto minmax(0, 1fr); }
 .wiring-toolbar { display: flex; align-items: center; gap: 5px; padding: 5px 8px; border-bottom: 1px solid #c9d5e2; background: #fff; overflow-x: auto; }
 .wiring-toolbar button { min-width: 34px; height: 31px; padding: 0 9px; white-space: nowrap; color: #3c506b; border: 1px solid #ced9e5; border-radius: 4px; background: #f7f9fc; font-size: 9px; }
 .wiring-toolbar button:hover:not(:disabled), .wiring-toolbar button.active { color: #fff; border-color: #1265e8; background: #1265e8; }
@@ -246,6 +247,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .board-label-layer rect { fill: rgba(250,252,255,.96); stroke: #6d7c8c; stroke-width: 2; }
 .board-label-layer .device-color-dot { stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .board-label-layer text { fill: #172a40; font-size: 19px; font-weight: 900; }
+.board-label-layer .terminal-block-label text { font-size: 16px; }
 .pin-summary rect { fill: rgba(255,255,255,.96); stroke-width: 3; }
 .pin-summary { cursor: pointer; outline: none; }
 .pin-summary text { fill: #27384d; font-size: 9px; font-weight: 900; }
@@ -256,7 +258,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .pin-capacity rect { fill: #0f2e55; stroke: #fff; stroke-width: 1.5; }
 .pin-capacity text { fill: #fff; font-size: 8px; font-weight: 900; }
 .external-wire-label { fill: #354960; font-size: 8px; font-weight: 900; paint-order: stroke; stroke: #f3ead3; stroke-width: 3px; }
-.external-wiring-tray { display: grid; grid-template-columns: 155px minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid #cbd7e4; background: #f4f8fc; }
+.external-wiring-tray { position: relative; z-index: 2; min-width: 0; display: grid; grid-template-columns: 155px minmax(0, 1fr); gap: 10px; align-items: center; padding: 8px 12px; border-bottom: 1px solid #cbd7e4; background: #f4f8fc; }
 .external-wiring-heading { display: grid; gap: 2px; color: #173e69; font-size: 10px; }
 .external-wiring-heading span { color: #65778d; font-size: 8px; font-weight: 500; }
 .external-device-list { display: flex; gap: 7px; overflow-x: auto; padding: 2px; }

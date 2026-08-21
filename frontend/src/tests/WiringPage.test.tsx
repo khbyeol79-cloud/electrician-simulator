@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
-import { buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
+import { boardItemLabelArea, buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
 import { buildConnectionEndpointOffsets, pathHasSelfOverlap, routeConnection, routeConnections } from '../features/wiring/engine/orthogonalRouter'
 import { WiringPage } from '../pages/WiringPage'
 import { installApiMock, trainingDetail, wiringBoard } from './mockApi'
@@ -66,11 +66,25 @@ describe('제어함 결선', () => {
     installApiMock({ board })
     const user = userEvent.setup()
     render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
-    await screen.findByRole('region', { name: '외부 기구선' })
+    const externalTray = await screen.findByRole('region', { name: '외부 기구선' })
+    expect(externalTray.parentElement).toHaveClass('has-external-wiring')
     await user.click(screen.getByRole('button', { name: /PB0-1 외부 기구선/ }))
     await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
     expect(screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
+  })
+
+  it('keeps terminal-block labels away from upper and lower slot numbers', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const tb5 = board.items.find((item) => item.item_id === 'TB5')!
+    const tb6 = board.items.find((item) => item.item_id === 'TB6')!
+    const tb5Label = boardItemLabelArea(tb5)
+    const tb6Label = boardItemLabelArea(tb6)
+
+    expect(tb5Label.y).toBeLessThan(tb5.label_area.y)
+    expect(tb5Label.y + tb5Label.height).toBeLessThan(Math.min(...tb5.pins.map((pin) => pin.y)) - 16)
+    expect(tb6Label.y).toBeGreaterThan(tb6.label_area.y)
+    expect(tb6Label.y).toBeGreaterThan(Math.max(...tb6.pins.map((pin) => pin.y)) + 25)
   })
 
   it('connects X1-1 to MC2-5 directly through an empty row gap', () => {

@@ -53,6 +53,17 @@ export function summaryLabelY(pin: BoardPin) {
   return pin.side === 'top' ? pin.y - 18 : pin.y + 31
 }
 
+export function boardItemLabelArea(item: BoardItem) {
+  if (item.item_type !== 'terminal_block') return item.label_area
+  const width = Math.min(item.label_area.width, 220)
+  const height = Math.min(item.label_area.height, 24)
+  const topPinCount = item.pins.filter((pin) => pin.side === 'top').length
+  const y = topPinCount > item.pins.length / 2
+    ? item.y + item.height - height - 3
+    : item.y + 3
+  return { x: item.x + (item.width - width) / 2, y, width, height }
+}
+
 export function BoardItemBody({ item }: { item: BoardItem }) {
   if (item.item_type === 'terminal_block') {
     return <g className="board-item-body terminal-block-body"><rect x={item.x} y={item.y} width={item.width} height={item.height} rx="5" />{item.pins.map((pin) => <rect key={pin.terminal_id} x={pin.x - 16} y={item.y + 8} width="32" height={item.height - 16} rx="2" />)}</g>
@@ -112,7 +123,7 @@ export function WiringBoard({ board, connections, externalDevices, mode, selecte
         <g className="board-item-layer">{board.items.map((item) => <BoardItemBody key={item.item_id} item={item} />)}</g>
         {mode === 'graphic' && <g className="wire-layer">{routed.map((wire) => { const connectionIndex = connections.findIndex((item) => [item.from, item.to].sort().join('|') === [wire.from, wire.to].sort().join('|')); const points = wire.points.map((point) => `${point.x},${point.y}`).join(' '); const selected = selectedWire === connectionIndex; return <g key={`${wire.from}|${wire.to}`} className={`board-wire editable${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={points} />}<polyline className="wire-visible" points={points} style={{ stroke: WIRE_COLORS[wire.wire_color] }} /><polyline className="wire-hit" points={points} /></g> })}{externalWires.map((wire) => { const boardId = wire.externalId === wire.connection.from ? wire.connection.to : wire.connection.from; const selected = selectedWire === wire.connectionIndex; return <g key={`${wire.externalId}-${wire.connectionIndex}`} className={`board-wire external${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.externalId}에서 ${boardId}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(wire.connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(wire.connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={wire.points} />}<polyline className="wire-visible" points={wire.points} style={{ stroke: WIRE_COLORS[wire.connection.wire_color] }} /><polyline className="wire-hit" points={wire.points} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor="middle">{wire.externalId}</text></g> })}</g>}
         <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => { const pinSummary = mode === 'summary' ? summary.get(pin.terminal_id) : undefined; return <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={pinSummary} summarySelected={selectedSummaryTerminal === pin.terminal_id || Boolean(pinSummary?.some((item) => item.connectionIndex === selectedWire))} connectionCount={counts.get(pin.terminal_id) ?? 0} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} onExternalDrop={(externalId) => onExternalDrop(externalId, pin.terminal_id)} onSummarySelect={onSummarySelect} /> }))}</g>
-        <g className="board-label-layer">{board.items.map((item) => <g key={item.item_id}><rect x={item.label_area.x} y={item.label_area.y} width={item.label_area.width} height={item.label_area.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={item.label_area.x + 11} cy={item.label_area.y + item.label_area.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={item.label_area.x + item.label_area.width / 2} y={item.label_area.y + item.label_area.height / 2 + 6} textAnchor="middle">{item.label}</text></g>)}</g>
+        <g className="board-label-layer">{board.items.map((item) => { const labelArea = boardItemLabelArea(item); return <g key={item.item_id} className={item.item_type === 'terminal_block' ? 'terminal-block-label' : undefined}><rect x={labelArea.x} y={labelArea.y} width={labelArea.width} height={labelArea.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={labelArea.x + 11} cy={labelArea.y + labelArea.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={labelArea.x + labelArea.width / 2} y={labelArea.y + labelArea.height / 2 + 5} textAnchor="middle">{item.label}</text></g> })}</g>
       </g>
     </svg>
   </div>
