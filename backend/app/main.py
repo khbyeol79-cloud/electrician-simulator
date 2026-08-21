@@ -15,9 +15,11 @@ from .api.problems import router as problems_router
 from .api.wiring import router as wiring_router
 from .api.mounting import router as mounting_router
 from .api.operation import router as operation_router, session_router as operation_session_router
+from .api.free_circuit import router as free_circuit_router
 from .core.config import Settings, load_settings
 from .core.exceptions import unhandled_exception_handler
 from .core.logging_config import configure_logging
+from .core.user_context import UserDatabasePool
 from .database import SQLiteDatabase
 from .repositories import AnswerRepository, ProblemRepository
 from .simulation import OperationSessionManager
@@ -67,6 +69,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = app_settings
     app.state.database = database
+    app.state.user_databases = UserDatabasePool(database)
     app.state.database_ready = False
     app.state.problem_repository = None
     app.state.answer_repository = None
@@ -79,7 +82,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             allow_origins=app_settings.allowed_origins,
             allow_credentials=False,
             allow_methods=["GET", "POST", "PUT", "DELETE"],
-            allow_headers=["Content-Type", "Authorization"],
+            allow_headers=["Content-Type", "Authorization", "X-User-Id"],
         )
 
     app.include_router(health_router)
@@ -90,6 +93,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(mounting_router)
     app.include_router(operation_router)
     app.include_router(operation_session_router)
+    app.include_router(free_circuit_router)
     static_root = app_settings.resolved_static_dir.resolve()
 
     @app.get("/{full_path:path}", include_in_schema=False)

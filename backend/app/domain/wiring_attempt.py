@@ -65,6 +65,10 @@ class WiringAttemptResult(BaseModel):
     extra_connection_count: int = 0
     terminal_capacity_errors: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    result_classification: Literal[
+        "correct", "functionally_equivalent", "operates_but_incorrect", "incorrect", "ungradable"
+    ] = "ungradable"
+    operation_requirements_passed: bool | None = None
 
 
 class WiringProgress(BaseModel):

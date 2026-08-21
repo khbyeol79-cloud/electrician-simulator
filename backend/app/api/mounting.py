@@ -9,6 +9,7 @@ from app.domain import (
 from app.repositories import ProblemRepository
 from app.repositories.mounting_repository import MountingRepository
 from app.services.mounting_service import MountingService, MountingValidationError
+from app.core.user_context import request_database
 
 
 # 0.6.0 이전 클라이언트의 데이터 호환을 위해 유지한다. 새 UI에서는 사용하지 않는다.
@@ -23,7 +24,7 @@ def _problems(request: Request) -> ProblemRepository:
 
 
 def _repository(request: Request) -> MountingRepository:
-    return MountingRepository(request.app.state.database)
+    return MountingRepository(request_database(request))
 
 
 def _raise(exc: MountingValidationError):

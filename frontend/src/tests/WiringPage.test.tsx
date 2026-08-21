@@ -163,6 +163,35 @@ describe('제어함 결선', () => {
     expect(summary.get('MC1-4')).toEqual([{ other: 'X1-1', slot: '1', color: deviceSummaryColor('X1'), connectionIndex: 0 }])
   })
 
+  it('shows only slot labels for MCCB, fuse and terminal-block connections', () => {
+    const baseItem = wiringBoard.items[0]
+    const basePin = baseItem.pins[0]
+    const board = {
+      ...wiringBoard,
+      items: [
+        { ...baseItem, item_id: 'MCCB', pins: [{ ...basePin, terminal_id: 'MCCB-L1', label: 'L1', number: null }] },
+        { ...baseItem, item_id: 'FUSE', pins: [{ ...basePin, terminal_id: 'FUSE-L1', label: 'L1', number: null }] },
+        { ...baseItem, item_id: 'TB5', pins: [{ ...basePin, terminal_id: 'TB5-01', label: '1', number: 1 }] },
+      ],
+    } as BoardDefinition
+    const summary = buildTerminalSummary(board, [
+      { from: 'MCCB-L1', to: 'FUSE-L1', wire_color: 'brown', pair_display_color: '#000' },
+      { from: 'FUSE-L1', to: 'TB5-01', wire_color: 'yellow', pair_display_color: '#000' },
+    ])
+    expect(summary.get('MCCB-L1')?.[0].slot).toBe('L1')
+    expect(summary.get('FUSE-L1')?.[0].slot).toBe('L1')
+    expect(summary.get('FUSE-L1')?.[1].slot).toBe('1')
+    expect(JSON.stringify([...summary.values()])).not.toContain('"slot":"MCCB-L1"')
+    expect(JSON.stringify([...summary.values()])).not.toContain('"slot":"TB5-01"')
+  })
+
+  it('keeps external device lead ids in terminal-block summaries', () => {
+    const summary = buildTerminalSummary(wiringBoard, [
+      { from: 'PB0-1', to: 'X1-1', wire_color: 'yellow', pair_display_color: '#000' },
+    ])
+    expect(summary.get('X1-1')?.[0].slot).toBe('PB0-1')
+  })
+
   it('separates the first and second wire to the left and right of a shared pin', () => {
     const board = trainingBoardData as unknown as BoardDefinition
     const connections = [
@@ -225,6 +254,7 @@ describe('제어함 결선', () => {
     await user.click(wire)
     expect(wire).toHaveClass('selected')
     expect(wire.querySelector('.wire-depth')).not.toBeInTheDocument()
+    expect(wire.querySelector('.wire-selection-halo')).toBeInTheDocument()
     await user.selectOptions(screen.getByLabelText('물리 전선 색상'), 'black')
     expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#171b22' })
   })

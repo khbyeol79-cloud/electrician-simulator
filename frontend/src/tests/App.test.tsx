@@ -28,7 +28,10 @@ describe('App', () => {
     render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
 
     await user.click(screen.getByRole('button', { name: /현재 문제/ }))
-    expect(await screen.findByRole('dialog', { name: '문제 선택' })).toBeInTheDocument()
+    const dialog = await screen.findByRole('dialog', { name: '문제 선택' })
+    expect(dialog).toBeInTheDocument()
+    expect(within(dialog).getByRole('region', { name: 'Q-Net 공개문제 학습' })).toHaveTextContent('0 / 18')
+    expect(within(dialog).getByRole('region', { name: '자체제작 기능검증 회로' })).toHaveTextContent('Q-Net 시험문제가 아닙니다')
     expect(screen.getByText('작성 중')).toBeInTheDocument()
     expect(screen.getByText('경고 1')).toBeInTheDocument()
 
@@ -66,6 +69,7 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /현재 문제/ }))
     const dialog = await screen.findByRole('dialog', { name: '문제 선택' })
     expect(within(dialog).getByRole('alert')).toHaveTextContent('문제 목록을 불러올 수 없습니다')
-    expect(within(dialog).getByRole('button', { name: '새로고침' })).toBeEnabled()
+    expect(within(dialog).queryByRole('button', { name: '새로고침' })).not.toBeInTheDocument()
+    expect(within(dialog).getByRole('region', { name: 'Q-Net 공개문제 학습' })).toHaveTextContent('0 / 18')
   })
 })

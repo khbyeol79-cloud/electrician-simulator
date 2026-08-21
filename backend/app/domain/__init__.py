@@ -6,6 +6,7 @@ from .catalog import DeviceCatalog, DeviceType, SocketCatalog, SocketType
 from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, CircuitQuestionResult
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
+from .free_circuit import FreeCircuitWorkspaceResponse, FreeCircuitWorkspaceUpdate
 from .schematic_diagram import SchematicDiagram
 from .mounting_attempt import (
     MountDevice, MountTarget, MountingAnswerPlacement, MountingAttemptResult,
@@ -39,6 +40,8 @@ __all__ = [
     "DeviceType",
     "ProblemDefinition",
     "ProblemManifest",
+    "FreeCircuitWorkspaceResponse",
+    "FreeCircuitWorkspaceUpdate",
     "ProblemPackage",
     "CircuitSummary",
     "CircuitAttemptResult",

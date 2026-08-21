@@ -15,7 +15,8 @@ from app.domain import (
 )
 from app.repositories import OperationRepository, ProblemRepository
 from app.repositories.wiring_repository import WiringRepository
-from app.simulation import OperationEngine, OperationSessionNotFound, SimulationDefinitionError
+from app.simulation import OperationEngine, OperationSessionNotFound, SimulationDefinitionError, matches_expectation
+from app.core.user_context import request_database, request_user_id
 
 
 problem_router = APIRouter(prefix="/api/problems", tags=["operation"])
@@ -31,7 +32,7 @@ def _problems(request: Request) -> ProblemRepository:
 
 def _engine(request: Request, session_id: str) -> OperationEngine:
     try:
-        return request.app.state.operation_sessions.get(session_id)
+        return request.app.state.operation_sessions.get(session_id, request_user_id(request))
     except OperationSessionNotFound as exc:
         raise HTTPException(status_code=404, detail="동작시험 세션을 찾을 수 없습니다.") from exc
 
@@ -44,7 +45,7 @@ def get_operation_setup(problem_id: str, request: Request) -> OperationSetupResp
     if package.board is None:
         raise HTTPException(status_code=404, detail="이 문제의 제어함 배치를 찾을 수 없습니다.")
 
-    wiring_repository = WiringRepository(request.app.state.database)
+    wiring_repository = WiringRepository(request_database(request))
     draft = wiring_repository.get_draft(problem_id)
     if draft is not None and draft.problem_version != package.manifest.version:
         draft = None
@@ -97,7 +98,7 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
         raise HTTPException(status_code=409, detail="문제 버전이 변경되었습니다. 다시 불러와 주세요.")
     if package.problem.operation is None or package.problem.operation.simulation_status != "functional":
         raise HTTPException(status_code=409, detail="이 문제의 동작 시뮬레이션 데이터가 준비되지 않았습니다.")
-    snapshot = WiringRepository(request.app.state.database).accepted_snapshot(
+    snapshot = WiringRepository(request_database(request)).accepted_snapshot(
         problem_id, package.manifest.version, payload.wiring_attempt_id
     )
     if snapshot is None:
@@ -122,8 +123,8 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
         )
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"동작 회로 정의를 확인해 주세요. {exc}") from exc
-    request.app.state.operation_sessions.add(engine)
-    repository = OperationRepository(request.app.state.database)
+    request.app.state.operation_sessions.add(engine, request_user_id(request))
+    repository = OperationRepository(request_database(request))
     repository.start_manual_run(
         problem_id=problem_id,
         problem_version=package.manifest.version,
@@ -138,7 +139,7 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
 def get_operation_progress(problem_id: str, request: Request):
     if _problems(request)._get_package_internal(problem_id) is None:
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
-    return OperationRepository(request.app.state.database).progress(problem_id)
+    return OperationRepository(request_database(request)).progress(problem_id)
 
 
 @session_router.get("/{session_id}", response_model=OperationSessionState)
@@ -153,7 +154,7 @@ def apply_operation_action(session_id: str, payload: OperationAction, request: R
         state = engine.apply(payload)
         package = _problems(request)._get_package_internal(engine.problem_id)
         if package is not None:
-            OperationRepository(request.app.state.database).observe_state(
+            OperationRepository(request_database(request)).observe_state(
                 problem_id=engine.problem_id,
                 problem_version=package.manifest.version,
                 state=state,
@@ -166,25 +167,6 @@ def apply_operation_action(session_id: str, payload: OperationAction, request: R
 @session_router.post("/{session_id}/reset", response_model=OperationSessionState)
 def reset_operation_session(session_id: str, request: Request):
     return _engine(request, session_id).reset()
-
-
-def _matches_expectation(state: OperationSessionState, expected: dict) -> bool:
-    payload = state.model_dump(mode="json")
-    for group, value in expected.items():
-        actual = payload.get(group)
-        if isinstance(value, dict):
-            if not isinstance(actual, dict):
-                return False
-            for key, expected_value in value.items():
-                actual_value = actual.get(key)
-                if isinstance(expected_value, dict):
-                    if not isinstance(actual_value, dict) or any(actual_value.get(k) != v for k, v in expected_value.items()):
-                        return False
-                elif actual_value != expected_value:
-                    return False
-        elif actual != value:
-            return False
-    return True
 
 
 @session_router.post("/{session_id}/run-check", response_model=OperationCheckResult)
@@ -224,7 +206,7 @@ def run_operation_check(session_id: str, request: Request):
             for step in test.get("steps", []):
                 action_payload = {key: value for key, value in step.items() if key != "expect"}
                 state = isolated.apply(OperationAction.model_validate(action_payload))
-                if not _matches_expectation(state, step.get("expect", {})):
+                if not matches_expectation(state, step.get("expect", {})):
                     passed = False
                     break
         except (ValueError, SimulationDefinitionError):
@@ -246,7 +228,7 @@ def run_operation_check(session_id: str, request: Request):
         results=results,
         message="모든 시험 조건이 정상적으로 작동했습니다." if passed_count == len(results) else "일부 동작을 다시 확인해 주세요.",
     )
-    OperationRepository(request.app.state.database).save_attempt(
+    OperationRepository(request_database(request)).save_attempt(
         problem_id=manual.problem_id,
         problem_version=package.manifest.version,
         wiring_attempt_id=manual.wiring_attempt_id,
@@ -259,7 +241,7 @@ def run_operation_check(session_id: str, request: Request):
 @session_router.delete("/{session_id}", status_code=204)
 def delete_operation_session(session_id: str, request: Request):
     try:
-        request.app.state.operation_sessions.delete(session_id)
+        request.app.state.operation_sessions.delete(session_id, request_user_id(request))
     except OperationSessionNotFound as exc:
         raise HTTPException(status_code=404, detail="동작시험 세션을 찾을 수 없습니다.") from exc
     return Response(status_code=204)

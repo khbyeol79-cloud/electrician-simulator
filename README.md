@@ -1,6 +1,8 @@
 # 전기기능사 시퀀스 결선 시뮬레이터
 
-Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.9.0이며 TB 번호 자유 선택, 전기적 연결관계 채점, 데이터 기반 회로도 분석과 논리 동작시험을 포함합니다.
+Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화면을 사용하는 전기기능사 실기 학습 프로그램입니다. 현재 버전은 0.9.1이며 TB 번호 자유 선택, 전기적 연결관계 채점, 데이터 기반 회로도 분석과 논리 동작시험을 포함합니다.
+
+시험 학습 콘텐츠는 Q-Net 전기기능사 실기 공개문제 18문제로 고정합니다. Q-Net이 공식 공개문제를 변경하지 않는 한 일반 사용자가 문제를 추가·편집하는 기능은 제공하지 않습니다. 현재 저장소에는 검증용 자체제작 회로 5개만 있고 검증된 Q-Net 18문제 데이터는 아직 들어 있지 않습니다. 프로그램은 이를 문제 선택 화면에서 서로 다른 영역으로 표시하며 자체제작 회로를 공식 문제로 취급하지 않습니다.
 
 회로도 분석 → 제어함 결선 → 동작시험의 3단계로 진행합니다. 0.8.0에서는 가장 최근의 정상 결선 제출 스냅샷을 이용해 전원, PB·LS, 릴레이, ON delay 타이머, MC1·MC2 자기유지와 인터록, EOCR 트립, 표시등과 3상 모터 방향을 계산합니다. 기구 위치는 문제지의 공개 조건이며 동작시험 화면에 자동으로 삽입됩니다.
 
@@ -32,6 +34,8 @@ Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화�
 - 8P·12P 소켓번호 입력과 임시 답안 복원
 - 검증 상태를 확인하는 서버 채점과 SQLite 제출 기록
 - 실제 제어함 그래픽·요약 결선, 자동 직교 경로와 전선 색상 변경
+- 요약 모드에서 상대 단자를 기구명 없이 `L1`, `1`, `4` 같은 슬롯명으로만 표시
+- 선택 전선의 원색 위에 청록색 고대비 외곽 강조선을 표시하고 선택 변경·삭제와 연동
 - PB·LS·표시등·모터·전원 등 문제별 외부 기구선의 TB 배정
 - 외부선 클릭·키보드 선택·드래그 후 원하는 TB5·TB6 단자에 연결
 - `functional`·`free_junction`·`external` 단자 역할과 기능 단자 네트워크 서명
@@ -54,12 +58,15 @@ Windows 데스크톱 프로그램과 웹 브라우저에서 동일한 React 화�
 - 표시등 도통 상태와 3상 모터 정·역회전·결상·동시 여자 판정
 - 직접 단락·상간 단락·불안정 회로 오류 표시
 - 비공개 동작시험 조건을 이용한 격리 자동 동작검사
+- 결선 구조가 틀렸지만 비공개 동작 요구조건은 통과한 경우 `동작하지만 오답`으로 별도 분류
 - 동작시험 결과 SQLite 기록과 0.6.0·0.6.1·0.7.0 DB 자동 호환
 - MC1·MC2 정·역회전, 전기적·기계적 인터록과 정지 후 방향 전환
 - EOCR 교육용 과부하 주입, 수동 복귀와 복귀 후 재시작
 - 3상 결상·상순서·동시 투입 위험 판정과 동작 이벤트 기록
 - 문제 참조 무결성을 한 번에 검사하는 `scripts/validate_problems.py`
 - 자체 제작 기능 확인 문제 `operation_demo_001`
+- LAN 브라우저별 SQLite 파일과 동작시험 세션 분리(`X-User-Id` 내부 식별자)
+- 자유회로 작업공간 저장 및 정답 없이 공통 논리 엔진을 시작하는 백엔드 API 기반
 - 기존 0.6.0 장착 API와 SQLite 테이블의 비파괴 호환 유지
 - 실제 시험 정답이 아닌 가상 기능 확인 문제
 
@@ -123,6 +130,8 @@ run_web.bat -Lan
 ```
 
 LAN 모드는 `0.0.0.0:8000`에서 수신합니다. 다른 기기에서는 서버 PC의 내부 IP 주소로 접속해야 하며 Windows 방화벽 설정을 확인해야 합니다. 인증 기능이 들어가기 전에는 신뢰할 수 없는 네트워크나 인터넷에 공개하지 마십시오.
+
+LAN 주소로 접속한 브라우저는 로컬 저장소에 생성된 식별자를 요청 헤더에 포함합니다. 서버는 사용자별 DB를 `%LOCALAPPDATA%\ElectricianSimulator\users` 아래에 분리하므로 서로 다른 브라우저의 회로 분석, 결선 초안, 제출기록과 동작시험 진행이 섞이지 않습니다. `127.0.0.1`과 Desktop 모드는 기존 `app.db`를 계속 사용해 과거 데이터와 호환됩니다. 이는 로컬 학습용 데이터 분리이며 로그인·권한 관리 기능은 아닙니다.
 
 ## 프런트엔드 개발 모드
 
@@ -201,6 +210,8 @@ scripts/    Windows 설치·실행·테스트 스크립트
 - `POST /api/operation-sessions/{session_id}/run-check`: 비공개 조건으로 격리 자동 동작검사
 - `DELETE /api/operation-sessions/{session_id}`: 동작시험 세션 종료
 - `GET /api/problems/{problem_id}/operation-progress`: 최근 자동 동작검사 진행상태
+- `GET/PUT/DELETE /api/free-circuits/{workspace_id}`: 사용자별 자유회로 정의·결선 저장
+- `POST /api/free-circuits/{workspace_id}/sessions`: 정답 데이터 없이 공통 동작 엔진 세션 시작
 - `GET/PUT/DELETE /api/problems/{problem_id}/mounting-draft`: 0.6.0 호환용 장착 임시 저장(새 UI에서 사용하지 않음)
 - `POST /api/problems/{problem_id}/mounting-attempts/submit`: 0.6.0 호환용 장착 채점(새 UI에서 사용하지 않음)
 
@@ -219,7 +230,7 @@ problems/problem_001/
 └─ assets/
 ```
 
-작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, TB 자유 선택과 네트워크 채점은 `docs/wiring-network-grading.md`, 고정 기구 배치는 `docs/device-layout.md`, 동작 정의는 `docs/operation-simulation.md`에서 확인할 수 있습니다. `docs/mounting-problem-authoring.md`는 0.6.0 호환 데이터 설명으로만 유지합니다. 문제 검증 명령은 다음과 같습니다.
+내부 기능검증 회로 작성법은 `docs/problem-management.md`, 결선은 `docs/wiring-problem-authoring.md`, TB 자유 선택과 네트워크 채점은 `docs/wiring-network-grading.md`, 고정 기구 배치는 `docs/device-layout.md`, 동작 정의는 `docs/operation-simulation.md`에서 확인할 수 있습니다. Q-Net 공개문제 데이터는 일반 템플릿으로 추가하지 않고 공식 변경과 검증 절차가 있을 때만 갱신합니다. `docs/mounting-problem-authoring.md`는 0.6.0 호환 데이터 설명으로만 유지합니다.
 
 ```powershell
 .venv\Scripts\python.exe -m tools.validate_problem problems\practice_001
@@ -261,6 +272,8 @@ Microsoft Edge WebView2 Runtime 설치 상태와 다음 로그를 확인합니�
 회로 모델은 `docs/circuit-data-model.md`, SVG 배치 데이터는 `docs/schematic-diagram.md`를 확인하십시오.
 
 회로 분석·결선 화면 기능 확인은 `가상 소켓번호 입력 기능 확인`, 기본 논리 동작시험은 `자기유지·타이머 동작 기능 확인`을 선택합니다. 정·역회전은 `정·역회전 자기유지·인터록·EOCR 연습`, 보호 동작은 `자기유지·타이머·EOCR 보호 연습`을 선택합니다. 모두 프로그램 검증용 자체 제작 데이터이며 실제 Q-net 문제 또는 시험 정답으로 사용할 수 없습니다. `practice_001`은 정답이 미검증이므로 제출해도 채점하지 않습니다.
+
+자유회로는 현재 공통 엔진·저장 API까지 구현되어 있습니다. 빈 제어함에서 기구를 배치하고 결선하는 사용자용 편집 화면은 아직 구현되지 않았으므로 Desktop/웹 화면에서 완전한 자유회로 제작 기능을 제공한다고 보지 않습니다.
 
 ## 동작시험 확인 순서
 

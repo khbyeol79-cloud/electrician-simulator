@@ -6,6 +6,7 @@ from app.domain import WiringAttemptResult, WiringAttemptSubmit, WiringDraftUpda
 from app.repositories.problem_repository import ProblemRepository
 from app.repositories.wiring_repository import WiringRepository
 from app.services.wiring_network_service import build_network_components, compare_networks
+from app.simulation import passes_operation_requirements
 
 
 class WiringValidationError(ValueError):
@@ -90,6 +91,7 @@ class WiringService:
                     electrically_equivalent=True,
                     required_net_count=len(package.answer.expected_nets),
                     correct_net_count=len(package.answer.expected_nets),
+                    result_classification="correct",
                 )
                 attempt_id = self.repository.save_attempt(problem_id, package.manifest.version, package.answer.answer_version, [item.model_dump(by_alias=True, mode="json") for item in submission.connections], result)
                 return result.model_copy(update={"attempt_id": attempt_id})
@@ -146,5 +148,35 @@ class WiringService:
             overall = not missing and not extras and not forbidden
             label = lambda key: f"{key[0]}|{key[1]}"
             result = WiringAttemptResult(gradable=True, overall_correct=overall, required_count=len(required), correct_count=correct, missing_connections=[label(item) for item in missing], extra_connections=[label(item) for item in extras], forbidden_connections=[label(item) for item in forbidden], message="모든 결선이 정확합니다." if overall else "누락 또는 잘못 연결된 단자를 확인해 주세요.")
+        if result.gradable and result.overall_correct:
+            classification = "functionally_equivalent" if result.used_alternative_tb_numbers else "correct"
+            result = result.model_copy(update={"result_classification": classification})
+        elif result.gradable:
+            operation = package.problem.operation
+            operation_passed = None
+            if operation is not None and operation.simulation_status == "functional" and package.answer.operation_tests:
+                submitted_terminal_ids = {terminal for item in submission.connections for terminal in item.key}
+                terminal_aliases = {
+                    terminal.operation_terminal_id: terminal.terminal_id
+                    for device in (package.problem.wiring_semantics.external_devices if package.problem.wiring_semantics else [])
+                    for terminal in device.terminals
+                    if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
+                }
+                operation_passed = passes_operation_requirements(
+                    circuit=package.problem.circuit,
+                    definition=operation,
+                    connections=submission.connections,
+                    tests=package.answer.operation_tests,
+                    terminal_aliases=terminal_aliases,
+                )
+            classification = "operates_but_incorrect" if operation_passed else "incorrect"
+            message = result.message
+            if operation_passed:
+                message = "장치는 동작하지만 공개문제에서 요구한 결선 구조 또는 제어 조건과 다릅니다."
+            result = result.model_copy(update={
+                "result_classification": classification,
+                "operation_requirements_passed": operation_passed,
+                "message": message,
+            })
         attempt_id = self.repository.save_attempt(problem_id, package.manifest.version, package.answer.answer_version, [item.model_dump(by_alias=True, mode="json") for item in submission.connections], result)
         return result.model_copy(update={"attempt_id": attempt_id})

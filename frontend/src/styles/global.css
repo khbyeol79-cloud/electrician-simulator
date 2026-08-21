@@ -230,11 +230,10 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .component-body > rect { fill: #27333f; }
 .component-body > line { stroke: #8b99a6; }
 .wire-layer { fill: none; }
-.board-wire .wire-depth { fill: none; stroke: rgba(54,43,32,.32); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.board-wire .wire-selection-halo { fill: none; stroke: #24c7ff; stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 4px rgba(36,199,255,.9)); pointer-events: none; }
 .board-wire .wire-visible { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(1px 1.5px 1px rgba(0,0,0,.28)); }
 .board-wire .wire-hit { fill: none; stroke: transparent; stroke-width: 18; cursor: pointer; vector-effect: non-scaling-stroke; }
-.board-wire.selected .wire-depth { stroke: rgba(18,101,232,.7); stroke-width: 11; }
-.board-wire.selected .wire-visible { stroke-width: 7; filter: none; }
+.board-wire.selected .wire-visible { stroke-width: 6; filter: none; }
 .board-wire.editable:focus { outline: none; }
 .board-wire.editable:focus-visible .wire-visible { stroke-width: 7; }
 .board-pin { cursor: pointer; outline: none; }
@@ -296,6 +295,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wire-color-select { display: grid; gap: 5px; margin-top: 10px; color: #5d6f86; font-size: 9px; }
 .wire-color-select select { height: 31px; border: 1px solid #bdcad9; border-radius: 4px; background: #fff; }
 .wiring-result { display: grid; gap: 4px; margin: 8px 0; padding: 8px; font-size: 9px; }
+.wiring-result > b { width: fit-content; padding: 2px 6px; border: 1px solid currentColor; border-radius: 10px; font-size: 8px; }
 .wiring-result.correct { color: #08713f; background: #e9f8f0; }
 .wiring-result.wrong { color: #a42929; background: #fff0f0; }
 .wiring-result.warning { color: #8d5700; background: #fff6df; }
@@ -450,7 +450,17 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .problem-empty { margin: 25px; padding: 45px 20px; text-align: center; color: #697a91; border: 1px dashed #becbda; background: #fff; }
 .problem-empty strong { display: block; margin-bottom: 7px; color: #33465f; }
 .problem-empty p { margin: 0; font-size: 11px; }
-.problem-list { min-height: 0; overflow: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; padding: 16px; }
+.problem-catalog { min-height: 0; overflow: auto; padding: 16px; }
+.problem-group { margin-bottom: 16px; border: 1px solid #c8d7e7; border-radius: 7px; background: #eef5fc; }
+.problem-group > header { display: flex; justify-content: space-between; gap: 14px; padding: 12px 14px; border-bottom: 1px solid #d5e0ec; }
+.problem-group > header div { display: grid; gap: 3px; }
+.problem-group > header strong { color: #173e69; font-size: 13px; }
+.problem-group > header span { color: #63758c; font-size: 9px; }
+.problem-group > header b { color: #1265e8; font-size: 13px; white-space: nowrap; }
+.problem-group.internal { background: #faf8f3; }
+.problem-group.internal > header b { color: #8a5b16; }
+.problem-group-empty { margin: 12px; padding: 18px; color: #77623f; border: 1px dashed #d8c69e; border-radius: 5px; background: #fffdf8; font-size: 10px; text-align: center; }
+.problem-list { min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 12px; padding: 12px; }
 .problem-card { min-height: 176px; display: flex; flex-direction: column; align-items: stretch; padding: 15px; text-align: left; color: #23334a; border: 1px solid #d4deea; border-radius: 7px; background: #fff; transition: 140ms ease; }
 .problem-card:hover:not(:disabled) { transform: translateY(-2px); border-color: #7ea9e9; box-shadow: 0 7px 18px rgba(30, 75, 135, .12); }
 .problem-card.selected { border: 2px solid var(--blue-600); background: #f7faff; }

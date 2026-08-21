@@ -11,22 +11,24 @@ class OperationSessionNotFound(KeyError):
 
 class OperationSessionManager:
     def __init__(self):
-        self._sessions: dict[str, OperationEngine] = {}
+        self._sessions: dict[str, tuple[str, OperationEngine]] = {}
         self._lock = RLock()
 
-    def add(self, engine: OperationEngine) -> OperationEngine:
+    def add(self, engine: OperationEngine, owner_id: str = "default") -> OperationEngine:
         with self._lock:
-            self._sessions[engine.session_id] = engine
+            self._sessions[engine.session_id] = (owner_id, engine)
         return engine
 
-    def get(self, session_id: str) -> OperationEngine:
+    def get(self, session_id: str, owner_id: str = "default") -> OperationEngine:
         with self._lock:
-            engine = self._sessions.get(session_id)
-        if engine is None:
+            entry = self._sessions.get(session_id)
+        if entry is None or entry[0] != owner_id:
             raise OperationSessionNotFound(session_id)
-        return engine
+        return entry[1]
 
-    def delete(self, session_id: str) -> None:
+    def delete(self, session_id: str, owner_id: str = "default") -> None:
         with self._lock:
-            if self._sessions.pop(session_id, None) is None:
+            entry = self._sessions.get(session_id)
+            if entry is None or entry[0] != owner_id:
                 raise OperationSessionNotFound(session_id)
+            self._sessions.pop(session_id)

@@ -6,6 +6,7 @@ from app.domain import BoardDefinition, WiringAttemptResult, WiringAttemptSubmit
 from app.repositories import ProblemRepository
 from app.repositories.wiring_repository import WiringRepository
 from app.services.wiring_service import WiringService, WiringValidationError
+from app.core.user_context import request_database
 
 
 router = APIRouter(prefix="/api/problems", tags=["wiring"])
@@ -19,7 +20,7 @@ def _problems(request: Request) -> ProblemRepository:
 
 
 def _repository(request: Request) -> WiringRepository:
-    return WiringRepository(request.app.state.database)
+    return WiringRepository(request_database(request))
 
 
 def _raise(exc: WiringValidationError):

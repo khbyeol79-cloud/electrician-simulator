@@ -140,3 +140,24 @@ def test_phase_loss_and_private_operation_tests_are_not_public(tmp_path):
         engine.apply(OperationAction(action="set_power", value=True))
         state = engine.apply(OperationAction(action="press_control", control_id="PB1"))
         assert state.motors["M1"] == "phase_loss"
+
+
+def test_operation_session_is_private_to_the_web_user(tmp_path):
+    headers = {"X-User-Id": "browser_a"}
+    with TestClient(create_app(Settings(paths=stage8_paths(tmp_path)))) as client:
+        submitted = client.post(
+            f"/api/problems/{PROBLEM_ID}/wiring-attempts/submit",
+            headers=headers,
+            json={"problem_version": 1, "connections": answer_connections(PROBLEM_ID)},
+        )
+        created = client.post(
+            f"/api/problems/{PROBLEM_ID}/operation-sessions",
+            headers=headers,
+            json={"problem_version": 1, "wiring_attempt_id": submitted.json()["attempt_id"]},
+        )
+        assert created.status_code == 201
+        session_id = created.json()["session_id"]
+        assert client.get(f"/api/operation-sessions/{session_id}", headers=headers).status_code == 200
+        assert client.get(
+            f"/api/operation-sessions/{session_id}", headers={"X-User-Id": "browser_b"}
+        ).status_code == 404

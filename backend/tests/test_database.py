@@ -15,11 +15,11 @@ def test_database_initialization_is_idempotent(tmp_path):
         version = connection.execute(
             "SELECT value FROM app_meta WHERE key='schema_version'"
         ).fetchone()["value"]
-    assert version == "6"
+    assert version == "7"
 
     with database.connect() as connection:
         tables = {row["name"] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        assert {"circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags"}.issubset(tables)
+        assert {"circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(tables)
 
 
 def test_version_5_database_is_upgraded_without_losing_user_settings(tmp_path):
@@ -48,6 +48,6 @@ def test_version_5_database_is_upgraded_without_losing_user_settings(tmp_path):
         selected = connection.execute(
             "SELECT value FROM user_settings WHERE key='selected_problem_id'"
         ).fetchone()["value"]
-    assert version == "6"
+    assert version == "7"
     assert selected == "operation_demo_001"
     assert database.is_ready() is True

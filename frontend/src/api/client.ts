@@ -132,6 +132,8 @@ export type WiringAttemptResult = {
   missing_connections: string[]; extra_connections: string[]; forbidden_connections: string[]; message: string
   electrically_equivalent?: boolean | null; used_alternative_tb_numbers?: boolean; required_net_count?: number; correct_net_count?: number
   missing_net_count?: number; merged_net_count?: number; extra_connection_count?: number; terminal_capacity_errors?: string[]; warnings?: string[]
+  result_classification?: 'correct' | 'functionally_equivalent' | 'operates_but_incorrect' | 'incorrect' | 'ungradable'
+  operation_requirements_passed?: boolean | null
 }
 export type WiringProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_correct: boolean | null; last_gradable: boolean | null; last_correct_count: number; required_count: number }
 
@@ -215,8 +217,28 @@ export type ReloadStatistics = {
   warnings: number
 }
 
+const USER_ID_STORAGE_KEY = 'electrician.webUserId'
+
+function requestHeaders(json = false): HeadersInit {
+  const headers: Record<string, string> = {}
+  if (json) headers['Content-Type'] = 'application/json'
+  const hostname = window.location.hostname
+  const local = !hostname || hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
+  if (!local) {
+    let userId = window.localStorage.getItem(USER_ID_STORAGE_KEY)
+    if (!userId) {
+      userId = typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID().replaceAll('-', '')
+        : `web_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`
+      window.localStorage.setItem(USER_ID_STORAGE_KEY, userId)
+    }
+    headers['X-User-Id'] = userId
+  }
+  return headers
+}
+
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal })
+  const response = await fetch(url, { signal, headers: requestHeaders() })
   if (!response.ok) {
     throw new Error(`서버 응답 오류 (${response.status})`)
   }
@@ -308,7 +330,7 @@ export function deleteOperationSession(sessionId: string) {
 }
 
 async function mutationJson<T>(url: string, method: string, body?: unknown): Promise<T> {
-  const response = await fetch(url, { method, headers: body === undefined ? undefined : { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
+  const response = await fetch(url, { method, headers: requestHeaders(body !== undefined), body: body === undefined ? undefined : JSON.stringify(body) })
   if (!response.ok) {
     const payload = await response.json().catch(() => undefined) as { detail?: { message?: string } | string } | undefined
     const message = typeof payload?.detail === 'object' ? payload.detail.message : payload?.detail
@@ -343,7 +365,7 @@ export function submitMountingAttempt(problemId: string, problemVersion: number,
 
 export async function submitCircuitAttempt(problemId: string, problemVersion: number, responses: Record<string, Record<string, number>>) {
   const response = await fetch(`/api/problems/${encodeURIComponent(problemId)}/circuit-attempts/submit`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: requestHeaders(true),
     body: JSON.stringify({ problem_version: problemVersion, responses }),
   })
   if (!response.ok) {
@@ -355,7 +377,7 @@ export async function submitCircuitAttempt(problemId: string, problemVersion: nu
 }
 
 export async function reloadProblemCatalog() {
-  const response = await fetch('/api/problems/reload', { method: 'POST' })
+  const response = await fetch('/api/problems/reload', { method: 'POST', headers: requestHeaders() })
   if (!response.ok) {
     throw new Error(`문제 새로고침 오류 (${response.status})`)
   }

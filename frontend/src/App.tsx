@@ -4,7 +4,6 @@ import {
   getProblem,
   getProblems,
   getSystemStatus,
-  reloadProblemCatalog,
   type AppInfoResponse,
   type ProblemSummary,
   type PublicProblemDetail,
@@ -61,19 +60,6 @@ export default function App() {
       setProblemLoading(false)
     }
   }, [selectProblem])
-
-  const reloadProblems = useCallback(async () => {
-    setProblemLoading(true)
-    setProblemError(undefined)
-    try {
-      await reloadProblemCatalog()
-      await loadProblems()
-    } catch (reason) {
-      const detail = reason instanceof Error ? ` ${reason.message}` : ''
-      setProblemError(`문제 목록을 새로고침할 수 없습니다.${detail}`)
-      setProblemLoading(false)
-    }
-  }, [loadProblems])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -135,7 +121,6 @@ export default function App() {
         error={problemError}
         onClose={() => setProblemDialogOpen(false)}
         onSelect={(problemId) => void selectProblem(problemId)}
-        onReload={() => void reloadProblems()}
       />
     </div>
   )

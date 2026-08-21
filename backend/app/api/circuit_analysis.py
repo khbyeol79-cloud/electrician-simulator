@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Request
 from app.domain import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, SchematicDiagram
 from app.repositories import CircuitAttemptRepository, ProblemRepository
 from app.services.circuit_attempt_service import CircuitAttemptService, CircuitAttemptValidationError
+from app.core.user_context import request_database
 
 
 router = APIRouter(prefix="/api/problems", tags=["circuit-analysis"])
@@ -18,7 +19,7 @@ def _problems(request: Request) -> ProblemRepository:
 
 
 def _attempts(request: Request) -> CircuitAttemptRepository:
-    return CircuitAttemptRepository(request.app.state.database)
+    return CircuitAttemptRepository(request_database(request))
 
 
 @router.get("/{problem_id}/diagram", response_model=SchematicDiagram)

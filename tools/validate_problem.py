@@ -39,11 +39,23 @@ def validate_one(package_dir: Path) -> int:
 def validate_all() -> int:
     repository = ProblemRepository(PROJECT_ROOT / "problems", PROJECT_ROOT / "schemas")
     statistics = repository.reload()
-    for summary in repository.list_summaries():
+    summaries = repository.list_summaries()
+    for summary in summaries:
         print(f"[정상] {summary.problem_id}")
     for issue in repository.issues():
         _print_issue(issue)
     errors = sum(issue.severity == "error" for issue in repository.issues())
+    qnet_count = sum(
+        summary.problem_type == "official" and summary.source_type == "official"
+        for summary in summaries
+    )
+    if qnet_count == 0:
+        print("[정책 경고] 검증된 Q-Net 공개문제 데이터가 없습니다: 0/18")
+    elif qnet_count != 18:
+        print(f"[정책 오류] Q-Net 공개문제는 18개 묶음이어야 합니다: {qnet_count}/18")
+        errors += 1
+    else:
+        print("[정책 정상] Q-Net 공개문제 18/18")
     print(
         f"전체 검사: 정상 {statistics.loaded}개, 제외 {statistics.excluded}개, "
         f"오류 {errors}개, 경고 {statistics.warnings}개"
@@ -72,4 +84,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

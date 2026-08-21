@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "6"
+SCHEMA_VERSION = "7"
 
 
 class SQLiteDatabase:
@@ -134,6 +134,15 @@ class SQLiteDatabase:
                     protection_trip_seen INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY(wiring_attempt_id) REFERENCES wiring_attempts(id)
                 );
+
+                CREATE TABLE IF NOT EXISTS free_circuit_workspaces (
+                    workspace_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    circuit_json TEXT NOT NULL,
+                    operation_json TEXT NOT NULL,
+                    connections_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
                 """
             )
             connection.execute(
@@ -151,6 +160,6 @@ class SQLiteDatabase:
                     "SELECT name FROM sqlite_master WHERE type='table'"
                 ).fetchall()
             names = {row["name"] for row in rows}
-            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags"}.issubset(names)
+            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(names)
         except sqlite3.Error:
             return False

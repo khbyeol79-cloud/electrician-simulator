@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
+
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
 from app.main import create_app
 from test_circuit_analysis_api import stage4_paths
+from problem_test_utils import PROJECT_ROOT
 
 
 CONNECTIONS = [
@@ -58,6 +61,7 @@ def test_wiring_draft_submit_and_progress(tmp_path):
         result = client.post("/api/problems/training_socket_demo_001/wiring-attempts/submit", json={"problem_version": 1, "connections": CONNECTIONS})
         assert result.status_code == 200
         assert result.json()["overall_correct"] is True
+        assert result.json()["result_classification"] == "correct"
         assert result.json()["correct_count"] == 8
         assert client.get("/api/problems/training_socket_demo_001/wiring-progress").json()["attempt_count"] == 1
 
@@ -121,6 +125,7 @@ def test_alternative_tb_numbers_are_accepted_by_electrical_network(tmp_path):
         assert payload["overall_correct"] is True
         assert payload["electrically_equivalent"] is True
         assert payload["used_alternative_tb_numbers"] is True
+        assert payload["result_classification"] == "functionally_equivalent"
         assert payload["correct_net_count"] == payload["required_net_count"] == 7
         setup = client.get("/api/problems/training_socket_demo_001/operation-setup").json()
         snapshot_edges = {
@@ -128,3 +133,63 @@ def test_alternative_tb_numbers_are_accepted_by_electrical_network(tmp_path):
             for item in setup["wiring_snapshot"]["connections"]
         }
         assert tuple(sorted(("EXT01-1", "TB5-11"))) in snapshot_edges
+
+
+def test_lan_users_have_isolated_sqlite_drafts_and_progress(tmp_path):
+    user_a = {"X-User-Id": "browser_a"}
+    user_b = {"X-User-Id": "browser_b"}
+    endpoint = "/api/problems/training_socket_demo_001/wiring-draft"
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        saved = client.put(
+            endpoint,
+            headers=user_a,
+            json={"problem_version": 1, "mode": "graphic", "connections": CONNECTIONS[:1]},
+        )
+        assert saved.status_code == 200
+        assert client.get(endpoint, headers=user_a).json()["connections"] == CONNECTIONS[:1]
+        assert client.get(endpoint, headers=user_b).json() is None
+        assert client.get(endpoint).json() is None
+
+        submitted = client.post(
+            "/api/problems/training_socket_demo_001/wiring-attempts/submit",
+            headers=user_a,
+            json={"problem_version": 1, "connections": CONNECTIONS},
+        )
+        assert submitted.status_code == 200
+        assert client.get(
+            "/api/problems/training_socket_demo_001/wiring-progress", headers=user_a
+        ).json()["attempt_count"] == 1
+        assert client.get(
+            "/api/problems/training_socket_demo_001/wiring-progress", headers=user_b
+        ).json()["attempt_count"] == 0
+
+
+def test_invalid_web_user_id_is_rejected(tmp_path):
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        response = client.get(
+            "/api/problems/training_socket_demo_001/wiring-draft",
+            headers={"X-User-Id": "../other-user"},
+        )
+        assert response.status_code == 400
+
+
+def test_working_but_structurally_extra_circuit_is_not_accepted_as_correct(tmp_path):
+    answer = json.loads(
+        (PROJECT_ROOT / "problems" / "operation_demo_001" / "answer.json").read_text(encoding="utf-8")
+    )
+    connections = [
+        {"from": item["from"], "to": item["to"], "wire_color": item["wire_color"]}
+        for item in answer["wiring_connections"]
+    ]
+    connections.append({"from": "X1-1", "to": "X1-2", "wire_color": "yellow"})
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        response = client.post(
+            "/api/problems/operation_demo_001/wiring-attempts/submit",
+            json={"problem_version": 1, "connections": connections},
+        )
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["overall_correct"] is False
+        assert payload["operation_requirements_passed"] is True
+        assert payload["result_classification"] == "operates_but_incorrect"
+        assert "동작하지만" in payload["message"]
