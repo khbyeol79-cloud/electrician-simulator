@@ -22,8 +22,8 @@ class FreeCircuitRepository:
                 """INSERT INTO free_circuit_workspaces(
                        workspace_id, name, circuit_json, operation_json, connections_json,
                        board_json, device_layout_json, wiring_semantics_json, editor_json,
-                       schema_version, updated_at
-                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                       assembly_json, schema_version, updated_at
+                   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
                    ON CONFLICT(workspace_id) DO UPDATE SET
                        name=excluded.name,
                        circuit_json=excluded.circuit_json,
@@ -33,6 +33,7 @@ class FreeCircuitRepository:
                        device_layout_json=excluded.device_layout_json,
                        wiring_semantics_json=excluded.wiring_semantics_json,
                        editor_json=excluded.editor_json,
+                       assembly_json=excluded.assembly_json,
                        schema_version=excluded.schema_version,
                        updated_at=CURRENT_TIMESTAMP""",
                 (
@@ -45,6 +46,7 @@ class FreeCircuitRepository:
                     json.dumps(payload["device_layout"], ensure_ascii=False) if payload["device_layout"] else None,
                     json.dumps(payload["wiring_semantics"], ensure_ascii=False) if payload["wiring_semantics"] else None,
                     json.dumps(payload["editor"], ensure_ascii=False),
+                    json.dumps(payload["assembly"], ensure_ascii=False) if payload["assembly"] else None,
                     payload["schema_version"],
                 ),
             )
@@ -70,6 +72,7 @@ class FreeCircuitRepository:
             device_layout=json.loads(row["device_layout_json"]) if "device_layout_json" in row.keys() and row["device_layout_json"] else None,
             wiring_semantics=json.loads(row["wiring_semantics_json"]) if "wiring_semantics_json" in row.keys() and row["wiring_semantics_json"] else None,
             editor=json.loads(row["editor_json"]) if "editor_json" in row.keys() and row["editor_json"] else {},
+            assembly=json.loads(row["assembly_json"]) if "assembly_json" in row.keys() and row["assembly_json"] else None,
             updated_at=datetime.fromisoformat(row["updated_at"]),
         )
 

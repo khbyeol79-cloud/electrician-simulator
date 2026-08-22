@@ -214,11 +214,22 @@ export type OperationCheckResult = {
 export type OperationProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_passed: boolean | null; last_gradable: boolean | null; last_passed_count: number; total_count: number; manual_run_count: number; last_run_at: string | null; forward_seen: boolean; reverse_seen: boolean; interlock_seen: boolean; protection_trip_seen: boolean }
 
 export type FreeCircuitEditorState = { schema_version: '1.0'; mode: 'graphic' | 'summary'; template_id: string | null }
+export type FreeCircuitDevicePlacement = { zone: 'internal_upper' | 'internal_lower' | 'external_top' | 'external_bottom'; row: number; column: number }
+export type FreeCircuitInstalledDevice = { instance_id: string; palette_id: string; model_id: string; label: string; placement: FreeCircuitDevicePlacement; properties: Record<string, string | number | boolean> }
+export type FreeCircuitAssembly = { schema_version: '1.0'; mode: 'editable' | 'fixed'; installed_devices: FreeCircuitInstalledDevice[] }
+export type FreeCircuitMountingSlot = FreeCircuitDevicePlacement & { slot_id: string; x: number; y: number; width: number; height: number }
+export type FreeCircuitPaletteItem = {
+  palette_id: string; model_id: string; device_type_id: string; name: string; category: string
+  mounting_kind: 'internal' | 'external'; default_zone: FreeCircuitDevicePlacement['zone']; socket_type_id: string | null
+  definition_status: string; capabilities: string[]; default_properties: Record<string, string | number | boolean>
+  max_instances: number | null; enabled: boolean; disabled_reason: string | null
+}
+export type FreeCircuitPalette = { items: FreeCircuitPaletteItem[]; slots: FreeCircuitMountingSlot[] }
 export type FreeCircuitWorkspace = {
   workspace_id: string; schema_version: '1.0'; name: string
   circuit: CircuitDefinition; operation: OperationDefinition; connections: WiringConnection[]
   board: BoardDefinition | null; device_layout: DeviceLayoutDefinition | null
-  wiring_semantics: WiringSemantics | null; editor: FreeCircuitEditorState; updated_at: string | null
+  wiring_semantics: WiringSemantics | null; assembly: FreeCircuitAssembly | null; editor: FreeCircuitEditorState; updated_at: string | null
 }
 export type FreeCircuitWorkspaceSummary = {
   workspace_id: string; name: string; schema_version: string; template_id: string | null
@@ -227,7 +238,7 @@ export type FreeCircuitWorkspaceSummary = {
 export type FreeCircuitTemplate = {
   template_id: string; name: string; description: string; board: BoardDefinition
   circuit: CircuitDefinition; operation: OperationDefinition; device_layout: DeviceLayoutDefinition | null
-  wiring_semantics: WiringSemantics | null
+  wiring_semantics: WiringSemantics | null; assembly: FreeCircuitAssembly | null
 }
 export type FreeCircuitDiagnostic = { severity: 'info' | 'warning' | 'error' | 'danger'; code: string; message: string }
 export type FreeCircuitDiagnostics = { status: 'normal' | 'attention'; diagnostics: FreeCircuitDiagnostic[] }
@@ -286,12 +297,29 @@ export function getFreeCircuitTemplates(signal?: AbortSignal) {
   return getJson<FreeCircuitTemplate[]>('/api/free-circuits/templates', signal)
 }
 
+export function getFreeCircuitPalette(signal?: AbortSignal) {
+  return getJson<FreeCircuitPalette>('/api/free-circuits/palette', signal)
+}
+
 export function getFreeCircuitWorkspace(workspaceId: string, signal?: AbortSignal) {
   return getJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}`, signal)
 }
 
-export function createFreeCircuitWorkspace(name: string) {
-  return mutationJson<FreeCircuitWorkspace>('/api/free-circuits/workspaces', 'POST', { name })
+export function createFreeCircuitWorkspace(name: string, templateId = 'basic_board_001') {
+  return mutationJson<FreeCircuitWorkspace>('/api/free-circuits/workspaces', 'POST', { name, template_id: templateId })
+}
+
+export function addFreeCircuitDevice(workspaceId: string, paletteId: string, placement: FreeCircuitDevicePlacement) {
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}/devices`, 'POST', { palette_id: paletteId, placement })
+}
+
+export function moveFreeCircuitDevice(workspaceId: string, instanceId: string, placement?: FreeCircuitDevicePlacement, properties?: Record<string, string | number | boolean>, label?: string) {
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}/devices/${encodeURIComponent(instanceId)}`, 'PUT', { placement, properties, label })
+}
+
+export function deleteFreeCircuitDevice(workspaceId: string, instanceId: string, removeConnectedWires = false) {
+  const suffix = removeConnectedWires ? '?remove_connected_wires=true' : ''
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}/devices/${encodeURIComponent(instanceId)}${suffix}`, 'DELETE')
 }
 
 export function saveFreeCircuitWorkspace(workspace: FreeCircuitWorkspace) {

@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.11.3',
+  version: '0.12.0',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.11.3',
+  version: '0.12.0',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -155,6 +155,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     },
     connections: [] as WiringConnection[], board: wiringBoard, device_layout: trainingDetail.device_layout,
     wiring_semantics: { schema_version: '1.0', extra_jumper_policy: 'warning', external_devices: [] },
+    assembly: null as null | { schema_version: '1.0'; mode: 'editable'; installed_devices: { instance_id: string; palette_id: string; model_id: string; label: string; placement: { zone: 'internal_upper' | 'internal_lower' | 'external_top' | 'external_bottom'; row: number; column: number }; properties: Record<string, string | number | boolean> }[] },
     editor: { schema_version: '1.0', mode: 'graphic', template_id: 'basic_board_001' }, updated_at: null,
   }
   let freeCreated = false
@@ -163,9 +164,30 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     const url = String(input)
     if (url === '/api/health') return response(health)
     if (url === '/api/app-info') return response(appInfo)
-    if (url === '/api/free-circuits/templates') return response([{ template_id: 'basic_board_001', name: '기본보드', description: '통합 기본보드', board: wiringBoard, circuit: freeCircuit.circuit, operation: freeCircuit.operation, device_layout: trainingDetail.device_layout, wiring_semantics: freeCircuit.wiring_semantics }])
+    if (url === '/api/free-circuits/templates') return response([
+      { template_id: 'basic_board_001', name: '기본보드', description: '통합 기본보드', board: wiringBoard, circuit: freeCircuit.circuit, operation: freeCircuit.operation, device_layout: trainingDetail.device_layout, wiring_semantics: freeCircuit.wiring_semantics, assembly: null },
+      { template_id: 'empty_board_001', name: '빈보드', description: 'TB5·TB6부터 시작', board: wiringBoard, circuit: { ...freeCircuit.circuit, devices: [] }, operation: freeCircuit.operation, device_layout: null, wiring_semantics: freeCircuit.wiring_semantics, assembly: { schema_version: '1.0', mode: 'editable', installed_devices: [] } },
+    ])
+    if (url === '/api/free-circuits/palette') return response({
+      items: [
+        { palette_id: 'relay_8p', model_id: 'auxiliary_relay_8p_training_partial', device_type_id: 'auxiliary_relay_8p', name: '8P 보조릴레이', category: '제어', mounting_kind: 'internal', default_zone: 'internal_upper', socket_type_id: 'socket_8p_base', definition_status: 'reviewed', capabilities: ['coil'], default_properties: {}, max_instances: null, enabled: true, disabled_reason: null },
+        { palette_id: 'power', model_id: 'power_3p_control_training', device_type_id: 'power_source', name: '3상·제어 전원', category: '외부', mounting_kind: 'external', default_zone: 'external_top', socket_type_id: null, definition_status: 'reviewed', capabilities: ['power_source'], default_properties: {}, max_instances: 1, enabled: true, disabled_reason: null },
+      ],
+      slots: [{ slot_id: 'internal_upper-0', zone: 'internal_upper', row: 0, column: 0, x: 80, y: 180, width: 180, height: 170 }, { slot_id: 'external_top-0', zone: 'external_top', row: 0, column: 0, x: 20, y: 0, width: 120, height: 50 }],
+    })
     if (url === '/api/free-circuits' && (!init?.method || init.method === 'GET')) return response(freeCreated ? [{ workspace_id: freeCircuit.workspace_id, name: freeCircuit.name, schema_version: '1.0', template_id: 'basic_board_001', connection_count: freeCircuit.connections.length, updated_at: freeCircuit.updated_at }] : [])
-    if (url === '/api/free-circuits/workspaces' && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
+    if (url === '/api/free-circuits/workspaces' && init?.method === 'POST') {
+      const body = JSON.parse(String(init.body)) as { template_id?: string }
+      freeCreated = true
+      freeCircuit.editor.template_id = body.template_id ?? 'basic_board_001'
+      freeCircuit.assembly = body.template_id === 'empty_board_001' ? { schema_version: '1.0', mode: 'editable', installed_devices: [] } : null
+      return response(freeCircuit, 201)
+    }
+    if (url === '/api/free-circuits/self_hold_01/devices' && init?.method === 'POST') {
+      const body = JSON.parse(String(init.body))
+      freeCircuit.assembly?.installed_devices.push({ instance_id: 'X1', palette_id: body.palette_id, model_id: 'auxiliary_relay_8p_training_partial', label: 'X1', placement: body.placement, properties: {} })
+      return response(freeCircuit, 201)
+    }
     if (url === '/api/free-circuits/self_hold_01' && (!init?.method || init.method === 'GET')) return response(freeCircuit)
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'PUT') {
       if (freeCircuitSaveFailures > 0) { freeCircuitSaveFailures -= 1; return response({ detail: '시험용 저장 실패' }, 500) }

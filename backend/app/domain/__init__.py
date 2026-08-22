@@ -13,6 +13,12 @@ from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, Circuit
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
 from .free_circuit import (
+    FreeCircuitAssembly,
+    FreeCircuitDevicePlacement,
+    FreeCircuitInstalledDevice,
+    FreeCircuitMountingSlot,
+    FreeCircuitPaletteItem,
+    FreeCircuitPaletteResponse,
     FreeCircuitTemplate,
     FreeCircuitWorkspaceResponse,
     FreeCircuitWorkspaceSummary,
@@ -59,6 +65,12 @@ __all__ = [
     "FreeCircuitWorkspaceSummary",
     "FreeCircuitTemplate",
     "FreeCircuitWorkspaceUpdate",
+    "FreeCircuitAssembly",
+    "FreeCircuitDevicePlacement",
+    "FreeCircuitInstalledDevice",
+    "FreeCircuitMountingSlot",
+    "FreeCircuitPaletteItem",
+    "FreeCircuitPaletteResponse",
     "ProblemPackage",
     "CircuitSummary",
     "CircuitAttemptResult",

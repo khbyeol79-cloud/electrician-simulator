@@ -21,13 +21,33 @@ describe('자유회로 실험', () => {
     expect(await screen.findByRole('heading', { name: '자유회로 실험', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('정답 없는 실제 결선 실험')).toBeInTheDocument()
     expect(screen.queryByLabelText('작업공간 ID')).not.toBeInTheDocument()
-    expect(screen.queryByLabelText('시작 보드')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /기본보드 통합 기본보드/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /빈보드 TB5·TB6부터 시작/ })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '기본보드로 만들기' }))
 
     expect(await screen.findByRole('heading', { name: '자기유지 자유회로', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('정답 데이터 없음')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: '제어함 결선판' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '결선 제출' })).not.toBeInTheDocument()
+  })
+
+  it('creates an editable empty board and installs a catalog device by grid click', async () => {
+    const fetchMock = installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/free-circuit']}><App /></MemoryRouter>)
+    await user.click(await screen.findByRole('button', { name: /빈보드 TB5·TB6부터 시작/ }))
+    await user.click(screen.getByRole('button', { name: '빈보드로 만들기' }))
+    expect(await screen.findByText('기구 팔레트')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /8P 보조릴레이/ }))
+    await user.click(screen.getByRole('button', { name: 'internal_upper 1번 장착칸' }))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      '/api/free-circuits/self_hold_01/devices', expect.objectContaining({ method: 'POST' }),
+    ))
+    expect(screen.getByText('기구를 설치하고 자동 저장했습니다.')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '실행 취소' }))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      '/api/free-circuits/self_hold_01', expect.objectContaining({ method: 'PUT' }),
+    ))
   })
 
   it('requires only a non-empty workspace name and uses the server-generated id', async () => {

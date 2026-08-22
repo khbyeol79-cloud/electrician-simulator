@@ -95,7 +95,7 @@ class OperationProtectionDevice(BaseModel):
     protection_device_id: str
     label: str
     protection_type: Literal["eocr"] = "eocr"
-    protected_coil_ids: list[str] = Field(min_length=1, max_length=20)
+    protected_coil_ids: list[str] = Field(default_factory=list, max_length=20)
     protected_motor_ids: list[str] = Field(default_factory=list, max_length=10)
     protection_contact_ids: list[str] = Field(default_factory=list, max_length=20)
     reset_mode: Literal["manual", "automatic", "restart_required"] = "manual"

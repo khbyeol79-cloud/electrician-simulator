@@ -62,7 +62,7 @@ def test_free_circuit_templates_create_list_and_keep_users_separate(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         templates = client.get("/api/free-circuits/templates")
         assert templates.status_code == 200
-        assert [item["template_id"] for item in templates.json()] == ["basic_board_001"]
+        assert [item["template_id"] for item in templates.json()] == ["basic_board_001", "empty_board_001"]
         created = client.post(
             "/api/free-circuits/templates/operation_demo_001/workspaces/self_hold_01",
             headers={"X-User-Id": "student_a"}, json={"name": "자기유지 실험"},
@@ -121,6 +121,108 @@ def test_basic_board_definition_is_independent_actual_wiring_without_answer(tmp_
         assert "basic_board_001" not in {
             item["problem_id"] for item in client.get("/api/problems").json()
         }
+
+
+def test_empty_board_palette_install_move_delete_and_power_gate(tmp_path):
+    headers = {"X-User-Id": "empty_board_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        palette = client.get("/api/free-circuits/palette", headers=headers)
+        assert palette.status_code == 200
+        assert {item["palette_id"] for item in palette.json()["items"]} >= {
+            "relay_8p", "timer_8p", "contactor_12p", "power", "pb_no", "motor"
+        }
+        assert "answer" not in palette.text
+        assert "expected_nets" not in palette.text
+
+        created = client.post(
+            "/api/free-circuits/workspaces", headers=headers,
+            json={"name": "빈 보드 시험", "template_id": "empty_board_001"},
+        )
+        assert created.status_code == 201, created.text
+        workspace = created.json()
+        assert workspace["editor"]["template_id"] == "empty_board_001"
+        assert {item["item_id"] for item in workspace["board"]["items"]} == {"TB5", "TB6"}
+        assert workspace["assembly"]["installed_devices"] == []
+        assert client.post(f"/api/free-circuits/{workspace['workspace_id']}/sessions", headers=headers).status_code == 422
+
+        added = client.post(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices", headers=headers,
+            json={"palette_id": "relay_8p", "placement": {"zone": "internal_upper", "row": 0, "column": 0}},
+        )
+        assert added.status_code == 201, added.text
+        relay = added.json()["assembly"]["installed_devices"][0]
+        assert relay["instance_id"] == "X1"
+        assert any(item["item_id"] == "X1" for item in added.json()["board"]["items"])
+        relay_item = next(item for item in added.json()["board"]["items"] if item["item_id"] == "X1")
+        relay_area = next(area for area in added.json()["board"]["forbidden_areas"] if area["area_id"] == "X1_body")
+        assert (relay_area["x"], relay_area["y"], relay_area["width"], relay_area["height"]) == (
+            relay_item["x"], relay_item["y"], relay_item["width"], relay_item["height"],
+        )
+        assert all(
+            pin["y"] in {relay_area["y"], relay_area["y"] + relay_area["height"]}
+            for pin in relay_item["pins"]
+        )
+
+        moved = client.put(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices/X1", headers=headers,
+            json={"placement": {"zone": "internal_lower", "row": 0, "column": 2}},
+        )
+        assert moved.status_code == 200, moved.text
+        assert moved.json()["assembly"]["installed_devices"][0]["instance_id"] == "X1"
+        assert moved.json()["assembly"]["installed_devices"][0]["placement"]["column"] == 2
+
+        powered = client.post(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices", headers=headers,
+            json={"palette_id": "power", "placement": {"zone": "external_top", "row": 0, "column": 0}},
+        )
+        assert powered.status_code == 201, powered.text
+        session = client.post(f"/api/free-circuits/{workspace['workspace_id']}/sessions", headers=headers)
+        assert session.status_code == 201, session.text
+        assert session.json()["catalog_composed"] is True
+
+        deleted = client.delete(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices/X1", headers=headers,
+        )
+        assert deleted.status_code == 200
+        assert [item["instance_id"] for item in deleted.json()["assembly"]["installed_devices"]] == ["PWR1"]
+
+
+def test_empty_board_rejects_overlap_wrong_zone_unknown_model_and_preserves_old_workspace(tmp_path):
+    headers = {"X-User-Id": "assembly_validation"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        workspace = client.post(
+            "/api/free-circuits/workspaces", headers=headers,
+            json={"name": "배치 검증", "template_id": "empty_board_001"},
+        ).json()
+        path = f"/api/free-circuits/{workspace['workspace_id']}/devices"
+        placement = {"zone": "internal_upper", "row": 0, "column": 0}
+        assert client.post(path, headers=headers, json={"palette_id": "relay_8p", "placement": placement}).status_code == 201
+        assert client.post(path, headers=headers, json={"palette_id": "timer_8p", "placement": placement}).status_code == 422
+        assert client.post(path, headers=headers, json={"palette_id": "pb_no", "placement": placement}).status_code == 422
+        assert client.post(path, headers=headers, json={"palette_id": "not_allowed", "placement": placement}).status_code == 422
+
+        timer = client.post(
+            path, headers=headers,
+            json={"palette_id": "timer_8p", "placement": {"zone": "internal_lower", "row": 0, "column": 1}},
+        ).json()["assembly"]["installed_devices"][-1]
+        changed = client.put(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices/{timer['instance_id']}",
+            headers=headers, json={"properties": {**timer["properties"], "delay_ms": 2500}},
+        )
+        assert changed.status_code == 200, changed.text
+        assert next(item for item in changed.json()["assembly"]["installed_devices"] if item["instance_id"] == timer["instance_id"])["properties"]["delay_ms"] == 2500
+        invalid = client.put(
+            f"/api/free-circuits/{workspace['workspace_id']}/devices/{timer['instance_id']}",
+            headers=headers, json={"properties": {**timer["properties"], "delay_ms": 0}},
+        )
+        assert invalid.status_code == 422
+
+        legacy = client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces/old_free",
+            headers=headers, json={"name": "기존 작업공간"},
+        )
+        assert legacy.status_code == 201
+        assert legacy.json()["assembly"] is None
 
 
 def test_basic_board_same_name_gets_distinct_ids_and_legacy_api_remains(tmp_path):

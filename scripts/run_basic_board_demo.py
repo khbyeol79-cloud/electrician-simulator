@@ -109,7 +109,7 @@ def check(label: str, actual, expected) -> None:
 
 
 def main() -> int:
-    print("0.11.3 통합 기본보드 실제 결선 간단 시험")
+    print("0.12.0 통합 기본보드 실제 결선 간단 시험")
     print("- Q-Net 답안과 expected_nets를 읽거나 사용하지 않습니다.\n")
     repository = ProblemRepository(PROJECT_ROOT / "problems", PROJECT_ROOT / "schemas", PROJECT_ROOT / "catalog")
     repository.reload()

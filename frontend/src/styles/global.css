@@ -103,6 +103,10 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .free-create-card input, .free-create-card select { height: 36px; padding: 0 9px; border: 1px solid #bdcad9; border-radius: 5px; background: #fff; color: #203750; }
 .free-create-card small { display: block; padding: 8px; color: #35665f; background: #effaf8; font-size: 9px; }
 .free-create-card > button { width: 100%; height: 38px; margin-top: 8px; border-radius: 5px; color: #fff; background: #0f766e; font-weight: 800; }
+.free-template-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.free-template-cards button { display: grid; gap: 4px; min-height: 70px; padding: 10px; border: 2px solid #d6e0e9; border-radius: 7px; text-align: left; background: #f8fafc; }
+.free-template-cards button.selected { border-color: #0f766e; background: #ecfdf8; box-shadow: 0 0 0 2px rgba(15,118,110,.12); }
+.free-template-cards strong { font-size: 12px; }.free-template-cards span { color: #607187; font-size: 9px; line-height: 1.45; }
 .free-workspace-list { display: grid; align-content: start; gap: 8px; }
 .free-workspace-list button { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px; text-align: left; border: 1px solid #d8e2ec; border-radius: 6px; background: #f9fbfd; }
 .free-workspace-list button:hover { border-color: #42aa9d; background: #f0fbf9; }
@@ -117,7 +121,19 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .autosave-status.error { color: #a02f2f; border-color: #e5b8b8; background: #fff1f1; }
 .operation-start { margin-top: 7px; background: #0f766e; }
 .free-device-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-.free-device-tags span { padding: 5px 7px; border: 1px solid #d5e0ea; border-radius: 12px; color: #475a72; background: #f7f9fc; font-size: 8px; }
+.free-device-tags span, .free-device-tags button { padding: 5px 7px; border: 1px solid #d5e0ea; border-radius: 12px; color: #475a72; background: #f7f9fc; font-size: 8px; }
+.free-device-tags button.selected { border-color: #0891b2; color: #075985; background: #ecfeff; }
+.free-palette { display: grid; gap: 8px; max-height: 360px; overflow: auto; }
+.free-palette > div { display: grid; gap: 5px; }.free-palette > div > strong { font-size: 10px; color: #344a62; }
+.free-palette button { display: grid; gap: 2px; padding: 7px 8px; border: 1px solid #d3dee9; border-radius: 5px; text-align: left; background: #f8fafc; }
+.free-palette button.selected { border-color: #0f766e; background: #e9fbf7; }.free-palette button:disabled { opacity: .55; }
+.free-palette button span { font-size: 10px; font-weight: 800; }.free-palette button small { color: #66778d; font-size: 8px; }
+.free-device-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }.free-device-actions button { padding: 7px; border-radius: 4px; }
+.free-external-slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 8px; }.free-external-slots strong { grid-column: 1 / -1; font-size: 9px; }.free-external-slots button { padding: 5px 2px; border: 1px solid #cbd8e4; border-radius: 4px; background: #f8fafc; font-size: 8px; }.free-external-slots button:disabled { opacity: .35; }
+.free-mounting-slot { fill: rgba(15,118,110,.025); stroke: rgba(15,118,110,.18); stroke-width: 2; stroke-dasharray: 8 6; pointer-events: none; }
+.free-mounting-slot.active { fill: rgba(20,184,166,.12); stroke: #14b8a6; pointer-events: all; cursor: pointer; }
+.free-mounting-slot.active:hover { fill: rgba(20,184,166,.24); stroke-width: 4; }
+.free-device { cursor: pointer; }.free-device.selected .board-item-body > rect:first-child { stroke: #06b6d4; stroke-width: 6; filter: drop-shadow(0 0 5px rgba(6,182,212,.65)); }
 .danger-zone-button { width: calc(100% - 20px); margin: 0 10px 12px; padding: 9px; color: #a53131; border: 1px solid #e2bcbc; border-radius: 4px; background: #fff5f5; font-size: 9px; }
 .free-circuit-operation .operation-panel { overflow: auto; }
 .free-circuit-operation .protection-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }

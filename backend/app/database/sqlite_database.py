@@ -4,7 +4,23 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "8"
+SCHEMA_VERSION = "9"
+
+
+class _ClosingSQLiteConnection(sqlite3.Connection):
+    """Commit or roll back a context block, then release the SQLite file handle.
+
+    ``sqlite3.Connection`` normally leaves the connection open after ``with``.
+    Repository code uses ``with database.connect()`` as the transaction and
+    lifetime boundary, so keeping that handle alive prevents temporary user
+    databases from being removed on Windows.
+    """
+
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        try:
+            return bool(super().__exit__(exc_type, exc_value, traceback))
+        finally:
+            self.close()
 
 
 class SQLiteDatabase:
@@ -13,7 +29,10 @@ class SQLiteDatabase:
 
     def connect(self) -> sqlite3.Connection:
         self.database_file.parent.mkdir(parents=True, exist_ok=True)
-        connection = sqlite3.connect(self.database_file)
+        connection = sqlite3.connect(
+            self.database_file,
+            factory=_ClosingSQLiteConnection,
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA foreign_keys = ON")
         return connection
@@ -145,6 +164,7 @@ class SQLiteDatabase:
                     device_layout_json TEXT,
                     wiring_semantics_json TEXT,
                     editor_json TEXT,
+                    assembly_json TEXT,
                     schema_version TEXT NOT NULL DEFAULT '1.0',
                     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
@@ -159,6 +179,7 @@ class SQLiteDatabase:
                 "device_layout_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN device_layout_json TEXT",
                 "wiring_semantics_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN wiring_semantics_json TEXT",
                 "editor_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN editor_json TEXT",
+                "assembly_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN assembly_json TEXT",
                 "schema_version": "ALTER TABLE free_circuit_workspaces ADD COLUMN schema_version TEXT NOT NULL DEFAULT '1.0'",
             }
             for column, statement in migrations.items():

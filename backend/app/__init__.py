@@ -1,3 +1,3 @@
 """Electrician simulator backend package."""
 
-__version__ = "0.11.3"
+__version__ = "0.12.0"

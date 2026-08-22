@@ -9,6 +9,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.core.user_context import request_database, request_user_id
 from app.domain import OperationSessionState
 from app.domain.free_circuit import (
+    FreeCircuitDevicePlacement,
+    FreeCircuitPaletteResponse,
     FreeCircuitEditorState,
     FreeCircuitTemplate,
     FreeCircuitWorkspaceResponse,
@@ -24,6 +26,10 @@ from app.services.free_circuit_template_service import (
     FreeCircuitTemplateError,
     FreeCircuitTemplateService,
 )
+from app.services.free_circuit_assembly_service import (
+    FreeCircuitAssemblyError,
+    FreeCircuitAssemblyService,
+)
 
 
 router = APIRouter(prefix="/api/free-circuits", tags=["free-circuit"])
@@ -34,6 +40,7 @@ TEMPLATE_IDS = (BASIC_BOARD_TEMPLATE_ID, *LEGACY_FREE_TEMPLATE_IDS)
 class CreateFromTemplateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(min_length=1, max_length=120)
+    template_id: str | None = Field(default=None, max_length=80)
 
     @field_validator("name")
     @classmethod
@@ -55,6 +62,19 @@ class FreeCircuitDiagnosticsResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: str
     diagnostics: list[FreeCircuitDiagnostic]
+
+
+class DevicePlacementRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    palette_id: str = Field(min_length=1, max_length=80)
+    placement: FreeCircuitDevicePlacement
+
+
+class DeviceMoveRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    placement: FreeCircuitDevicePlacement | None = None
+    properties: dict[str, str | int | float | bool] | None = None
+    label: str | None = Field(default=None, max_length=80)
 
 
 def _repository(request: Request) -> FreeCircuitRepository:
@@ -93,6 +113,7 @@ def _workspace_from_template(template: FreeCircuitTemplate, name: str) -> FreeCi
         board=template.board,
         device_layout=template.device_layout,
         wiring_semantics=template.wiring_semantics,
+        assembly=template.assembly,
         editor=FreeCircuitEditorState(template_id=template.template_id),
     )
 
@@ -159,13 +180,24 @@ def list_workspaces(request: Request):
 
 @router.get("/templates", response_model=list[FreeCircuitTemplate])
 def list_templates(request: Request):
-    return [_template(request, BASIC_BOARD_TEMPLATE_ID)]
+    problem_repository = getattr(request.app.state, "problem_repository", None)
+    if problem_repository is None:
+        raise HTTPException(status_code=503, detail="자유회로 시작 템플릿을 준비할 수 없습니다.")
+    return FreeCircuitTemplateService(problem_repository).visible_templates()
+
+
+@router.get("/palette", response_model=FreeCircuitPaletteResponse)
+def get_palette(request: Request):
+    problem_repository = getattr(request.app.state, "problem_repository", None)
+    if problem_repository is None:
+        raise HTTPException(status_code=503, detail="기구 팔레트를 준비할 수 없습니다.")
+    return FreeCircuitAssemblyService(problem_repository).palette()
 
 
 @router.post("/workspaces", response_model=FreeCircuitWorkspaceResponse, status_code=201)
 def create_basic_workspace(request: Request, payload: CreateFromTemplateRequest = Body(...)):
-    """신규 UI용: 이름만 받아 통합 기본보드 작업공간을 만든다."""
-    template = _template(request, BASIC_BOARD_TEMPLATE_ID)
+    """이름과 선택 보드를 받아 서버 생성 ID의 작업공간을 만든다."""
+    template = _template(request, payload.template_id or BASIC_BOARD_TEMPLATE_ID)
     repository = _repository(request)
     workspace_id = _new_workspace_id(repository)
     return repository.save(workspace_id, _workspace_from_template(template, payload.name))
@@ -203,8 +235,65 @@ def get_workspace(workspace_id: WorkspaceId, request: Request):
 
 @router.put("/{workspace_id}", response_model=FreeCircuitWorkspaceResponse)
 def save_workspace(workspace_id: WorkspaceId, payload: FreeCircuitWorkspaceUpdate, request: Request):
+    if payload.assembly is not None and payload.assembly.mode == "editable":
+        problem_repository = getattr(request.app.state, "problem_repository", None)
+        if problem_repository is None:
+            raise HTTPException(status_code=503, detail="기구 구성을 검증할 수 없습니다.")
+        try:
+            payload = FreeCircuitAssemblyService(problem_repository).compose(payload)
+        except FreeCircuitAssemblyError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
     _validate_workspace(payload)
     return _repository(request).save(workspace_id, payload)
+
+
+def _editable_workspace(workspace_id: str, request: Request):
+    workspace = _repository(request).get(workspace_id)
+    if workspace is None:
+        raise HTTPException(status_code=404, detail="자유회로 작업공간을 찾을 수 없습니다.")
+    problem_repository = getattr(request.app.state, "problem_repository", None)
+    if problem_repository is None:
+        raise HTTPException(status_code=503, detail="기구 구성을 준비할 수 없습니다.")
+    return workspace, FreeCircuitAssemblyService(problem_repository)
+
+
+@router.post("/{workspace_id}/devices", response_model=FreeCircuitWorkspaceResponse, status_code=201)
+def add_device(workspace_id: WorkspaceId, payload: DevicePlacementRequest, request: Request):
+    workspace, service = _editable_workspace(workspace_id, request)
+    try:
+        updated = service.add(workspace, payload.palette_id, payload.placement)
+        _validate_workspace(updated)
+    except FreeCircuitAssemblyError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return _repository(request).save(workspace_id, updated)
+
+
+@router.put("/{workspace_id}/devices/{instance_id}", response_model=FreeCircuitWorkspaceResponse)
+def move_device(workspace_id: WorkspaceId, instance_id: str, payload: DeviceMoveRequest, request: Request):
+    workspace, service = _editable_workspace(workspace_id, request)
+    try:
+        updated = service.update(
+            workspace, instance_id, payload.placement, payload.properties, payload.label
+        )
+        _validate_workspace(updated)
+    except FreeCircuitAssemblyError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return _repository(request).save(workspace_id, updated)
+
+
+@router.delete("/{workspace_id}/devices/{instance_id}", response_model=FreeCircuitWorkspaceResponse)
+def remove_device(
+    workspace_id: WorkspaceId, instance_id: str, request: Request,
+    remove_connected_wires: bool = False,
+):
+    workspace, service = _editable_workspace(workspace_id, request)
+    try:
+        updated = service.delete(workspace, instance_id, remove_connected_wires)
+        _validate_workspace(updated)
+    except FreeCircuitAssemblyError as exc:
+        status = 409 if "확인" in str(exc) else 422
+        raise HTTPException(status_code=status, detail=str(exc)) from exc
+    return _repository(request).save(workspace_id, updated)
 
 
 @router.delete("/{workspace_id}", status_code=204)
@@ -218,6 +307,8 @@ def create_free_circuit_session(workspace_id: WorkspaceId, request: Request):
     workspace = _repository(request).get(workspace_id)
     if workspace is None:
         raise HTTPException(status_code=404, detail="자유회로 작업공간을 찾을 수 없습니다.")
+    if not workspace.operation.power.line_terminal_id or not workspace.operation.power.return_terminal_id:
+        raise HTTPException(status_code=422, detail="전원 기구를 설치해 주세요.")
     session_id = token_urlsafe(24)
     submitted_terminal_ids = {
         terminal_id

@@ -45,9 +45,14 @@ function segmentIntersectsRect(start: DiagramPoint, end: DiagramPoint, rect: Boa
   return true
 }
 
-function pathIsClear(board: BoardDefinition, points: DiagramPoint[]) {
+function pathIsClear(board: BoardDefinition, points: DiagramPoint[], endpointItemIds: ReadonlySet<string> = new Set()) {
   return points.slice(1).every((point, index) =>
-    board.forbidden_areas.every((area) => !segmentIntersectsRect(points[index], point, area)),
+    board.forbidden_areas.every((area) => {
+      const endpointArea = [...endpointItemIds].some((itemId) =>
+        area.area_id === `${itemId}_body` || area.area_id === `DEVICE-${itemId}`,
+      )
+      return endpointArea || !segmentIntersectsRect(points[index], point, area)
+    }),
   )
 }
 
@@ -140,6 +145,7 @@ export function routeConnection(
   if (!start || !end) throw new Error('연결 단자의 좌표를 찾을 수 없습니다.')
   const startPin = { ...start.pin, x: start.pin.x + endpointOffset.from }
   const endPin = { ...end.pin, x: end.pin.x + endpointOffset.to }
+  const endpointItemIds = new Set([start.item.item_id, end.item.item_id])
 
   const lanes = horizontalLanes(board)
   const startLane = laneForPin(lanes, startPin)
@@ -162,7 +168,7 @@ export function routeConnection(
     ].sort((left, right) => routeCost(left) - routeCost(right))
   }
 
-  const points = candidates.find((candidate) => isOrthogonal(candidate) && pathIsClear(board, candidate) && !pathHasSelfOverlap(candidate))
+  const points = candidates.find((candidate) => isOrthogonal(candidate) && pathIsClear(board, candidate, endpointItemIds) && !pathHasSelfOverlap(candidate))
   if (!points) throw new Error('겹치지 않는 직교 배선 경로를 만들 수 없습니다.')
   return { ...connection, points }
 }

@@ -185,6 +185,25 @@ describe('제어함 결선', () => {
     expect(route.points.every((point) => point.x !== board.routing_margin)).toBe(true)
   })
 
+  it('lets an installed empty-board device wire leave its legacy padded endpoint area', () => {
+    const board: BoardDefinition = {
+      ...wiringBoard,
+      forbidden_areas: wiringBoard.items.map((item) => ({
+        area_id: `DEVICE-${item.item_id}`,
+        x: item.x - 12,
+        y: item.y - 12,
+        width: item.width + 24,
+        height: item.height + 24,
+      })),
+    }
+    const route = routeConnection(board, {
+      from: 'X1-1', to: 'MC1-4', wire_color: 'yellow', pair_display_color: '#64748b',
+    })
+    expect(route.points.length).toBeGreaterThanOrEqual(4)
+    expect(route.points[0]).toEqual({ x: 200, y: 340 })
+    expect(route.points.at(-1)).toEqual({ x: 576, y: 500 })
+  })
+
   it('keeps the real training board X1-1 to MC2-5 route inside the middle channel', () => {
     const route = routeConnection(trainingBoardData as unknown as BoardDefinition, {
       from: 'X1-1', to: 'MC2-5', wire_color: 'yellow', pair_display_color: '#2563eb',

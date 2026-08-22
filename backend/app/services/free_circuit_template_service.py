@@ -23,6 +23,10 @@ from app.domain.problem_definition import (
     WiringSemantics,
 )
 from app.repositories.problem_repository import ProblemRepository
+from app.services.free_circuit_assembly_service import (
+    EMPTY_BOARD_TEMPLATE_ID,
+    FreeCircuitAssemblyService,
+)
 
 
 BASIC_BOARD_TEMPLATE_ID = "basic_board_001"
@@ -59,11 +63,24 @@ class FreeCircuitTemplateService:
         ).resolve()
 
     def visible_templates(self) -> list[FreeCircuitTemplate]:
-        return [self.get(BASIC_BOARD_TEMPLATE_ID)]
+        return [self.get(BASIC_BOARD_TEMPLATE_ID), self.get(EMPTY_BOARD_TEMPLATE_ID)]
 
     def get(self, template_id: str) -> FreeCircuitTemplate:
         if template_id == BASIC_BOARD_TEMPLATE_ID:
             return self._basic_board()
+        if template_id == EMPTY_BOARD_TEMPLATE_ID:
+            workspace = FreeCircuitAssemblyService(self.repository).empty_workspace("빈보드")
+            return FreeCircuitTemplate(
+                template_id=EMPTY_BOARD_TEMPLATE_ID,
+                name="빈보드",
+                description="TB5·TB6만 배치된 자유 기구 설치 보드",
+                board=workspace.board,
+                circuit=workspace.circuit,
+                operation=workspace.operation,
+                device_layout=workspace.device_layout,
+                wiring_semantics=workspace.wiring_semantics,
+                assembly=workspace.assembly,
+            )
         if template_id in LEGACY_FREE_TEMPLATE_IDS:
             return self._legacy(template_id)
         raise FreeCircuitTemplateError("자유회로 시작 템플릿을 찾을 수 없습니다.")

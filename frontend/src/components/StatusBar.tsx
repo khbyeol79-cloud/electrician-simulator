@@ -31,7 +31,7 @@ export function StatusBar({ info, error }: StatusBarProps) {
       />
       <div className="status-spacer" />
       <span>실행 모드: <strong>{info?.mode === 'desktop' ? '데스크톱' : '웹'}</strong></span>
-      <span>버전 <strong>{info?.version ?? '0.11.3'}</strong></span>
+      <span>버전 <strong>{info?.version ?? '0.12.0'}</strong></span>
     </footer>
   )
 }
