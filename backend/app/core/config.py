@@ -11,7 +11,7 @@ from .paths import AppPaths, build_paths
 
 class Settings(BaseModel):
     app_name: str = "전기기능사 시퀀스 결선 시뮬레이터"
-    version: str = "0.11.2"
+    version: str = "0.11.3"
     app_mode: Literal["desktop", "web"] = "web"
     host: str = "127.0.0.1"
     port: int = Field(default=8000, ge=0, le=65535)

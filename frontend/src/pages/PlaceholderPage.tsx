@@ -13,11 +13,6 @@ export function PlaceholderPage({ stage, title, description, icon }: Placeholder
           <span>{stage}</span>
           <h2>{title}</h2>
         </div>
-        <div className="toolbar-buttons" aria-label="작업 도구">
-          <button type="button" disabled>−</button>
-          <button type="button" disabled>＋</button>
-          <button type="button" disabled>화면 맞춤</button>
-        </div>
       </div>
       <div className="workspace-canvas">
         <div className="placeholder-card">
@@ -31,4 +26,3 @@ export function PlaceholderPage({ stage, title, description, icon }: Placeholder
     </section>
   )
 }
-

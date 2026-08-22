@@ -16,7 +16,7 @@ afterEach(() => {
 })
 
 describe('제어함 결선', () => {
-  it('shows the stage-one socket-number draft in a read-only zoomable reference diagram', async () => {
+  it('shows the stage-one socket-number draft in a read-only reference without toolbar buttons', async () => {
     installApiMock()
     window.localStorage.setItem('electrician.circuitDraft.training_socket_demo_001.v1', JSON.stringify({
       'SQ-VR1-C1': { upper: 6, lower: 3 },
@@ -30,11 +30,9 @@ describe('제어함 결선', () => {
     expect(diagram.querySelector('.answer-marker.entered')?.textContent).toBe('6')
     expect(within(diagram).queryByRole('button', { name: /VR1.*선택/ })).not.toBeInTheDocument()
 
-    const toolbar = screen.getByLabelText('참고 회로도 보기 도구')
-    await user.click(within(toolbar).getByRole('button', { name: '확대' }))
-    expect(within(toolbar).getByText('130%')).toBeInTheDocument()
-    await user.click(within(toolbar).getByRole('button', { name: '화면 맞춤' }))
-    expect(within(toolbar).getByText('82%')).toBeInTheDocument()
+    expect(screen.queryByLabelText('참고 회로도 보기 도구')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '확대' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '화면 맞춤' })).not.toBeInTheDocument()
   })
 
   it('renders symmetric 8P and 12P bases and connects exact terminals', async () => {

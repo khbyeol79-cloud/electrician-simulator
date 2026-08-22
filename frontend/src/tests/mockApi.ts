@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.11.2',
+  version: '0.11.3',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.11.2',
+  version: '0.11.3',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -125,7 +125,7 @@ function response(data: unknown, status = 200): Response {
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number; actualOperation?: boolean }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number; actualOperation?: boolean; freeCircuitSaveFailures?: number }) {
   const problems = options?.problems ?? [problemSummary]
   let operationState: OperationSessionState = {
     session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
@@ -158,6 +158,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     editor: { schema_version: '1.0', mode: 'graphic', template_id: 'basic_board_001' }, updated_at: null,
   }
   let freeCreated = false
+  let freeCircuitSaveFailures = options?.freeCircuitSaveFailures ?? 0
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
     if (url === '/api/health') return response(health)
@@ -166,7 +167,10 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     if (url === '/api/free-circuits' && (!init?.method || init.method === 'GET')) return response(freeCreated ? [{ workspace_id: freeCircuit.workspace_id, name: freeCircuit.name, schema_version: '1.0', template_id: 'basic_board_001', connection_count: freeCircuit.connections.length, updated_at: freeCircuit.updated_at }] : [])
     if (url === '/api/free-circuits/workspaces' && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
     if (url === '/api/free-circuits/self_hold_01' && (!init?.method || init.method === 'GET')) return response(freeCircuit)
-    if (url === '/api/free-circuits/self_hold_01' && init?.method === 'PUT') { Object.assign(freeCircuit, JSON.parse(String(init.body))); return response(freeCircuit) }
+    if (url === '/api/free-circuits/self_hold_01' && init?.method === 'PUT') {
+      if (freeCircuitSaveFailures > 0) { freeCircuitSaveFailures -= 1; return response({ detail: '시험용 저장 실패' }, 500) }
+      Object.assign(freeCircuit, JSON.parse(String(init.body))); return response(freeCircuit)
+    }
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'DELETE') { freeCreated = false; return response(undefined, 204) }
     if (url === '/api/free-circuits/self_hold_01/sessions' && init?.method === 'POST') return response({ ...operationState, problem_id: 'free:self_hold_01' }, 201)
     if (url === '/api/free-circuits/self_hold_01/diagnostics') return response({ status: 'attention', diagnostics: [{ severity: 'warning', code: 'empty_wiring', message: '아직 연결된 전선이 없습니다.' }] })

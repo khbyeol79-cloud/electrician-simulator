@@ -1,11 +1,12 @@
 {
   "name": "electrician-simulator-frontend",
   "private": true,
-  "version": "0.11.2",
+  "version": "0.11.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"

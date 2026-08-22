@@ -8,9 +8,6 @@ const stages = [
   { number: 3, path: '/operation', label: '동작시험', detail: '완성 회로 작동 확인' },
 ]
 
-const statusLabels = { draft: '작성 중', reviewed: '검토됨', verified: '검증 완료' }
-const difficultyLabels = { beginner: '초급', intermediate: '중급', advanced: '고급' }
-
 export function StageNavigation({ problem }: { problem?: PublicProblemDetail }) {
   const [completed, setCompleted] = useState(0)
   const refreshProgress = useCallback(async () => {
@@ -54,21 +51,6 @@ export function StageNavigation({ problem }: { problem?: PublicProblemDetail }) 
           <span className="stage-number">∞</span><span className="stage-copy"><strong>자유회로 실험</strong><small>정답 없이 실제 결선 계산</small></span>
         </NavLink>
       </nav>
-      <div className="problem-summary">
-        <span>문제 정보</span>
-        <strong>{problem?.title ?? '선택된 문제가 없습니다'}</strong>
-        {problem ? (
-          <dl>
-            <div><dt>ID</dt><dd>{problem.problem_id}</dd></div>
-            <div><dt>상태</dt><dd>{statusLabels[problem.status]}</dd></div>
-            <div><dt>난이도</dt><dd>{difficultyLabels[problem.difficulty]}</dd></div>
-            <div><dt>시간</dt><dd>{problem.estimated_minutes}분</dd></div>
-            <div><dt>전원</dt><dd>{problem.power_supply.system}</dd></div>
-          </dl>
-        ) : (
-          <p>상단의 현재 문제 영역에서 문제를 선택하세요.</p>
-        )}
-      </div>
     </aside>
   )
 }

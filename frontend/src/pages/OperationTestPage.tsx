@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEventHandler } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   applyOperationAction,
@@ -26,8 +26,6 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
   const [setup, setSetup] = useState<OperationSetup>()
   const [session, setSession] = useState<OperationSessionState>()
   const [checkResult, setCheckResult] = useState<OperationCheckResult>()
-  const [zoom, setZoom] = useState(1)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
   const [loading, setLoading] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
@@ -35,13 +33,12 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
   const tickingRef = useRef(false)
   const actionQueueRef = useRef<Promise<void>>(Promise.resolve())
   const activeMomentaryRef = useRef(new Set<string>())
-  const dragRef = useRef<{ pointerId: number; x: number; y: number; panX: number; panY: number } | undefined>(undefined)
 
   useEffect(() => {
     if (!problem) return
     const controller = new AbortController()
     let createdSession: string | undefined
-    setLoading(true); setError(undefined); setSetup(undefined); setSession(undefined); setCheckResult(undefined); setZoom(1); setPan({ x: 0, y: 0 })
+    setLoading(true); setError(undefined); setSetup(undefined); setSession(undefined); setCheckResult(undefined)
     getOperationSetup(problem.problem_id, controller.signal)
       .then(async (value) => {
         if (controller.signal.aborted) return
@@ -131,20 +128,6 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
   const connections = setup?.wiring_snapshot?.connections ?? setup?.wiring_draft?.connections ?? []
   const submission = setup?.wiring_submission
 
-  const fit = () => { setZoom(1); setPan({ x: 0, y: 0 }) }
-  const handleDragStart: PointerEventHandler<SVGSVGElement> = (event) => {
-    dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, panX: pan.x, panY: pan.y }
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-  const handleDragMove: PointerEventHandler<SVGSVGElement> = (event) => {
-    const drag = dragRef.current
-    if (!drag || drag.pointerId !== event.pointerId) return
-    setPan({ x: drag.panX + (event.clientX - drag.x) / zoom, y: drag.panY + (event.clientY - drag.y) / zoom })
-  }
-  const handleDragEnd: PointerEventHandler<SVGSVGElement> = (event) => {
-    if (dragRef.current?.pointerId === event.pointerId) dragRef.current = undefined
-  }
-
   const runCheck = async () => {
     if (!sessionRef.current) return
     setBusy(true)
@@ -170,13 +153,10 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
     {error && <div className="circuit-load-error compact" role="alert"><strong>동작시험 안내</strong><span>{error}</span></div>}
     {!loading && setup && <div className="operation-layout">
       <div className="wiring-stage operation-stage">
-        <div className="wiring-toolbar" aria-label="동작시험 제어함 보기 도구">
-          <button aria-label="확대" onClick={() => setZoom((value) => Math.min(1.6, value + .1))}>＋</button>
-          <button aria-label="축소" onClick={() => setZoom((value) => Math.max(.65, value - .1))}>－</button>
-          <button onClick={fit}>화면 맞춤</button>
-          <span className="mounting-readonly-note">배선과 기구는 읽기 전용 · 빈 공간을 드래그해 이동</span>
+        <div className="wiring-toolbar" aria-label="동작시험 제어함 안내">
+          <span className="mounting-readonly-note">배선과 기구는 읽기 전용 · 화면 자동 맞춤</span>
         </div>
-        <OperationBoard board={setup.board} connections={connections} placements={placements} zoom={zoom} pan={pan} energizedSocketIds={energizedSocketIds} onPointerDown={handleDragStart} onPointerMove={handleDragMove} onPointerUp={handleDragEnd} />
+        <OperationBoard board={setup.board} connections={connections} placements={placements} zoom={1} energizedSocketIds={energizedSocketIds} />
       </div>
       <aside className="wiring-panel operation-panel">
         <section className={setup.operation_ready ? 'operation-ready-card' : 'operation-next-warning'}>

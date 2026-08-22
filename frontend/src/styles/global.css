@@ -14,6 +14,7 @@
   --green: #148a50;
   --orange: #d97706;
   --red: #c93b3b;
+  --work-panel-width: clamp(340px, 19vw, 380px);
 }
 
 * { box-sizing: border-box; }
@@ -75,15 +76,6 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .stage-link.active small { color: #dbe9ff; }
 .stage-link.free-stage { margin-top: 8px; border-color: #a7d8d2; background: #effcf9; }
 .stage-link.free-stage.active { border-color: #0f766e; background: linear-gradient(135deg, #0f766e, #14b8a6); }
-.problem-summary { margin-top: auto; padding: 13px; border: 1px solid #dce4ee; border-radius: 7px; background: #fff; }
-.problem-summary span { display: block; color: var(--blue-600); font-size: 10px; font-weight: 800; margin-bottom: 6px; }
-.problem-summary strong { font-size: 12px; }
-.problem-summary p { color: var(--muted); font-size: 10px; line-height: 1.55; margin: 7px 0 0; }
-.problem-summary dl { display: grid; gap: 5px; margin: 10px 0 0; font-size: 9px; }
-.problem-summary dl div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid #edf1f5; padding-bottom: 4px; }
-.problem-summary dt { color: #7a899f; }
-.problem-summary dd { margin: 0; color: #31435d; font-weight: 700; text-align: right; }
-
 .main-content { min-width: 0; min-height: 0; position: relative; padding: 16px; background: #e9eff6; }
 .workspace-page { height: 100%; min-height: 0; display: grid; grid-template-rows: 66px minmax(0, 1fr); border: 1px solid #d4deea; border-radius: 7px; overflow: hidden; background: #fff; box-shadow: 0 4px 16px rgba(27, 49, 78, .07); }
 .workspace-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 17px; border-bottom: 1px solid #dce4ee; }
@@ -119,6 +111,10 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .free-workspace-list button small { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: #728197; font-size: 8px; }
 .free-mode-notice { border-left: 4px solid #0f766e !important; background: #f0fbf9 !important; }
 .free-mode-notice > strong { color: #0f665f; font-size: 11px; }
+.autosave-status { margin: 8px 0; padding: 7px 9px; color: #52677f; border: 1px solid #d5e0ea; border-radius: 4px; background: #f7f9fc; font-size: 10px; font-weight: 800; }
+.autosave-status.pending, .autosave-status.saving { color: #785100; border-color: #ead09b; background: #fff8e8; }
+.autosave-status.saved { color: #0c7043; border-color: #a9dcc3; background: #edf9f3; }
+.autosave-status.error { color: #a02f2f; border-color: #e5b8b8; background: #fff1f1; }
 .operation-start { margin-top: 7px; background: #0f766e; }
 .free-device-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
 .free-device-tags span { padding: 5px 7px; border: 1px solid #d5e0ea; border-radius: 12px; color: #475a72; background: #f7f9fc; font-size: 8px; }
@@ -176,7 +172,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .circuit-workspace { grid-template-rows: 66px minmax(0, 1fr); }
 .circuit-overview { display: flex; gap: 6px; }
 .circuit-overview span { padding: 5px 7px; color: #40526c; border: 1px solid #d7e0eb; background: #f7f9fc; font-size: 9px; }
-.circuit-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 292px; }
+.circuit-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--work-panel-width); }
 .diagram-stage { min-width: 0; min-height: 0; position: relative; display: grid; grid-template-rows: 44px minmax(0, 1fr); overflow: hidden; background: #eef2f7; }
 .diagram-toolbar { display: flex; align-items: center; gap: 5px; padding: 5px 9px; border-bottom: 1px solid #ccd7e4; background: #fff; }
 .diagram-toolbar button { height: 30px; padding: 0 9px; color: #354a66; border: 1px solid #cfd9e6; border-radius: 4px; background: #f7f9fc; font-size: 10px; }
@@ -244,7 +240,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-header { background: #fff; }
 .wiring-stats { display: flex; gap: 6px; }
 .wiring-stats span { padding: 6px 9px; color: #315276; border: 1px solid #d4dfeb; background: #f6f9fc; font-size: 10px; }
-.wiring-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 294px; }
+.wiring-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--work-panel-width); }
 .wiring-stage { min-width: 0; min-height: 0; display: grid; grid-template-rows: 44px minmax(0, 1fr); overflow: hidden; background: #dce4ed; }
 .wiring-stage.has-external-wiring { grid-template-rows: 44px auto minmax(0, 1fr); }
 .wiring-toolbar { display: flex; align-items: center; gap: 5px; padding: 5px 8px; border-bottom: 1px solid #c9d5e2; background: #fff; overflow-x: auto; }
@@ -252,8 +248,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .wiring-toolbar button:hover:not(:disabled), .wiring-toolbar button.active { color: #fff; border-color: #1265e8; background: #1265e8; }
 .wiring-toolbar button.danger { color: #a53131; border-color: #e3baba; background: #fff5f5; }
 .toolbar-separator { width: 1px; height: 22px; margin: 0 3px; background: #d7e0ea; }
+.board-auto-fit-label { margin-left: auto; padding: 5px 8px; color: #52677f; border: 1px solid #d5e0ea; border-radius: 4px; background: #eef3f8; font-size: 9px; font-weight: 800; white-space: nowrap; }
 .wiring-board-scroll { min-height: 0; overflow: auto; padding: 10px; }
-.wiring-board { width: 100%; min-width: 820px; height: 100%; min-height: 540px; display: block; background: #cfd8e3; touch-action: none; }
+.wiring-board { width: 100%; min-width: 0; height: 100%; min-height: 0; display: block; background: #cfd8e3; touch-action: none; }
 .board-background { fill: #e8dfcc; stroke: #9c8f75; stroke-width: 3; }
 .routing-channel-layer rect { fill: rgba(74, 111, 151, .035); stroke: rgba(74, 111, 151, .13); stroke-width: 1; stroke-dasharray: 8 7; }
 .board-item-body { fill: #263341; stroke: #111b26; stroke-width: 3; vector-effect: non-scaling-stroke; }
@@ -306,11 +303,11 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .external-device-card small { grid-column: 2; color: #6b7d91; font-size: 7px; }
 .external-wire-swatch { width: 7px; height: 18px; grid-row: 1 / 3; border-radius: 4px; background: #e0a500; }
 .external-wire-swatch.brown { background: #7a3f25; }.external-wire-swatch.black { background: #171b22; }.external-wire-swatch.gray { background: #77808a; }
-.wiring-panel { min-height: 0; overflow: auto; display: flex; flex-direction: column; padding: 10px; border-left: 1px solid #c9d5e2; background: #f6f8fb; }
+.wiring-panel { min-height: 0; overflow: auto; display: flex; flex-direction: column; padding: 11px; border-left: 1px solid #c9d5e2; background: #f6f8fb; font-size: 11px; }
 .wiring-panel section { flex: 0 0 auto; margin-bottom: 9px; padding: 12px; border: 1px solid #d5dfeb; border-radius: 5px; background: #fff; }
-.wiring-panel h3 { margin: 0 0 7px; font-size: 14px; word-break: break-all; }
-.wiring-panel p { margin: 5px 0; color: #687991; font-size: 9px; line-height: 1.55; }
-.wiring-panel dl { display: grid; gap: 5px; margin: 0 0 9px; font-size: 9px; }
+.wiring-panel h3 { margin: 0 0 7px; font-size: 15px; word-break: break-word; }
+.wiring-panel p { margin: 5px 0; color: #687991; font-size: 11px; line-height: 1.55; }
+.wiring-panel dl { display: grid; gap: 5px; margin: 0 0 9px; font-size: 10px; }
 .wiring-panel dl div { display: flex; justify-content: space-between; gap: 8px; }
 .wiring-panel dt { color: #718198; }
 .wiring-panel dd { margin: 0; color: #263b57; font-weight: 800; }
@@ -324,13 +321,14 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .circuit-reference-header h3 { margin: 0; font-size: 13px; }
 .circuit-reference-header > strong { flex: none; color: #174f94; font-size: 9px; }
 .circuit-reference-stage { width: 100%; height: 300px; min-height: 300px; grid-template-rows: 36px minmax(0, 1fr); border-top: 1px solid #d5dfeb; border-bottom: 1px solid #d5dfeb; background: #eef2f7; }
+.circuit-reference-stage.toolbarless { grid-template-rows: minmax(0, 1fr); }
 .circuit-reference-stage .diagram-toolbar { gap: 3px; padding: 3px 5px; overflow-x: auto; }
 .circuit-reference-stage .diagram-toolbar button { height: 27px; padding: 0 6px; font-size: 8px; }
 .circuit-reference-stage .diagram-toolbar span { white-space: nowrap; font-size: 8px; }
 .circuit-reference-stage .circuit-svg { min-width: 0; min-height: 0; }
 .wiring-panel .circuit-reference-empty { margin: 0; padding: 7px 11px; color: #925800; background: #fff7e4; }
 .wiring-panel .circuit-reference-note { margin: 0; padding: 8px 11px 10px; }
-.wire-color-select { display: grid; gap: 5px; margin-top: 10px; color: #5d6f86; font-size: 9px; }
+.wire-color-select { display: grid; gap: 5px; margin-top: 10px; color: #5d6f86; font-size: 10px; }
 .wire-color-select select { height: 31px; border: 1px solid #bdcad9; border-radius: 4px; background: #fff; }
 .wiring-result { display: grid; gap: 4px; margin: 8px 0; padding: 8px; font-size: 9px; }
 .wiring-result > b { width: fit-content; padding: 2px 6px; border: 1px solid currentColor; border-radius: 10px; font-size: 8px; }
@@ -342,7 +340,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 .mounting-workspace { grid-template-rows: 66px minmax(0, 1fr); }
 .mounting-header { background: #fff; }
-.mounting-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; }
+.mounting-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--work-panel-width); }
 .mounting-stage { background: #dce4ed; }
 .mounting-readonly-note { margin-left: auto; padding: 5px 8px; color: #51647d; border: 1px solid #d6e0eb; background: #eef3f8; font-size: 9px; white-space: nowrap; }
 .mounting-board-scroll { position: relative; }
@@ -394,50 +392,49 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 
 .operation-workspace { grid-template-rows: 66px minmax(0, 1fr); }
 .operation-header { background: #fff; }
-.operation-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
+.operation-layout { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--work-panel-width); }
 .operation-stage { background: #dce4ed; }
 .operation-board-scroll { position: relative; }
-.operation-board { cursor: grab; touch-action: none; }
-.operation-board:active { cursor: grabbing; }
+.operation-board { cursor: default; touch-action: none; }
 .operation-board .board-pin.static, .operation-board .board-wire.readonly, .operation-board .fixed-device-layer { pointer-events: none; }
 .operation-board .board-wire.readonly { opacity: .88; }
 .operation-panel { padding-bottom: 10px; overflow-y: auto; }
 .operation-ready-card { color: #08713f; border-left: 4px solid var(--green) !important; background: #eefaf3 !important; }
-.operation-ready-card strong, .operation-next-warning strong { font-size: 10px; }
+.operation-ready-card strong, .operation-next-warning strong { font-size: 12px; }
 .operation-ready-card p { color: #3d7157 !important; }
 .operation-next-warning { color: #805000; border-left: 4px solid var(--orange) !important; background: #fff8e8 !important; }
 .operation-next-warning p { color: #765f35 !important; }
-.operation-ready-card small, .operation-next-warning small { display: block; margin-top: 5px; color: #61738a; font-size: 8px; }
+.operation-ready-card small, .operation-next-warning small { display: block; margin-top: 5px; color: #61738a; font-size: 10px; }
 .fixed-device.energized .mounted-device-shell { filter: drop-shadow(0 0 8px rgba(18,101,232,.75)); }
 .fixed-device.energized .mounted-device-shell { stroke: #1265e8; stroke-width: 4; }
 .device-on-badge { fill: #1265e8; font-size: 11px; font-weight: 900; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
-.operation-section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 10px; }
-.operation-section-title span { color: #61738a; font-size: 8px; font-weight: 800; }
+.operation-section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
+.operation-section-title span { color: #61738a; font-size: 10px; font-weight: 800; }
 .power-switch { width: 100%; height: 40px; margin-bottom: 8px; color: #fff; border: 1px solid #a62d2d; border-radius: 5px; background: #c93b3b; font-weight: 900; }
 .power-switch.on { border-color: #08713f; background: #148a50; }
 .control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .control-button { min-height: 48px; display: grid; gap: 2px; place-content: center; color: #263d59; border: 1px solid #b9c8da; border-radius: 5px; background: #f7f9fc; }
-.control-button b { font-size: 11px; }
-.control-button span { color: #687b93; font-size: 8px; }
+.control-button b { font-size: 12px; }
+.control-button span { color: #687b93; font-size: 10px; }
 .control-button.active { color: #fff; border-color: #1265e8; background: #1265e8; box-shadow: inset 0 2px 4px rgba(0,0,0,.2); }
 .control-button.active span { color: #e6efff; }
 .status-chip-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
 .status-chip { min-width: 0; display: grid; gap: 3px; padding: 7px; color: #5b6d83; border: 1px solid #d3dde8; border-left: 4px solid #9aa9ba; background: #f8fafc; }
-.status-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; }
-.status-chip b { color: #304761; font-size: 9px; }
+.status-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+.status-chip b { color: #304761; font-size: 10px; }
 .status-chip.on, .status-chip.completed, .status-chip.lamp.on, .status-chip.motor.forward, .status-chip.motor.reverse { border-left-color: #148a50; background: #edf9f2; }
 .status-chip.timing { border-left-color: #d97706; background: #fff8e8; }
 .status-chip.phase_loss, .status-chip.simultaneous_fault, .status-chip.connection_error { border-left-color: #c93b3b; background: #fff1f1; }
-.operation-faults p, .operation-log li { margin: 3px 0; color: #5e6f84; font-size: 8px; line-height: 1.4; }
+.operation-faults p, .operation-log li { margin: 3px 0; color: #5e6f84; font-size: 10px; line-height: 1.45; }
 .operation-faults.active { border-left: 4px solid #c93b3b !important; background: #fff1f1 !important; }
 .operation-log ol { max-height: 82px; margin: 6px 0 0; padding-left: 18px; overflow: auto; }
 .operation-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.operation-actions button { min-height: 35px; color: #fff; border-radius: 4px; background: #1265e8; font-size: 9px; font-weight: 800; }
+.operation-actions button { min-height: 35px; color: #fff; border-radius: 4px; background: #1265e8; font-size: 10px; font-weight: 800; }
 .operation-actions .secondary-action { margin: 0; color: #24517f; background: #eef3f8; }
 .protection-controls { display: grid; gap: 6px; margin-top: 9px; padding-top: 8px; border-top: 1px solid #d7e0ea; }
-.protection-controls p { margin: 0; color: #8a5a08; font-size: 8px; line-height: 1.45; }
+.protection-controls p { margin: 0; color: #8a5a08; font-size: 10px; line-height: 1.45; }
 .protection-controls > div { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.protection-controls button { min-height: 32px; border-radius: 4px; font-size: 8px; font-weight: 800; }
+.protection-controls button { min-height: 32px; border-radius: 4px; font-size: 10px; font-weight: 800; }
 .protection-controls .fault-trigger { color: #8d2d22; border-color: #e6b7ad; background: #fff3ef; }
 .protection-controls .fault-reset { color: #244e78; border-color: #b8cce0; background: #eff6fd; }
 .status-chip.motor b { display: inline-flex; gap: 5px; align-items: center; }
@@ -447,7 +444,7 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .status-chip.motor.simultaneous_fault, .status-chip.motor.protection_trip { border-color: #e3a6a6; background: #fff2f2; }
 .status-chip.protection.reset_required, .status-chip.protection.tripped { border-color: #e0a76b; background: #fff7e9; }
 .operation-interlocks { display: grid; gap: 5px; }
-.operation-interlocks p { display: grid; grid-template-columns: 48px 1fr auto; gap: 6px; align-items: center; margin: 0; padding: 6px; border: 1px solid #dce5ef; border-radius: 4px; color: #50657c; font-size: 8px; }
+.operation-interlocks p { display: grid; grid-template-columns: 54px 1fr auto; gap: 6px; align-items: center; margin: 0; padding: 6px; border: 1px solid #dce5ef; border-radius: 4px; color: #50657c; font-size: 10px; }
 .operation-interlocks p b { color: #173e69; }
 .operation-interlocks p em { color: #587088; font-style: normal; font-weight: 800; }
 .operation-interlocks p.blocking { border-color: #e7b36d; background: #fff8ea; }
@@ -455,13 +452,12 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .operation-check-result { display: grid; gap: 4px; border-left: 4px solid #c93b3b !important; background: #fff1f1 !important; }
 .operation-check-result.passed { border-left-color: #148a50 !important; background: #edf9f2 !important; }
 .operation-check-result.warning { border-left-color: #d97706 !important; background: #fff8e8 !important; }
-.operation-check-result p, .operation-check-result span { margin: 0; color: #5e6f84; font-size: 8px; }
+.operation-check-result p, .operation-check-result span { margin: 0; color: #5e6f84; font-size: 10px; }
 .secondary-action { margin-top: auto; color: #24517f; border: 1px solid #a9bfd8; background: #eef3f8; }
 .secondary-action:hover { color: #fff; background: #315f91; }
 
 @media (max-width: 1280px) {
-  .mounting-layout { grid-template-columns: minmax(0, 1fr) 292px; }
-  .operation-layout { grid-template-columns: minmax(0, 1fr) 310px; }
+  :root { --work-panel-width: 320px; }
 }
 
 .status-bar { display: flex; align-items: center; gap: 22px; padding: 0 15px; color: #5a6980; border-top: 1px solid #cfd9e5; background: #f8fafc; font-size: 10px; }
@@ -519,5 +515,4 @@ button:disabled { cursor: not-allowed; opacity: .48; }
   .header-actions button:nth-of-type(n+3) { display: none; }
   .app-body { grid-template-columns: 220px minmax(0, 1fr); }
   .socket-preview-grid { grid-template-columns: 1fr; }
-  .circuit-layout { grid-template-columns: minmax(0, 1fr) 265px; }
 }

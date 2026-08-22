@@ -57,23 +57,23 @@ function AnswerMarkers({ element, question, draft, result }: { element: DiagramE
   </g>
 }
 
-export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, ariaLabel = '시퀀스 회로도' }: {
+export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, showToolbar = !compact, ariaLabel = '시퀀스 회로도' }: {
   diagram: SchematicDiagram; questions: SocketQuestion[]; selectedQuestionId: string | null
   draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
-  readOnly?: boolean; compact?: boolean; ariaLabel?: string
+  readOnly?: boolean; compact?: boolean; showToolbar?: boolean; ariaLabel?: string
 }) {
   const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4, mapClientToViewBox: true } : undefined)
   const zoomStep = compact ? 0.3 : 0.15
   const questionMap = Object.fromEntries(questions.map((question) => [question.question_id, question]))
-  return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}`}>
-    <div className="diagram-toolbar" aria-label={compact ? '참고 회로도 보기 도구' : '회로도 보기 도구'}>
+  return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}${showToolbar ? '' : ' toolbarless'}`}>
+    {showToolbar && <div className="diagram-toolbar" aria-label={compact ? '참고 회로도 보기 도구' : '회로도 보기 도구'}>
       <button type="button" onClick={() => viewport.zoomBy(zoomStep)} aria-label="확대">＋</button>
       <button type="button" onClick={() => viewport.zoomBy(-zoomStep)} aria-label="축소">－</button>
       <button type="button" onClick={viewport.fit}>화면 맞춤</button>
       <button type="button" onClick={viewport.reset}>100%</button>
       <span>{Math.round(viewport.zoom * 100)}%</span>
       <span>✋ 드래그 이동</span>
-    </div>
+    </div>}
     <svg
       className="circuit-svg" role="img" aria-label={ariaLabel}
       viewBox={`${diagram.view_box.x} ${diagram.view_box.y} ${diagram.view_box.width} ${diagram.view_box.height}`}

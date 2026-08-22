@@ -1,1 +1,2 @@
-frontend/dist/assets/index-B0sLCTUY.js
+frontend/dist/assets/index-DY3_tYgr.js
+frontend/dist/assets/index-BUK8lGZO.css

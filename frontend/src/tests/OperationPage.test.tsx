@@ -133,12 +133,14 @@ describe('동작시험', () => {
     })
   })
 
-  it('supports zoom and returns to the editable wiring stage', async () => {
+  it('uses automatic board fit without zoom buttons and returns to the editable wiring stage', async () => {
     installApiMock({ operationSetup: readySetup })
     const user = userEvent.setup()
     render(<MemoryRouter initialEntries={['/operation']}><Routes><Route path="/operation" element={<OperationTestPage problem={trainingDetail} />} /><Route path="/wiring" element={<h2>제어함 결선 돌아옴</h2>} /></Routes></MemoryRouter>)
     await screen.findByRole('img', { name: '동작시험 준비 제어함' })
-    await user.click(screen.getByRole('button', { name: '확대' }))
+    expect(screen.queryByRole('button', { name: '확대' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '화면 맞춤' })).not.toBeInTheDocument()
+    expect(screen.getByText(/화면 자동 맞춤/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '선택 전선 삭제' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '결선 화면으로 돌아가기' }))
     expect(screen.getByRole('heading', { name: '제어함 결선 돌아옴' })).toBeInTheDocument()

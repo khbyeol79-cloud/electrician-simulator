@@ -2,11 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   applyOperationAction, createFreeCircuitSession, createFreeCircuitWorkspace, deleteFreeCircuitWorkspace,
   deleteOperationSession, getFreeCircuitDiagnostics, getFreeCircuitWorkspace,
-  getFreeCircuitWorkspaces, resetOperationSession, saveFreeCircuitWorkspace,
+  getFreeCircuitWorkspaces, resetOperationSession,
   type FreeCircuitDiagnostics, type FreeCircuitWorkspace,
   type FreeCircuitWorkspaceSummary, type OperationSessionState, type WiringConnection,
 } from '../api/client'
 import { OperationBoard } from '../features/operation/components/OperationBoard'
+import { isTextEditingTarget, useFreeCircuitAutosave } from '../features/free-circuit/useFreeCircuitAutosave'
 import { WiringBoard } from '../features/wiring/components/WiringBoard'
 import { isFreeJunction, terminalBlockBank, terminalBlockUsage } from '../features/wiring/engine/terminalCapacity'
 
@@ -21,7 +22,6 @@ export function FreeCircuitPage() {
   const [selectedPin, setSelectedPin] = useState<string | null>(null)
   const [selectedWire, setSelectedWire] = useState<number | null>(null)
   const [selectedSummaryTerminal, setSelectedSummaryTerminal] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(1)
   const [notice, setNotice] = useState<string>()
   const [error, setError] = useState<string>()
   const [busy, setBusy] = useState(false)
@@ -30,6 +30,19 @@ export function FreeCircuitPage() {
   const dragStart = useRef<string | null>(null)
   const suppressClick = useRef(false)
   const sessionRef = useRef<string | undefined>(undefined)
+
+  const handleAutosaveSaved = useCallback((saved: FreeCircuitWorkspace) => {
+    setWorkspace((current) => current?.workspace_id === saved.workspace_id
+      ? { ...current, updated_at: saved.updated_at }
+      : current)
+    setError(undefined)
+  }, [])
+  const handleAutosaveError = useCallback((message: string) => setError(`자동 저장 실패: ${message}`), [])
+  const autosave = useFreeCircuitAutosave({
+    workspace, connections, mode,
+    onSaved: handleAutosaveSaved,
+    onError: handleAutosaveError,
+  })
 
   const reloadList = useCallback(async () => setSummaries(await getFreeCircuitWorkspaces()), [])
   useEffect(() => {
@@ -76,6 +89,7 @@ export function FreeCircuitPage() {
   const commit = (next: WiringConnection[]) => {
     setHistory((items) => [...items.slice(-29), connections]); setFuture([]); setConnections(next)
     setSelectedWire(null); setSelectedSummaryTerminal(null); setNotice(undefined); setDiagnostics(undefined)
+    autosave.schedule({ connections: next })
   }
   const connect = (from: string, to: string) => {
     if (from === to) { setNotice('같은 단자끼리는 연결할 수 없습니다.'); return }
@@ -111,15 +125,35 @@ export function FreeCircuitPage() {
     const from = dragStart.current; dragStart.current = null
     if (from && from !== terminalId) { suppressClick.current = true; connect(from, terminalId) }
   }
-  const undo = () => { const previous = history.at(-1); if (!previous) return; setFuture((items) => [connections, ...items]); setConnections(previous); setHistory((items) => items.slice(0, -1)); setSelectedWire(null) }
-  const redo = () => { const next = future[0]; if (!next) return; setHistory((items) => [...items, connections]); setConnections(next); setFuture((items) => items.slice(1)); setSelectedWire(null) }
+  const undo = () => { const previous = history.at(-1); if (!previous) return; setFuture((items) => [connections, ...items]); setConnections(previous); setHistory((items) => items.slice(0, -1)); setSelectedWire(null); autosave.schedule({ connections: previous }) }
+  const redo = () => { const next = future[0]; if (!next) return; setHistory((items) => [...items, connections]); setConnections(next); setFuture((items) => items.slice(1)); setSelectedWire(null); autosave.schedule({ connections: next }) }
+  const removeSelected = () => {
+    if (selectedWire === null || !connections[selectedWire]) return
+    commit(connections.filter((_, index) => index !== selectedWire))
+  }
+  const changeMode = (nextMode: 'graphic' | 'summary') => {
+    if (nextMode === mode) return
+    setMode(nextMode)
+    setSelectedWire(null); setSelectedSummaryTerminal(null)
+    autosave.schedule({ mode: nextMode })
+  }
+
+  useEffect(() => {
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key !== 'Delete' || selectedWire === null || isTextEditingTarget(event.target)) return
+      event.preventDefault()
+      removeSelected()
+    }
+    window.addEventListener('keydown', keydown)
+    return () => window.removeEventListener('keydown', keydown)
+  })
 
   const save = async () => {
     if (!workspace) return
     setBusy(true)
     try {
-      const value = await saveFreeCircuitWorkspace({ ...workspace, connections, editor: { ...workspace.editor, mode } })
-      setWorkspace(value); await reloadList(); setNotice('자유회로를 저장했습니다.'); setError(undefined)
+      await autosave.saveNow()
+      await reloadList(); setNotice('자유회로를 저장했습니다.'); setError(undefined)
     } catch (reason) { setNotice(reason instanceof Error ? reason.message : '자유회로를 저장할 수 없습니다.') }
     finally { setBusy(false) }
   }
@@ -127,7 +161,7 @@ export function FreeCircuitPage() {
     if (!workspace) return
     setBusy(true)
     try {
-      await saveFreeCircuitWorkspace({ ...workspace, connections, editor: { ...workspace.editor, mode } })
+      await autosave.flushPending()
       if (sessionRef.current) await deleteOperationSession(sessionRef.current).catch(() => undefined)
       const state = await createFreeCircuitSession(workspace.workspace_id)
       sessionRef.current = state.session_id; setOperation(state); setDiagnostics(await getFreeCircuitDiagnostics(workspace.workspace_id)); setError(undefined)
@@ -151,7 +185,7 @@ export function FreeCircuitPage() {
   const removeWorkspace = async () => {
     if (!workspace || !window.confirm(`'${workspace.name}' 작업공간을 삭제하시겠습니까?`)) return
     setBusy(true)
-    try { await deleteFreeCircuitWorkspace(workspace.workspace_id); setWorkspace(undefined); setConnections([]); setOperation(undefined); await reloadList() }
+    try { await autosave.flushPending(); autosave.discardPending(); await deleteFreeCircuitWorkspace(workspace.workspace_id); setWorkspace(undefined); setConnections([]); setOperation(undefined); await reloadList() }
     catch (reason) { setNotice(reason instanceof Error ? reason.message : '작업공간을 삭제할 수 없습니다.') }
     finally { setBusy(false) }
   }
@@ -179,7 +213,7 @@ export function FreeCircuitPage() {
   if (operation && board) return <section className="workspace-page free-circuit-operation">
     <header className="workspace-toolbar"><div><span>자유회로 · 실제 결선 계산</span><h2>{workspace.name}</h2></div><div className="wiring-stats"><span>전원 {operation.power_state.toUpperCase()}</span><span>정답 채점 없음</span></div></header>
     <div className="operation-layout">
-      <div className="wiring-stage operation-stage"><div className="wiring-toolbar"><button onClick={() => setZoom((value) => Math.min(1.35, value + .1))}>＋</button><button onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button><span>현재 저장된 실제 결선 · 읽기 전용</span></div><OperationBoard board={board} connections={connections} placements={workspace.device_layout?.fixed_placements ?? []} zoom={zoom} energizedSocketIds={new Set(workspace.circuit.coils.filter((coil) => operation.coils[coil.coil_id]).map((coil) => coil.owner_device_id))} /></div>
+      <div className="wiring-stage operation-stage"><div className="wiring-toolbar"><span>현재 저장된 실제 결선 · 읽기 전용 · 화면 자동 맞춤</span></div><OperationBoard board={board} connections={connections} placements={workspace.device_layout?.fixed_placements ?? []} zoom={1} energizedSocketIds={new Set(workspace.circuit.coils.filter((coil) => operation.coils[coil.coil_id]).map((coil) => coil.owner_device_id))} /></div>
       <aside className="wiring-panel operation-panel"><section className="operation-ready-card"><span className="panel-kicker">자유회로 동작시험</span><h3>{operation.simulation_mode === 'actual_wiring' ? '실제 결선 모드 실행 중' : '기존 호환 모드 실행 중'}</h3><p>정답과 비교하지 않고 현재 결선의 Net과 접점 상태를 계산합니다.</p>{operation.catalog_composed && <span>공통 기구 카탈로그 적용</span>}</section>
         <section className="operation-controls"><button className={`power-switch ${operation.powered ? 'on' : ''}`} onClick={() => void perform({ action: 'set_power', value: !operation.powered })}>전원 {operation.powered ? 'OFF' : 'ON'}</button><div className="control-grid">{Object.entries(operation.controls).map(([id, state]) => state.mode === 'maintained' ? <button key={id} className={state.active ? 'control-button active' : 'control-button'} onClick={() => void perform({ action: 'toggle_control', control_id: id })}><b>{id}</b><span>{state.active ? '작동' : '복귀'}</span></button> : <button key={id} className={state.active ? 'control-button active' : 'control-button'} onPointerDown={() => void perform({ action: 'press_control', control_id: id })} onPointerUp={() => void perform({ action: 'release_control', control_id: id })} onPointerLeave={() => state.active && void perform({ action: 'release_control', control_id: id })}><b>{id}</b><span>{state.contact_type} · 누르는 동안</span></button>)}</div></section>
         {Object.entries(operation.protections).map(([id, state]) => <section key={id} className="protection-controls"><strong>{state.label}</strong><button disabled={state.status !== 'normal'} onClick={() => void perform({ action: 'trigger_fault', target_id: id, fault_type: 'overload' })}>과부하 발생</button><button disabled={state.status === 'normal'} onClick={() => void perform({ action: 'reset_fault', target_id: id })}>복귀</button></section>)}
@@ -197,9 +231,9 @@ export function FreeCircuitPage() {
 
   return <section className="workspace-page free-circuit-editor">
     <header className="workspace-toolbar"><div><span>자유회로 · 정답 채점 없음</span><h2>{workspace.name}</h2></div><div className="wiring-stats"><span>전선 {connections.length}</span><span>{templateLabel(workspace.editor.template_id)}</span><span>{workspace.operation.simulation_mode === 'actual_wiring' ? '실제 결선 모드' : '기존 호환 모드'}</span></div></header>
-    <div className="wiring-layout"><div className={`wiring-stage${externalDevices.length ? ' has-external-wiring' : ''}`}><div className="wiring-toolbar"><button className={mode === 'graphic' ? 'active' : ''} onClick={() => setMode('graphic')}>그래픽 모드</button><button className={mode === 'summary' ? 'active' : ''} onClick={() => setMode('summary')}>요약 모드</button><span className="toolbar-separator"/><button onClick={() => setZoom((value) => Math.min(1.35, value + .1))}>＋</button><button onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button><span className="toolbar-separator"/><button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={selectedWire === null} onClick={() => selectedWire !== null && commit(connections.filter((_, index) => index !== selectedWire))}>선택 전선 삭제</button><button className="danger" onClick={() => window.confirm('모든 전선을 초기화하시겠습니까?') && commit([])}>전체 초기화</button></div>
+    <div className="wiring-layout"><div className={`wiring-stage${externalDevices.length ? ' has-external-wiring' : ''}`}><div className="wiring-toolbar"><button className={mode === 'graphic' ? 'active' : ''} onClick={() => changeMode('graphic')}>그래픽 모드</button><button className={mode === 'summary' ? 'active' : ''} onClick={() => changeMode('summary')}>요약 모드</button><span className="toolbar-separator"/><button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={selectedWire === null} onClick={removeSelected}>선택 전선 삭제</button><button className="danger" onClick={() => window.confirm('모든 전선을 초기화하시겠습니까?') && commit([])}>전체 초기화</button><span className="board-auto-fit-label">화면 자동 맞춤</span></div>
       {externalDevices.length > 0 && <section className="external-wiring-tray"><div className="external-wiring-heading"><strong>외부 기구선</strong><span>외부선은 TB5 위쪽 또는 TB6 아래쪽 물리 포트로 연결됩니다.</span><small>같은 TB 번호: 외부측 2가닥 + 내부측 2가닥</small></div><div className="external-device-list">{externalDevices.map((device) => <article key={device.device_id} className="external-device-card"><strong>{device.label}</strong><div>{device.terminals.map((terminal) => { const linked = connections.findIndex((item) => item.from === terminal.terminal_id || item.to === terminal.terminal_id); return <button key={terminal.terminal_id} draggable={linked < 0} className={selectedPin === terminal.terminal_id ? 'selected' : ''} onClick={() => linked >= 0 ? setSelectedWire(linked) : pinClick(terminal.terminal_id)} onDragStart={(event) => event.dataTransfer.setData('application/x-electrician-terminal', terminal.terminal_id)}><span className={`external-wire-swatch ${terminal.wire_color}`}/>{terminal.terminal_id}<small>{linked >= 0 ? '연결됨' : '미연결'}</small></button>})}</div></article>)}</div></section>}
-      <WiringBoard board={board} connections={connections} externalDevices={externalDevices} mode={mode} selectedPin={selectedPin} selectedWire={selectedWire} selectedSummaryTerminal={selectedSummaryTerminal} zoom={zoom} onPinClick={pinClick} onPinPointerDown={(id) => { dragStart.current = id }} onPinPointerUp={pinPointerUp} onExternalDrop={(externalId, targetId) => connect(externalId, targetId)} onWireSelect={(index) => { setSelectedWire(index); setSelectedPin(null) }} onSummarySelect={(id, indices) => { setSelectedSummaryTerminal(id); setSelectedWire(indices[0] ?? null) }} onClearSelection={() => { setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null) }}/></div>
-      <aside className="wiring-panel"><section><span className="panel-kicker">작업공간</span><h3>{workspace.name}</h3><p>기구 배치는 시작 보드에서 고정되며 전선은 자유롭게 연결할 수 있습니다.</p><button className="secondary-action submit-circuit" disabled={busy} onClick={() => { setWorkspace(undefined); setConnections([]) }}>다른 작업공간</button></section><section><span className="panel-kicker">현재 선택</span><h3>{selectedWire === null ? selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요' : `${connections[selectedWire]?.from} → ${connections[selectedWire]?.to}`}</h3>{selectedWire !== null && <label className="wire-color-select">전선 색상<select value={connections[selectedWire].wire_color} onChange={(event) => commit(connections.map((item, index) => index === selectedWire ? { ...item, wire_color: event.target.value as WiringConnection['wire_color'] } : item))}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section><section className="free-mode-notice"><strong>정답 데이터 없음</strong><p>자유회로는 정답·오답으로 채점하지 않고 현재 결선으로 실제 논리 상태를 계산합니다.</p>{notice && <div className="submission-notice">{notice}</div>}{error && <div className="submission-notice">{error}</div>}<button className="submit-circuit" disabled={busy} onClick={() => void save()}>저장</button><button className="submit-circuit operation-start" disabled={busy} onClick={() => void startOperation()}>현재 결선으로 동작시험</button></section><section><span className="panel-kicker">기구 구성</span><p>0.11.2 통합 기본보드는 공통 기구 카탈로그를 실제 결선 계산에 연결합니다. 개별 기구 임의 배치는 0.12.0에서 확장합니다.</p><div className="free-device-tags">{workspace.circuit.devices.map((device) => <span key={device.device_id}>{device.label}</span>)}</div></section><button className="danger-zone-button" disabled={busy} onClick={() => void removeWorkspace()}>이 작업공간 삭제</button></aside></div>
+      <WiringBoard board={board} connections={connections} externalDevices={externalDevices} mode={mode} selectedPin={selectedPin} selectedWire={selectedWire} selectedSummaryTerminal={selectedSummaryTerminal} zoom={1} onPinClick={pinClick} onPinPointerDown={(id) => { dragStart.current = id }} onPinPointerUp={pinPointerUp} onExternalDrop={(externalId, targetId) => connect(externalId, targetId)} onWireSelect={(index) => { setSelectedWire(index); setSelectedPin(null) }} onSummarySelect={(id, indices) => { setSelectedSummaryTerminal(id); setSelectedWire(indices[0] ?? null) }} onClearSelection={() => { setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null) }}/></div>
+      <aside className="wiring-panel"><section><span className="panel-kicker">작업공간</span><h3>{workspace.name}</h3><p>기구 배치는 시작 보드에서 고정되며 전선은 자유롭게 연결할 수 있습니다.</p><button className="secondary-action submit-circuit" disabled={busy} onClick={async () => { try { await autosave.flushPending(); setWorkspace(undefined); setConnections([]) } catch { setNotice('자동 저장에 실패해 작업공간을 닫지 않았습니다. 다시 시도해 주세요.') } }}>다른 작업공간</button></section><section><span className="panel-kicker">현재 선택</span><h3>{selectedWire === null ? selectedPin ? `시작 단자 ${selectedPin}` : '단자를 선택하세요' : `${connections[selectedWire]?.from} → ${connections[selectedWire]?.to}`}</h3>{selectedWire !== null && <label className="wire-color-select">전선 색상<select value={connections[selectedWire].wire_color} onChange={(event) => commit(connections.map((item, index) => index === selectedWire ? { ...item, wire_color: event.target.value as WiringConnection['wire_color'] } : item))}><option value="yellow">노란색</option><option value="brown">갈색</option><option value="black">검은색</option><option value="gray">회색</option></select></label>}</section><section className="free-mode-notice"><strong>정답 데이터 없음</strong><p>자유회로는 정답·오답으로 채점하지 않고 현재 결선으로 실제 논리 상태를 계산합니다.</p><div className={`autosave-status ${autosave.status}`} role="status">{{ idle: '자동 저장 준비', pending: '저장 대기 중…', saving: '저장 중…', saved: '자동 저장됨', error: '저장 실패 · 다시 시도' }[autosave.status]}</div>{notice && <div className="submission-notice">{notice}</div>}{error && <div className="submission-notice">{error}</div>}<button className="submit-circuit" disabled={busy || autosave.status === 'saving'} onClick={() => void save()}>저장</button><button className="submit-circuit operation-start" disabled={busy} onClick={() => void startOperation()}>현재 결선으로 동작시험</button></section><section><span className="panel-kicker">기구 구성</span><p>0.11.3 통합 기본보드는 공통 기구 카탈로그를 실제 결선 계산에 연결합니다. 개별 기구 임의 배치는 0.12.0에서 확장합니다.</p><div className="free-device-tags">{workspace.circuit.devices.map((device) => <span key={device.device_id}>{device.label}</span>)}</div></section><button className="danger-zone-button" disabled={busy} onClick={() => void removeWorkspace()}>이 작업공간 삭제</button></aside></div>
   </section>
 }

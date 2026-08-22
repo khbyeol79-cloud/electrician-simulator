@@ -22,7 +22,7 @@ describe('App', () => {
     await waitFor(() => expect(screen.getAllByText('준비됨')).toHaveLength(2))
   })
 
-  it('selects a problem and updates the header and sidebar', async () => {
+  it('selects a problem, keeps the header, and omits the old sidebar problem card', async () => {
     installApiMock()
     const user = userEvent.setup()
     render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
@@ -39,7 +39,8 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /현재 문제.*기본 자기유지 회로 구조 연습/ })).toBeInTheDocument()
     })
-    expect(screen.getByText('3P3W_AC_220V')).toBeInTheDocument()
+    expect(screen.queryByText('문제 정보')).not.toBeInTheDocument()
+    expect(screen.queryByText('3P3W_AC_220V')).not.toBeInTheDocument()
     expect(await screen.findByRole('img', { name: '시퀀스 회로도' })).toBeInTheDocument()
     expect(screen.getByText('상단 6 5 4 3')).toBeInTheDocument()
     expect(screen.getByText('하단 7 8 1 2')).toBeInTheDocument()

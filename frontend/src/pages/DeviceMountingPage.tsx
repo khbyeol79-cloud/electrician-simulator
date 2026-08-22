@@ -35,7 +35,6 @@ export function DeviceMountingPage({ problem }: { problem?: PublicProblemDetail 
   const [history, setHistory] = useState<MountingPlacement[][]>([])
   const [future, setFuture] = useState<MountingPlacement[][]>([])
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(1)
   const [progress, setProgress] = useState<MountingProgress>()
   const [result, setResult] = useState<MountingAttemptResult>()
   const [notice, setNotice] = useState<string>()
@@ -54,7 +53,7 @@ export function DeviceMountingPage({ problem }: { problem?: PublicProblemDetail 
     if (!problem) return
     const controller = new AbortController()
     setLoading(true); setReady(false); setError(undefined); setNotice(undefined); setResult(undefined)
-    setSelectedDeviceId(null); setHistory([]); setFuture([]); setZoom(1)
+    setSelectedDeviceId(null); setHistory([]); setFuture([])
     Promise.all([
       getBoard(problem.problem_id, controller.signal),
       getWiringDraft(problem.problem_id, controller.signal),
@@ -182,11 +181,10 @@ export function DeviceMountingPage({ problem }: { problem?: PublicProblemDetail 
     {!loading && !error && board && mounting && <div className="mounting-layout">
       <div className="wiring-stage mounting-stage">
         <div className="wiring-toolbar" aria-label="기구 장착 편집 도구">
-          <button aria-label="확대" onClick={() => setZoom((value) => Math.min(1.4, value + .1))}>＋</button><button aria-label="축소" onClick={() => setZoom((value) => Math.max(.7, value - .1))}>－</button><button onClick={() => setZoom(1)}>화면 맞춤</button>
-          <span className="toolbar-separator" /><button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={!selectedDeviceId || !placementByDevice.has(selectedDeviceId)} onClick={removeSelected}>선택 기구 분리</button><button className="danger" onClick={() => void reset()}>장착 초기화</button>
-          <span className="mounting-readonly-note">배선은 읽기 전용입니다.</span>
+          <button disabled={!history.length} onClick={undo}>실행 취소</button><button disabled={!future.length} onClick={redo}>다시 실행</button><button disabled={!selectedDeviceId || !placementByDevice.has(selectedDeviceId)} onClick={removeSelected}>선택 기구 분리</button><button className="danger" onClick={() => void reset()}>장착 초기화</button>
+          <span className="mounting-readonly-note">배선은 읽기 전용 · 화면 자동 맞춤</span>
         </div>
-        <MountingBoard board={board} connections={connections} devices={mounting.available_devices} targets={mounting.mount_targets} placements={placements} selectedDeviceId={selectedDeviceId} zoom={zoom} result={result} onTargetClick={targetClick} onDropDevice={placeDevice} onClearSelection={() => setSelectedDeviceId(null)} />
+        <MountingBoard board={board} connections={connections} devices={mounting.available_devices} targets={mounting.mount_targets} placements={placements} selectedDeviceId={selectedDeviceId} zoom={1} result={result} onTargetClick={targetClick} onDropDevice={placeDevice} onClearSelection={() => setSelectedDeviceId(null)} />
       </div>
       <aside className="wiring-panel mounting-panel">
         <section><span className="panel-kicker">현재 선택</span><h3>{selectedDevice?.label ?? '기구를 선택하세요'}</h3><p>{selectedDevice ? `${selectedDevice.device_type_id} · ${selectedDevice.compatible_socket_type_ids.map(socketName).join(', ')}` : '기구를 클릭하거나 드래그한 뒤 중앙의 장착 소켓을 선택하세요.'}</p>{selectedDevice && placementByDevice.has(selectedDevice.mount_device_id) && <button className="clear-answer" onClick={removeSelected}>현재 기구 분리</button>}</section>
