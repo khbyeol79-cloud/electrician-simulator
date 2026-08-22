@@ -1,4 +1,5 @@
 import type { PublicProblemDetail } from '../api/client'
+import { NavLink } from 'react-router-dom'
 
 type HeaderProps = {
   mode?: 'desktop' | 'web'
@@ -24,6 +25,7 @@ export function Header({ mode, onRefresh, selectedProblem, onOpenProblems, onRes
         <small>{selectedProblem ? `${selectedProblem.problem_id} · 문제 변경` : '문제 선택하기'}</small>
       </button>
       <div className="header-actions">
+        <NavLink className={({ isActive }) => `free-circuit-link${isActive ? ' active' : ''}`} to="/free-circuit">자유회로</NavLink>
         <span className="mode-badge">{mode === 'desktop' ? '데스크톱' : '웹'}</span>
         <button type="button" onClick={onRefresh}>새로고침</button>
         <button type="button" onClick={onReset} disabled={!selectedProblem}>초기화</button>

@@ -211,6 +211,25 @@ export type OperationCheckResult = {
 }
 export type OperationProgress = { problem_id: string; attempt_count: number; last_submitted_at: string | null; last_overall_passed: boolean | null; last_gradable: boolean | null; last_passed_count: number; total_count: number; manual_run_count: number; last_run_at: string | null; forward_seen: boolean; reverse_seen: boolean; interlock_seen: boolean; protection_trip_seen: boolean }
 
+export type FreeCircuitEditorState = { schema_version: '1.0'; mode: 'graphic' | 'summary'; template_id: string | null }
+export type FreeCircuitWorkspace = {
+  workspace_id: string; schema_version: '1.0'; name: string
+  circuit: CircuitDefinition; operation: OperationDefinition; connections: WiringConnection[]
+  board: BoardDefinition | null; device_layout: DeviceLayoutDefinition | null
+  wiring_semantics: WiringSemantics | null; editor: FreeCircuitEditorState; updated_at: string | null
+}
+export type FreeCircuitWorkspaceSummary = {
+  workspace_id: string; name: string; schema_version: string; template_id: string | null
+  connection_count: number; updated_at: string | null
+}
+export type FreeCircuitTemplate = {
+  template_id: string; name: string; description: string; board: BoardDefinition
+  circuit: CircuitDefinition; operation: OperationDefinition; device_layout: DeviceLayoutDefinition | null
+  wiring_semantics: WiringSemantics | null
+}
+export type FreeCircuitDiagnostic = { severity: 'info' | 'warning' | 'error' | 'danger'; code: string; message: string }
+export type FreeCircuitDiagnostics = { status: 'normal' | 'attention'; diagnostics: FreeCircuitDiagnostic[] }
+
 export type ReloadStatistics = {
   loaded: number
   excluded: number
@@ -255,6 +274,39 @@ export async function getSystemStatus(signal?: AbortSignal) {
 
 export function getProblems(signal?: AbortSignal) {
   return getJson<ProblemSummary[]>('/api/problems', signal)
+}
+
+export function getFreeCircuitWorkspaces(signal?: AbortSignal) {
+  return getJson<FreeCircuitWorkspaceSummary[]>('/api/free-circuits', signal)
+}
+
+export function getFreeCircuitTemplates(signal?: AbortSignal) {
+  return getJson<FreeCircuitTemplate[]>('/api/free-circuits/templates', signal)
+}
+
+export function getFreeCircuitWorkspace(workspaceId: string, signal?: AbortSignal) {
+  return getJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}`, signal)
+}
+
+export function createFreeCircuitWorkspace(templateId: string, workspaceId: string, name: string) {
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/templates/${encodeURIComponent(templateId)}/workspaces/${encodeURIComponent(workspaceId)}`, 'POST', { name })
+}
+
+export function saveFreeCircuitWorkspace(workspace: FreeCircuitWorkspace) {
+  const { workspace_id, updated_at: _updatedAt, ...payload } = workspace
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspace_id)}`, 'PUT', payload)
+}
+
+export function deleteFreeCircuitWorkspace(workspaceId: string) {
+  return mutationJson<void>(`/api/free-circuits/${encodeURIComponent(workspaceId)}`, 'DELETE')
+}
+
+export function createFreeCircuitSession(workspaceId: string) {
+  return mutationJson<OperationSessionState>(`/api/free-circuits/${encodeURIComponent(workspaceId)}/sessions`, 'POST')
+}
+
+export function getFreeCircuitDiagnostics(workspaceId: string) {
+  return getJson<FreeCircuitDiagnostics>(`/api/free-circuits/${encodeURIComponent(workspaceId)}/diagnostics`)
 }
 
 export function getProblem(problemId: string, signal?: AbortSignal) {

@@ -22,7 +22,7 @@ class ConductiveGraph:
             if node in visited:
                 continue
             visited.add(node)
-            pending.extend(self._adjacency.get(node, ()) - visited)
+            pending.extend(self._adjacency.get(node, set()) - visited)
         return visited
 
     def connected(self, left: str, right: str) -> bool:

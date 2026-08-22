@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "7"
+SCHEMA_VERSION = "8"
 
 
 class SQLiteDatabase:
@@ -141,10 +141,29 @@ class SQLiteDatabase:
                     circuit_json TEXT NOT NULL,
                     operation_json TEXT NOT NULL,
                     connections_json TEXT NOT NULL,
+                    board_json TEXT,
+                    device_layout_json TEXT,
+                    wiring_semantics_json TEXT,
+                    editor_json TEXT,
+                    schema_version TEXT NOT NULL DEFAULT '1.0',
                     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
                 """
             )
+            columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(free_circuit_workspaces)").fetchall()
+            }
+            migrations = {
+                "board_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN board_json TEXT",
+                "device_layout_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN device_layout_json TEXT",
+                "wiring_semantics_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN wiring_semantics_json TEXT",
+                "editor_json": "ALTER TABLE free_circuit_workspaces ADD COLUMN editor_json TEXT",
+                "schema_version": "ALTER TABLE free_circuit_workspaces ADD COLUMN schema_version TEXT NOT NULL DEFAULT '1.0'",
+            }
+            for column, statement in migrations.items():
+                if column not in columns:
+                    connection.execute(statement)
             connection.execute(
                 """
                 INSERT INTO app_meta(key, value) VALUES('schema_version', ?)

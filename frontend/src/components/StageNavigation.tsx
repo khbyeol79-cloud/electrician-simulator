@@ -50,6 +50,9 @@ export function StageNavigation({ problem }: { problem?: PublicProblemDetail }) 
             </span>
           </NavLink>
         ))}
+        <NavLink to="/free-circuit" className={({ isActive }) => `stage-link free-stage${isActive ? ' active' : ''}`}>
+          <span className="stage-number">∞</span><span className="stage-copy"><strong>자유회로 실험</strong><small>정답 없이 실제 결선 계산</small></span>
+        </NavLink>
       </nav>
       <div className="problem-summary">
         <span>문제 정보</span>

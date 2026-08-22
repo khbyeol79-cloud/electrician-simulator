@@ -15,7 +15,7 @@ def test_database_initialization_is_idempotent(tmp_path):
         version = connection.execute(
             "SELECT value FROM app_meta WHERE key='schema_version'"
         ).fetchone()["value"]
-    assert version == "7"
+    assert version == "8"
 
     with database.connect() as connection:
         tables = {row["name"] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
@@ -48,6 +48,10 @@ def test_version_5_database_is_upgraded_without_losing_user_settings(tmp_path):
         selected = connection.execute(
             "SELECT value FROM user_settings WHERE key='selected_problem_id'"
         ).fetchone()["value"]
-    assert version == "7"
+    assert version == "8"
     assert selected == "operation_demo_001"
+
+    with database.connect() as connection:
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(free_circuit_workspaces)")}
+    assert {"board_json", "device_layout_json", "wiring_semantics_json", "editor_json", "schema_version"}.issubset(columns)
     assert database.is_ready() is True

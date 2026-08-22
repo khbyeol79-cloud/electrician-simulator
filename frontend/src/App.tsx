@@ -15,6 +15,7 @@ import { StatusBar } from './components/StatusBar'
 import { CircuitAnalysisPage } from './pages/CircuitAnalysisPage'
 import { OperationTestPage } from './pages/OperationTestPage'
 import { WiringPage } from './pages/WiringPage'
+import { FreeCircuitPage } from './pages/FreeCircuitPage'
 
 export default function App() {
   const [info, setInfo] = useState<AppInfoResponse>()
@@ -108,6 +109,7 @@ export default function App() {
             <Route path="/wiring" element={<WiringPage problem={selectedProblem} />} />
             <Route path="/mounting" element={<Navigate to="/operation" replace />} />
             <Route path="/operation" element={<OperationTestPage problem={selectedProblem} />} />
+            <Route path="/free-circuit" element={<FreeCircuitPage />} />
             <Route path="*" element={<Navigate to="/circuit" replace />} />
           </Routes>
         </main>

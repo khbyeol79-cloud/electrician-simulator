@@ -53,3 +53,53 @@ def test_free_circuit_workspace_rejects_invalid_id(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         response = client.get("/api/free-circuits/not%20valid")
         assert response.status_code in {404, 422}
+
+
+def test_free_circuit_templates_create_list_and_keep_users_separate(tmp_path):
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        templates = client.get("/api/free-circuits/templates")
+        assert templates.status_code == 200
+        assert "operation_demo_001" in {item["template_id"] for item in templates.json()}
+        created = client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces/self_hold_01",
+            headers={"X-User-Id": "student_a"}, json={"name": "자기유지 실험"},
+        )
+        assert created.status_code == 201
+        assert created.json()["board"]["board_id"]
+        assert created.json()["connections"] == []
+        own = client.get("/api/free-circuits", headers={"X-User-Id": "student_a"})
+        other = client.get("/api/free-circuits", headers={"X-User-Id": "student_b"})
+        assert own.json()[0]["workspace_id"] == "self_hold_01"
+        assert other.json() == []
+
+
+def test_free_circuit_rejects_unknown_duplicate_and_tb_bank_over_capacity(tmp_path):
+    headers = {"X-User-Id": "free_validation"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        created = client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces/validate_wires",
+            headers=headers, json={"name": "검증"},
+        ).json()
+        created["connections"] = [{"from": "NO-SUCH", "to": "TB5-01", "wire_color": "yellow", "pair_display_color": "#64748b"}]
+        assert client.put("/api/free-circuits/validate_wires", headers=headers, json={key: value for key, value in created.items() if key not in {"workspace_id", "updated_at"}}).status_code == 422
+
+        created = client.get("/api/free-circuits/validate_wires", headers=headers).json()
+        wire = {"from": "PWR-L1", "to": "TB5-01", "wire_color": "brown", "pair_display_color": "#64748b"}
+        created["connections"] = [wire, wire]
+        response = client.put("/api/free-circuits/validate_wires", headers=headers, json={key: value for key, value in created.items() if key not in {"workspace_id", "updated_at"}})
+        assert response.status_code == 422
+        assert "중복" in response.json()["detail"]
+
+
+def test_free_circuit_diagnostics_do_not_grade_answer(tmp_path):
+    headers = {"X-User-Id": "diagnostic_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces/diagnostic",
+            headers=headers, json={"name": "진단"},
+        )
+        response = client.get("/api/free-circuits/diagnostic/diagnostics", headers=headers)
+        assert response.status_code == 200
+        assert response.json()["status"] == "attention"
+        assert any(item["code"] == "empty_wiring" for item in response.json()["diagnostics"])
+        assert "expected_nets" not in response.text
