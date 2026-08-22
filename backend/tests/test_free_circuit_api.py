@@ -62,7 +62,7 @@ def test_free_circuit_templates_create_list_and_keep_users_separate(tmp_path):
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         templates = client.get("/api/free-circuits/templates")
         assert templates.status_code == 200
-        assert "operation_demo_001" in {item["template_id"] for item in templates.json()}
+        assert [item["template_id"] for item in templates.json()] == ["basic_board_001"]
         created = client.post(
             "/api/free-circuits/templates/operation_demo_001/workspaces/self_hold_01",
             headers={"X-User-Id": "student_a"}, json={"name": "자기유지 실험"},
@@ -81,7 +81,7 @@ def test_free_circuit_template_generates_unique_workspace_ids_from_name_only(tmp
     with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
         created = [
             client.post(
-                "/api/free-circuits/templates/operation_demo_001/workspaces",
+                "/api/free-circuits/workspaces",
                 headers=headers,
                 json={"name": f"  자동 작업공간 {index}  "},
             )
@@ -95,11 +95,49 @@ def test_free_circuit_template_generates_unique_workspace_ids_from_name_only(tmp
         listed = client.get("/api/free-circuits", headers=headers).json()
         assert {item["workspace_id"] for item in listed} == ids
         blank = client.post(
-            "/api/free-circuits/templates/operation_demo_001/workspaces",
+            "/api/free-circuits/workspaces",
             headers=headers,
             json={"name": "   "},
         )
         assert blank.status_code == 422
+
+
+def test_basic_board_definition_is_independent_actual_wiring_without_answer(tmp_path):
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        response = client.get("/api/free-circuits/templates")
+        assert response.status_code == 200, response.text
+        template = response.json()[0]
+        assert template["template_id"] == "basic_board_001"
+        assert template["operation"]["simulation_mode"] == "actual_wiring"
+        assert "answer" not in response.text
+        assert "expected_nets" not in response.text
+        device_ids = {item["device_id"] for item in template["circuit"]["devices"]}
+        assert {"MCCB", "F", "X1", "X2", "T1", "T2", "MC1", "MC2", "EOCR"} <= device_ids
+        assert all(item["behavior_model_id"] for item in template["circuit"]["devices"])
+        external_ids = {
+            item["device_id"] for item in template["wiring_semantics"]["external_devices"]
+        }
+        assert {"PWR", "PB0", "PB1", "PB2", "LS1", "LS2", "GL", "RL", "M1"} == external_ids
+        assert "basic_board_001" not in {
+            item["problem_id"] for item in client.get("/api/problems").json()
+        }
+
+
+def test_basic_board_same_name_gets_distinct_ids_and_legacy_api_remains(tmp_path):
+    headers = {"X-User-Id": "basic_board_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        first = client.post("/api/free-circuits/workspaces", headers=headers, json={"name": "같은 이름"})
+        second = client.post("/api/free-circuits/workspaces", headers=headers, json={"name": "같은 이름"})
+        assert first.status_code == second.status_code == 201
+        assert first.json()["workspace_id"] != second.json()["workspace_id"]
+        assert first.json()["editor"]["template_id"] == "basic_board_001"
+        assert first.json()["connections"] == []
+        legacy = client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces/legacy_saved",
+            headers=headers, json={"name": "기존 형식"},
+        )
+        assert legacy.status_code == 201
+        assert legacy.json()["editor"]["template_id"] == "operation_demo_001"
 
 
 def test_free_circuit_rejects_unknown_duplicate_and_tb_bank_over_capacity(tmp_path):

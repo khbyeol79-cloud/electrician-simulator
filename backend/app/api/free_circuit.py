@@ -18,15 +18,17 @@ from app.domain.free_circuit import (
 from app.repositories.free_circuit_repository import FreeCircuitRepository
 from app.simulation import OperationEngine, SimulationDefinitionError
 from app.services import DeviceBehaviorRuntimeComposer, RuntimeCompositionError
+from app.services.free_circuit_template_service import (
+    BASIC_BOARD_TEMPLATE_ID,
+    LEGACY_FREE_TEMPLATE_IDS,
+    FreeCircuitTemplateError,
+    FreeCircuitTemplateService,
+)
 
 
 router = APIRouter(prefix="/api/free-circuits", tags=["free-circuit"])
 WorkspaceId = Annotated[str, Path(pattern=r"^[A-Za-z0-9_-]{1,64}$")]
-TEMPLATE_IDS = (
-    "operation_demo_001",
-    "forward_reverse_interlock_demo_001",
-    "eocr_sequence_demo_001",
-)
+TEMPLATE_IDS = (BASIC_BOARD_TEMPLATE_ID, *LEGACY_FREE_TEMPLATE_IDS)
 
 
 class CreateFromTemplateRequest(BaseModel):
@@ -72,26 +74,14 @@ def _runtime_definition(request: Request, circuit, operation):
 
 
 def _template(request: Request, template_id: str) -> FreeCircuitTemplate:
-    if template_id not in TEMPLATE_IDS:
-        raise HTTPException(status_code=404, detail="자유회로 시작 템플릿을 찾을 수 없습니다.")
-    package = request.app.state.problem_repository._get_package_internal(template_id)
-    if package is None or package.board is None or package.problem.operation is None:
-        raise HTTPException(status_code=409, detail="자유회로 시작 템플릿이 준비되지 않았습니다.")
-    descriptions = {
-        "operation_demo_001": "자기유지·릴레이·타이머·표시등·모터 기초 실험",
-        "forward_reverse_interlock_demo_001": "정·역회전 자기유지와 전기·기계 인터록 실험",
-        "eocr_sequence_demo_001": "EOCR 과부하 트립·복귀와 모터 보호 실험",
-    }
-    return FreeCircuitTemplate(
-        template_id=template_id,
-        name=package.manifest.title.replace("연습", "실험 보드"),
-        description=descriptions[template_id],
-        board=package.board,
-        circuit=package.problem.circuit,
-        operation=package.problem.operation,
-        device_layout=package.problem.device_layout,
-        wiring_semantics=package.problem.wiring_semantics,
-    )
+    problem_repository = getattr(request.app.state, "problem_repository", None)
+    if problem_repository is None:
+        raise HTTPException(status_code=503, detail="자유회로 시작 템플릿을 준비할 수 없습니다.")
+    try:
+        return FreeCircuitTemplateService(problem_repository).get(template_id)
+    except FreeCircuitTemplateError as exc:
+        status_code = 404 if "찾을 수 없습니다" in str(exc) else 409
+        raise HTTPException(status_code=status_code, detail=str(exc)) from exc
 
 
 def _workspace_from_template(template: FreeCircuitTemplate, name: str) -> FreeCircuitWorkspaceUpdate:
@@ -169,12 +159,16 @@ def list_workspaces(request: Request):
 
 @router.get("/templates", response_model=list[FreeCircuitTemplate])
 def list_templates(request: Request):
-    templates: list[FreeCircuitTemplate] = []
-    for template_id in TEMPLATE_IDS:
-        package = request.app.state.problem_repository._get_package_internal(template_id)
-        if package is not None and package.board is not None and package.problem.operation is not None:
-            templates.append(_template(request, template_id))
-    return templates
+    return [_template(request, BASIC_BOARD_TEMPLATE_ID)]
+
+
+@router.post("/workspaces", response_model=FreeCircuitWorkspaceResponse, status_code=201)
+def create_basic_workspace(request: Request, payload: CreateFromTemplateRequest = Body(...)):
+    """신규 UI용: 이름만 받아 통합 기본보드 작업공간을 만든다."""
+    template = _template(request, BASIC_BOARD_TEMPLATE_ID)
+    repository = _repository(request)
+    workspace_id = _new_workspace_id(repository)
+    return repository.save(workspace_id, _workspace_from_template(template, payload.name))
 
 
 @router.post("/templates/{template_id}/workspaces/{workspace_id}", response_model=FreeCircuitWorkspaceResponse, status_code=201)
@@ -264,14 +258,14 @@ def get_diagnostics(workspace_id: WorkspaceId, request: Request):
     if not workspace.connections:
         diagnostics.append(FreeCircuitDiagnostic(severity="warning", code="empty_wiring", message="아직 연결된 전선이 없습니다."))
     connected = {item.from_terminal for item in workspace.connections} | {item.to for item in workspace.connections}
-    for coil in workspace.circuit.coils:
-        if coil.terminal_a_id not in connected or coil.terminal_b_id not in connected:
-            diagnostics.append(FreeCircuitDiagnostic(
-                severity="info", code=f"open_coil:{coil.coil_id}",
-                message=f"{coil.coil_id} 코일의 전원 경로가 아직 완성되지 않았을 수 있습니다.",
-            ))
     try:
         runtime = _runtime_definition(request, workspace.circuit, workspace.operation)
+        for coil in runtime.circuit.coils:
+            if coil.terminal_a_id not in connected or coil.terminal_b_id not in connected:
+                diagnostics.append(FreeCircuitDiagnostic(
+                    severity="info", code=f"open_coil:{coil.coil_id}",
+                    message=f"{coil.coil_id} 코일의 전원 경로가 아직 완성되지 않았을 수 있습니다.",
+                ))
         engine = OperationEngine(
             session_id="diagnostic", problem_id=f"free:{workspace_id}", wiring_attempt_id=0,
             circuit=runtime.circuit, definition=runtime.operation, connections=workspace.connections,

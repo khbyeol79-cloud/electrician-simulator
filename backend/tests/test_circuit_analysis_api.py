@@ -14,6 +14,7 @@ def stage4_paths(tmp_path):
     bundle = tmp_path / "bundle"
     shutil.copytree(PROJECT_ROOT / "schemas", bundle / "schemas")
     shutil.copytree(PROJECT_ROOT / "catalog", bundle / "catalog")
+    shutil.copytree(PROJECT_ROOT / "free_templates", bundle / "free_templates")
     for problem_id in ("practice_001", "training_socket_demo_001", "operation_demo_001"):
         shutil.copytree(PROJECT_ROOT / "problems" / problem_id, bundle / "problems" / problem_id)
     dist = bundle / "frontend" / "dist"

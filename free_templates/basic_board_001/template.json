@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "template_id": "basic_board_001",
+  "name": "기본보드",
+  "description": "릴레이·타이머·MC·EOCR·표시등·3상 모터를 실제 결선으로 자유롭게 시험하는 통합 보드",
+  "layout_source_id": "forward_reverse_interlock_demo_001",
+  "simulation_mode": "actual_wiring",
+  "device_models": {
+    "MCCB": "mccb_3p_training",
+    "F": "fuse_single_pole_training",
+    "X1": "auxiliary_relay_8p_training_partial",
+    "X2": "auxiliary_relay_8p_training_partial",
+    "T1": "timer_8p_on_delay_training_partial",
+    "T2": "timer_8p_on_delay_training_partial",
+    "MC1": "magnetic_contactor_12p_training",
+    "MC2": "magnetic_contactor_12p_training",
+    "EOCR": "eocr_12p_training",
+    "PWR": "power_3p_control_training",
+    "PB0": "push_button_nc",
+    "PB1": "push_button_no",
+    "PB2": "push_button_no",
+    "LS1": "limit_switch_no",
+    "LS2": "limit_switch_nc",
+    "GL": "indicator_lamp_two_terminal",
+    "RL": "indicator_lamp_two_terminal",
+    "M1": "motor_three_phase"
+  }
+}

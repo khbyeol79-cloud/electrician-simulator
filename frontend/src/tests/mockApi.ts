@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.11.1',
+  version: '0.11.2',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.11.1',
+  version: '0.11.2',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -130,7 +130,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
   let operationState: OperationSessionState = {
     session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
     powered: false, power_state: 'off',
-    simulation_mode: options?.actualOperation ? 'actual_wiring' : 'legacy_assisted',
+    simulation_mode: 'actual_wiring',
     catalog_composed: Boolean(options?.actualOperation),
     controls: {
       PB0: { label: 'PB0 정지', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NC', active: false },
@@ -148,23 +148,23 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     workspace_id: 'self_hold_01', schema_version: '1.0', name: '자기유지 자유회로',
     circuit: { ...trainingDetail.circuit, definition_status: 'functional' },
     operation: {
-      schema_version: '1.0', simulation_status: 'functional',
+      schema_version: '1.0', simulation_status: 'functional', simulation_mode: 'actual_wiring',
       power: { line_terminal_id: 'X1-6', return_terminal_id: 'MC1-12', phase_terminal_ids: [] },
       controls: [], timers: [], indicators: [], motors: [], contactors: [], interlocks: [], protection_devices: [],
       direction_change_policy: 'block_both', internal_connections: [],
     },
     connections: [] as WiringConnection[], board: wiringBoard, device_layout: trainingDetail.device_layout,
     wiring_semantics: { schema_version: '1.0', extra_jumper_policy: 'warning', external_devices: [] },
-    editor: { schema_version: '1.0', mode: 'graphic', template_id: 'operation_demo_001' }, updated_at: null,
+    editor: { schema_version: '1.0', mode: 'graphic', template_id: 'basic_board_001' }, updated_at: null,
   }
   let freeCreated = false
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input)
     if (url === '/api/health') return response(health)
     if (url === '/api/app-info') return response(appInfo)
-    if (url === '/api/free-circuits/templates') return response([{ template_id: 'operation_demo_001', name: '자기유지 실험 보드', description: '자기유지 기초 실험', board: wiringBoard, circuit: freeCircuit.circuit, operation: freeCircuit.operation, device_layout: trainingDetail.device_layout, wiring_semantics: freeCircuit.wiring_semantics }])
-    if (url === '/api/free-circuits' && (!init?.method || init.method === 'GET')) return response(freeCreated ? [{ workspace_id: freeCircuit.workspace_id, name: freeCircuit.name, schema_version: '1.0', template_id: 'operation_demo_001', connection_count: freeCircuit.connections.length, updated_at: freeCircuit.updated_at }] : [])
-    if (url === '/api/free-circuits/templates/operation_demo_001/workspaces' && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
+    if (url === '/api/free-circuits/templates') return response([{ template_id: 'basic_board_001', name: '기본보드', description: '통합 기본보드', board: wiringBoard, circuit: freeCircuit.circuit, operation: freeCircuit.operation, device_layout: trainingDetail.device_layout, wiring_semantics: freeCircuit.wiring_semantics }])
+    if (url === '/api/free-circuits' && (!init?.method || init.method === 'GET')) return response(freeCreated ? [{ workspace_id: freeCircuit.workspace_id, name: freeCircuit.name, schema_version: '1.0', template_id: 'basic_board_001', connection_count: freeCircuit.connections.length, updated_at: freeCircuit.updated_at }] : [])
+    if (url === '/api/free-circuits/workspaces' && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
     if (url === '/api/free-circuits/self_hold_01' && (!init?.method || init.method === 'GET')) return response(freeCircuit)
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'PUT') { Object.assign(freeCircuit, JSON.parse(String(init.body))); return response(freeCircuit) }
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'DELETE') { freeCreated = false; return response(undefined, 204) }

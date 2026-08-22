@@ -1,34 +1,25 @@
 {
-  "base_version": "0.11.0",
-  "target_version": "0.11.1",
-  "created_at": "2026-08-22T20:08:17+09:00",
+  "base_version": "0.11.1",
+  "target_version": "0.11.2",
+  "created_at": "2026-08-22T20:41:09+09:00",
   "added_files": [
-    "DELETED_FILES.txt",
-    "TEST_RESULTS_0.11.1.md",
-    "backend/app/services/runtime_circuit_composer.py",
-    "backend/tests/actual_wiring_test_utils.py",
-    "backend/tests/test_actual_wiring_engine.py",
-    "backend/tests/test_actual_wiring_interlocks.py",
-    "backend/tests/test_runtime_circuit_composer.py",
-    "docs/actual-wiring-runtime-0.11.1.md",
-    "frontend/dist/assets/index-B0sLCTUY.js",
-    "scripts/run_actual_wiring_demo.py"
+    "TEST_RESULTS_0.11.2.md",
+    "backend/app/services/free_circuit_template_service.py",
+    "backend/tests/test_basic_board_actual_wiring.py",
+    "docs/basic-board-manual-test-0.11.2.md",
+    "free_templates/basic_board_001/template.json",
+    "frontend/dist/assets/index-DY3_tYgr.js",
+    "scripts/run_basic_board_demo.py"
   ],
   "modified_files": [
     "APPLY_PATCH_KO.md",
+    "DELETED_FILES.txt",
     "PATCH_MANIFEST.json",
     "README.md",
     "backend/app/__init__.py",
     "backend/app/api/free_circuit.py",
-    "backend/app/api/operation.py",
     "backend/app/core/config.py",
-    "backend/app/domain/operation_definition.py",
-    "backend/app/domain/problem_definition.py",
-    "backend/app/services/__init__.py",
-    "backend/app/services/circuit_reference_validator.py",
-    "backend/app/services/device_instance_factory.py",
-    "backend/app/simulation/engine.py",
-    "backend/tests/test_device_instance_factory.py",
+    "backend/tests/test_circuit_analysis_api.py",
     "backend/tests/test_free_circuit_api.py",
     "frontend/dist/index.html",
     "frontend/package-lock.json",
@@ -36,219 +27,36 @@
     "frontend/src/api/client.ts",
     "frontend/src/components/StatusBar.tsx",
     "frontend/src/pages/FreeCircuitPage.tsx",
-    "frontend/src/pages/OperationTestPage.tsx",
     "frontend/src/tests/FreeCircuitPage.test.tsx",
-    "frontend/src/tests/mockApi.ts",
-    "schemas/problem.schema.json"
+    "frontend/src/tests/mockApi.ts"
   ],
   "deleted_files": [
-    "frontend/dist/assets/index-DZLDjMmg.js"
+    "frontend/dist/assets/index-B0sLCTUY.js"
   ],
   "manifest_self_hash_excluded": true,
   "files": [
-    {
-      "path": "APPLY_PATCH_KO.md",
-      "change_type": "modified",
-      "size": 2645,
-      "sha256": "6252ba99de7481c752c7c6fea12419cce5bb1f63c115f0026a278cce40d264b5"
-    },
-    {
-      "path": "DELETED_FILES.txt",
-      "change_type": "added",
-      "size": 39,
-      "sha256": "f1e5ea9ebdaf8c9cbf5e36aae0ccf6d2faadd5c206f73ce6ce3b588b4bcc2416"
-    },
-    {
-      "path": "README.md",
-      "change_type": "modified",
-      "size": 20613,
-      "sha256": "ceaaafc7c375019016d2efcb6c71aeecfce611491890aeaeb78720ee15ba2cf3"
-    },
-    {
-      "path": "TEST_RESULTS_0.11.1.md",
-      "change_type": "added",
-      "size": 3619,
-      "sha256": "7fafb4444e9bc64e3a3b122fa595adcfabf0d6d67517347e81704ddd519d0509"
-    },
-    {
-      "path": "backend/app/__init__.py",
-      "change_type": "modified",
-      "size": 69,
-      "sha256": "f10d4eb038ab618a8fccfad8fd914e0b445924df01da2705591094c71e181d99"
-    },
-    {
-      "path": "backend/app/api/free_circuit.py",
-      "change_type": "modified",
-      "size": 13442,
-      "sha256": "9c37b6c1b0cf8388b8e2bbd4fa4ce419a380ae1df04472aa1045a95b810be90a"
-    },
-    {
-      "path": "backend/app/api/operation.py",
-      "change_type": "modified",
-      "size": 12708,
-      "sha256": "88a02bb4b122ee485b7688e3effa8df3660bdba56c58bc02e28f9ade2ea2ff30"
-    },
-    {
-      "path": "backend/app/core/config.py",
-      "change_type": "modified",
-      "size": 1915,
-      "sha256": "fb3eebb8c1f2c95c11b5e93707ad86ec635ae53ec559af93184d2d12ba196dec"
-    },
-    {
-      "path": "backend/app/domain/operation_definition.py",
-      "change_type": "modified",
-      "size": 8699,
-      "sha256": "8359e6e4f60003ecd169600df434e4e50b9b3afd13ff9965cc6c8f5b5dc1a563"
-    },
-    {
-      "path": "backend/app/domain/problem_definition.py",
-      "change_type": "modified",
-      "size": 7219,
-      "sha256": "ef5d767c31d152620e62120670b3a2a67cc285fe1044df042374531737abd1ad"
-    },
-    {
-      "path": "backend/app/services/__init__.py",
-      "change_type": "modified",
-      "size": 809,
-      "sha256": "4c82d8448f279c211bfbc3e36e25adb25b14fd2c821db79079a98eb056109480"
-    },
-    {
-      "path": "backend/app/services/circuit_reference_validator.py",
-      "change_type": "modified",
-      "size": 22401,
-      "sha256": "f489470d215f9cc011784d4bbfd0e70630907124069ee20364d44075f39a77fd"
-    },
-    {
-      "path": "backend/app/services/device_instance_factory.py",
-      "change_type": "modified",
-      "size": 11560,
-      "sha256": "cf9551ca5a6fbbf59423711be7388971a659475b45a8b6714856ca98d2efea89"
-    },
-    {
-      "path": "backend/app/services/runtime_circuit_composer.py",
-      "change_type": "added",
-      "size": 11005,
-      "sha256": "a9d6c6b6be99eaa9a6285e6d84b6ec4aa845520c29118ee385a3309e29cfdaed"
-    },
-    {
-      "path": "backend/app/simulation/engine.py",
-      "change_type": "modified",
-      "size": 33508,
-      "sha256": "ae023f9e8883856a6f1c0cc16910cb7a8b2fbf26ea8423081699a57065ce9cd9"
-    },
-    {
-      "path": "backend/tests/actual_wiring_test_utils.py",
-      "change_type": "added",
-      "size": 4514,
-      "sha256": "fd9e030855be01536e82c355b8bd81aa5a46771e29198b4dd9232aa68a2879d5"
-    },
-    {
-      "path": "backend/tests/test_actual_wiring_engine.py",
-      "change_type": "added",
-      "size": 3841,
-      "sha256": "17a9b30995c6693edead070442522785b1b3aade22b80910b4fb1d8a64b64c7b"
-    },
-    {
-      "path": "backend/tests/test_actual_wiring_interlocks.py",
-      "change_type": "added",
-      "size": 3219,
-      "sha256": "e060074f3eadd9075a509b16c1a11be63c5d822ce52891c173f1bc0f2c164d42"
-    },
-    {
-      "path": "backend/tests/test_device_instance_factory.py",
-      "change_type": "modified",
-      "size": 6508,
-      "sha256": "2a3d9c265f8dcc22a5e26c20999235297f761642891853e161bd324003f0bca6"
-    },
-    {
-      "path": "backend/tests/test_free_circuit_api.py",
-      "change_type": "modified",
-      "size": 7766,
-      "sha256": "0564ea03ec0ecd5daf13a47abc58cc7aac6eb63fa5f2ea0a4d50530c23ccf8f8"
-    },
-    {
-      "path": "backend/tests/test_runtime_circuit_composer.py",
-      "change_type": "added",
-      "size": 4434,
-      "sha256": "7ed85016c825382aae64142fac65addf59447d98600625684812de8a1bcb5f0d"
-    },
-    {
-      "path": "docs/actual-wiring-runtime-0.11.1.md",
-      "change_type": "added",
-      "size": 6723,
-      "sha256": "df7a0bb0a76346423bf32b8961c4b030747f2b01b12c2889cfbbcd9d449636d5"
-    },
-    {
-      "path": "frontend/dist/assets/index-B0sLCTUY.js",
-      "change_type": "added",
-      "size": 323925,
-      "sha256": "b52f2a402a3876009369af61432f1351b6088ac66a73f4aa9c3f97e7488e55b1"
-    },
-    {
-      "path": "frontend/dist/index.html",
-      "change_type": "modified",
-      "size": 484,
-      "sha256": "df03eb0b618b54a0648be0996831d6cebcf484f13ece7abcfa206dcb1ebe29d7"
-    },
-    {
-      "path": "frontend/package-lock.json",
-      "change_type": "modified",
-      "size": 103225,
-      "sha256": "2b86da8aa7ff74eb084a183cf795033f6b3bb84c68e601e9db5cc26c01b98b14"
-    },
-    {
-      "path": "frontend/package.json",
-      "change_type": "modified",
-      "size": 739,
-      "sha256": "0790b8ad9881f7377aa4e8b98b95157f58c832f60e6fd938d01cb1d6ca99b692"
-    },
-    {
-      "path": "frontend/src/api/client.ts",
-      "change_type": "modified",
-      "size": 23823,
-      "sha256": "ac91e9d18e192726755ba6b9cae011dfa123823d17e30baa42d3ccf6e024d2f7"
-    },
-    {
-      "path": "frontend/src/components/StatusBar.tsx",
-      "change_type": "modified",
-      "size": 1234,
-      "sha256": "9655d55876efa63f0eb4cc4af3abb6abe0124b68c55c09235e62a3d49bcfd7b7"
-    },
-    {
-      "path": "frontend/src/pages/FreeCircuitPage.tsx",
-      "change_type": "modified",
-      "size": 23118,
-      "sha256": "0fc4703e807dc08d8671bac26088f3593c02e2c432b356f6326806664a983694"
-    },
-    {
-      "path": "frontend/src/pages/OperationTestPage.tsx",
-      "change_type": "modified",
-      "size": 16838,
-      "sha256": "acda92e81e49d44789b4136eb9b85f388a3c8c0115bb984359e2d772d547b373"
-    },
-    {
-      "path": "frontend/src/tests/FreeCircuitPage.test.tsx",
-      "change_type": "modified",
-      "size": 3940,
-      "sha256": "0450ceeced3e524ff21c60f9ca9bf5740f18ad51697dc623654c5f9d86fad9ff"
-    },
-    {
-      "path": "frontend/src/tests/mockApi.ts",
-      "change_type": "modified",
-      "size": 24177,
-      "sha256": "dc1d8dc59c89fc0cbc440abe050fbef8f7906366e0b82eeb331e3b0fea06ddd8"
-    },
-    {
-      "path": "schemas/problem.schema.json",
-      "change_type": "modified",
-      "size": 19139,
-      "sha256": "3aad7ee32740fcd1313e64be0516af5a760f147ddded1bf6c73157f2e4a93bc2"
-    },
-    {
-      "path": "scripts/run_actual_wiring_demo.py",
-      "change_type": "added",
-      "size": 3126,
-      "sha256": "90eed8b33419172c45444f171082d141e90c95f113d53318ef79dd42a8c76954"
-    }
+    {"path":"APPLY_PATCH_KO.md","change_type":"modified","size":3110,"sha256":"f61f2e9438ef4ae54fbb55dbc2d3e980f2b6180112c1fbed0c511d4d82096bda"},
+    {"path":"DELETED_FILES.txt","change_type":"modified","size":39,"sha256":"fe3c7ff442b403b9ef728cd50b90b9bd499a1d695a225b035886627b71d2e5ec"},
+    {"path":"README.md","change_type":"modified","size":20662,"sha256":"9cd09afc7a5060a1c245ecbbb1a6339247066217becf97f478554d0a25eac4d1"},
+    {"path":"backend/app/__init__.py","change_type":"modified","size":69,"sha256":"2e69200479435c6dc200d2f86de33843c312bce57e45d8c7abe3faa448b5188c"},
+    {"path":"backend/app/api/free_circuit.py","change_type":"modified","size":13130,"sha256":"61323c6ec13a0a25f8c77e5731cb2017fe4e9b415dc4fad0e270d1cad0212a92"},
+    {"path":"backend/app/core/config.py","change_type":"modified","size":1915,"sha256":"afbf65443070c89801092aff56580dae1c3e1376f9307ad2c4b618d0759ba8a0"},
+    {"path":"backend/tests/test_circuit_analysis_api.py","change_type":"modified","size":4301,"sha256":"089996772420a0c20fa5ffb470adbd810314e8413a8fc80adeaf78a941a10323"},
+    {"path":"backend/tests/test_free_circuit_api.py","change_type":"modified","size":9885,"sha256":"0b184b5ff39cd0b1c3c9346a0b3086c3e1d88755ea5b11e970451fbbca8a36e9"},
+    {"path":"frontend/dist/index.html","change_type":"modified","size":484,"sha256":"0162462e6fe13af9a45f37932b845de0bc877ec1bae8b5ce5a0a240513ca98ef"},
+    {"path":"frontend/package-lock.json","change_type":"modified","size":103225,"sha256":"5efb8f9cf6eaba4bf59d6b9aa97988bbab1a8834019d32e99bf9b57446c92219"},
+    {"path":"frontend/package.json","change_type":"modified","size":739,"sha256":"e43428ba5bedf3670bb73cc78fcb31cf4ef3558203582ade8645db28b23b7f09"},
+    {"path":"frontend/src/api/client.ts","change_type":"modified","size":23759,"sha256":"72f0e80c7ffe46c4b4a7962da9ff6fe014e977ce1c435f0ce37648dc685908a9"},
+    {"path":"frontend/src/components/StatusBar.tsx","change_type":"modified","size":1234,"sha256":"7206a6309f9c84e6f73efe878faf8c1972cacd36afd125860933d49a70b8979d"},
+    {"path":"frontend/src/pages/FreeCircuitPage.tsx","change_type":"modified","size":23053,"sha256":"c35a105c49534e957bc393e8df1d999822b390e136786d5d92172d623b6b62ba"},
+    {"path":"frontend/src/tests/FreeCircuitPage.test.tsx","change_type":"modified","size":5126,"sha256":"8d68bda595470208e89ce65c394834473e56aac07b192a817e60ae38d5a53fb9"},
+    {"path":"frontend/src/tests/mockApi.ts","change_type":"modified","size":24105,"sha256":"8899ddb817c64d6d0b34ec23856f8b4858a45280128fb38d2c83def25b148858"},
+    {"path":"TEST_RESULTS_0.11.2.md","change_type":"added","size":3976,"sha256":"37c8af918d463379b9142310df27159b21c7e11ca3585dfd55685a6182eed89d"},
+    {"path":"backend/app/services/free_circuit_template_service.py","change_type":"added","size":12283,"sha256":"a9aa5ed32d22022b170c6201a9d1e65b356e330ca5f554d7626409dbf749fc20"},
+    {"path":"backend/tests/test_basic_board_actual_wiring.py","change_type":"added","size":4220,"sha256":"5904f959f31b0089a798b7fd6f7f0b13978573a22bafa3c83696119974a9e9f8"},
+    {"path":"docs/basic-board-manual-test-0.11.2.md","change_type":"added","size":8128,"sha256":"37fb1ea4a97398c95fa4020b77a35a960f0dee78099a2ab6148076fd8180f90d"},
+    {"path":"free_templates/basic_board_001/template.json","change_type":"added","size":1042,"sha256":"cf4d6508799ab9db6e52da3f021b628e9dd617a78a00752d307f367d9f98548d"},
+    {"path":"frontend/dist/assets/index-DY3_tYgr.js","change_type":"added","size":324031,"sha256":"5d598543f714370916f95adb46968168a6dbe1cb3585a77f28b5cc43ab70111d"},
+    {"path":"scripts/run_basic_board_demo.py","change_type":"added","size":9179,"sha256":"929027a7ac9ea55fdd7bef6a8b8faf8a1f4508dee8a8c8055ee406478f1214c1"}
   ]
 }
