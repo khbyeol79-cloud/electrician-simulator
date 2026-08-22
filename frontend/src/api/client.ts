@@ -50,8 +50,8 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   wiring_semantics?: WiringSemantics | null
 }
 
-export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null }
-export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed' }
+export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null; behavior_model_id?: string | null }
+export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed'; controller_type?: 'coil' | 'timer' | 'protection'; controller_id?: string | null }
 export type CircuitCoil = { coil_id: string; owner_device_id: string }
 export type CircuitDefinition = {
   schema_version: '1.0'; definition_status: 'structure_only' | 'functional'
@@ -181,6 +181,7 @@ export type OperationSetup = {
 
 export type OperationDefinition = {
   schema_version: '1.0'; simulation_status: 'preview' | 'functional'
+  simulation_mode?: 'legacy_assisted' | 'actual_wiring'
   power: { line_terminal_id: string; return_terminal_id: string; phase_terminal_ids: string[] }
   controls: { control_id: string; label: string; control_type: 'pushbutton' | 'limit_switch' | 'selector'; mode: 'momentary' | 'maintained'; contact_type: 'NO' | 'NC'; terminal_a_id: string; terminal_b_id: string; initial_active: boolean }[]
   timers: { timer_id: string; label: string; coil_id: string; mode: 'on_delay'; delay_ms: number; timed_contact_ids: string[]; retentive: boolean }[]
@@ -188,7 +189,7 @@ export type OperationDefinition = {
   motors: { motor_id: string; label: string; forward_coil_id: string | null; reverse_coil_id: string | null; phase_terminal_ids: string[]; phase_source_terminal_ids: string[]; forward_phase_order: number[] }[]
   contactors: { contactor_id: string; label: string; coil_id: string; role: 'forward' | 'reverse' | 'general'; start_control_id: string | null; motor_id: string | null }[]
   interlocks: { interlock_id: string; label: string; type: 'electrical' | 'mechanical'; contactor_ids: string[]; contact_ids: string[]; policy: 'prevent_simultaneous_activation' }[]
-  protection_devices: { protection_device_id: string; label: string; protection_type: 'eocr'; protected_coil_ids: string[]; protected_motor_ids: string[]; reset_mode: 'manual' | 'automatic' | 'restart_required'; allowed_fault_types: 'overload'[] }[]
+  protection_devices: { protection_device_id: string; label: string; protection_type: 'eocr'; protected_coil_ids: string[]; protected_motor_ids: string[]; protection_contact_ids?: string[]; reset_mode: 'manual' | 'automatic' | 'restart_required'; allowed_fault_types: 'overload'[] }[]
   direction_change_policy: 'current_direction_first' | 'first_input_first' | 'block_both' | 'stop_before_reverse'
   internal_connections: { from: string; to: string }[]
 }
@@ -199,6 +200,7 @@ export type OperationProtectionState = { label: string; protection_type: string;
 export type OperationInterlockState = { label: string; type: 'electrical' | 'mechanical'; status: 'ready' | 'blocking' | 'fault'; blocked_contactor_id: string | null }
 export type OperationSessionState = {
   session_id: string; problem_id: string; wiring_attempt_id: number; powered: boolean; power_state: 'off' | 'on' | 'tripped'
+  simulation_mode?: 'legacy_assisted' | 'actual_wiring'; catalog_composed?: boolean
   controls: Record<string, OperationControlState>; coils: Record<string, boolean>; contacts: Record<string, 'open' | 'closed'>
   timers: Record<string, OperationTimerState>; indicators: Record<string, 'off' | 'on' | 'error'>
   motors: Record<string, 'stopped' | 'forward' | 'reverse' | 'phase_loss' | 'phase_sequence_error' | 'simultaneous_fault' | 'connection_error' | 'power_off' | 'protection_trip' | 'undetermined'>

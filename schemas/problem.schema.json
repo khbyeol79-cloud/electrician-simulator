@@ -113,7 +113,7 @@
     "device": {
       "type": "object", "additionalProperties": false,
       "required": ["device_id", "device_type_id", "label", "socket_type_id", "board_position", "installed_initially"],
-      "properties": { "device_id": { "$ref": "#/$defs/id" }, "device_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }, "label": { "$ref": "#/$defs/id" }, "socket_type_id": { "type": ["string", "null"] }, "board_position": { "$ref": "#/$defs/boardPosition" }, "installed_initially": { "type": "boolean" } }
+      "properties": { "device_id": { "$ref": "#/$defs/id" }, "device_type_id": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }, "label": { "$ref": "#/$defs/id" }, "socket_type_id": { "type": ["string", "null"] }, "behavior_model_id": { "type": ["string", "null"], "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" }, "board_position": { "$ref": "#/$defs/boardPosition" }, "installed_initially": { "type": "boolean" } }
     },
     "terminal": {
       "type": "object", "additionalProperties": false,
@@ -127,8 +127,8 @@
     },
     "contact": {
       "type": "object", "additionalProperties": false,
-      "required": ["contact_id", "owner_device_id", "contact_type", "common_terminal_id", "switched_terminal_id", "controlled_by_coil_id", "normal_state"],
-      "properties": { "contact_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] }, "common_terminal_id": { "$ref": "#/$defs/id" }, "switched_terminal_id": { "$ref": "#/$defs/id" }, "nc_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "no_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "controlled_by_coil_id": { "$ref": "#/$defs/id" }, "normal_state": { "enum": ["open", "closed"] } }
+      "required": ["contact_id", "owner_device_id", "contact_type", "common_terminal_id", "switched_terminal_id", "normal_state"],
+      "properties": { "contact_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] }, "common_terminal_id": { "$ref": "#/$defs/id" }, "switched_terminal_id": { "$ref": "#/$defs/id" }, "nc_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "no_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "controller_type": { "enum": ["coil", "timer", "protection"] }, "controller_id": { "type": ["string", "null"], "maxLength": 80 }, "controlled_by_coil_id": { "type": ["string", "null"], "maxLength": 80 }, "normal_state": { "enum": ["open", "closed"] } }
     },
     "coil": {
       "type": "object", "additionalProperties": false,
@@ -200,6 +200,7 @@
       "properties": {
         "schema_version": { "const": "1.0" },
         "simulation_status": { "enum": ["preview", "functional"] },
+        "simulation_mode": { "enum": ["legacy_assisted", "actual_wiring"] },
         "power": {
           "type": "object", "additionalProperties": false,
           "required": ["line_terminal_id", "return_terminal_id", "phase_terminal_ids"],
@@ -295,6 +296,7 @@
         "protection_type": { "const": "eocr" },
         "protected_coil_ids": { "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
         "protected_motor_ids": { "type": "array", "maxItems": 10, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "protection_contact_ids": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
         "reset_mode": { "enum": ["manual", "automatic", "restart_required"] },
         "allowed_fault_types": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "const": "overload" } }
       }

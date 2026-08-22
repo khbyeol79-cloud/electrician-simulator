@@ -16,6 +16,7 @@ from app.domain import (
 from app.repositories import OperationRepository, ProblemRepository
 from app.repositories.wiring_repository import WiringRepository
 from app.simulation import OperationEngine, OperationSessionNotFound, SimulationDefinitionError, matches_expectation
+from app.services import DeviceBehaviorRuntimeComposer, RuntimeCompositionError
 from app.core.user_context import request_database, request_user_id
 
 
@@ -35,6 +36,14 @@ def _engine(request: Request, session_id: str) -> OperationEngine:
         return request.app.state.operation_sessions.get(session_id, request_user_id(request))
     except OperationSessionNotFound as exc:
         raise HTTPException(status_code=404, detail="동작시험 세션을 찾을 수 없습니다.") from exc
+
+
+def _runtime_definition(request: Request, circuit, operation):
+    repository = _problems(request)
+    try:
+        return DeviceBehaviorRuntimeComposer(repository.catalog).compose(circuit, operation)
+    except RuntimeCompositionError as exc:
+        raise HTTPException(status_code=422, detail=f"동작 회로 구성을 확인해 주세요. {exc}") from exc
 
 
 @problem_router.get("/{problem_id}/operation-setup", response_model=OperationSetupResponse)
@@ -111,15 +120,18 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
         for terminal in device.terminals
         if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
     }
+    runtime = _runtime_definition(request, package.problem.circuit, package.problem.operation)
     try:
         engine = OperationEngine(
             session_id=session_id,
             problem_id=problem_id,
             wiring_attempt_id=snapshot.attempt_id,
-            circuit=package.problem.circuit,
-            definition=package.problem.operation,
+            circuit=runtime.circuit,
+            definition=runtime.operation,
             connections=snapshot.connections,
             terminal_aliases=terminal_aliases,
+            catalog_composed=runtime.catalog_composed,
+            composition_warnings=runtime.warnings,
         )
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"동작 회로 정의를 확인해 주세요. {exc}") from exc
@@ -192,14 +204,17 @@ def run_operation_check(session_id: str, request: Request):
             for terminal in device.terminals
             if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
         }
+        runtime = _runtime_definition(request, package.problem.circuit, package.problem.operation)
         isolated = OperationEngine(
             session_id="isolated-check",
             problem_id=manual.problem_id,
             wiring_attempt_id=manual.wiring_attempt_id,
-            circuit=package.problem.circuit,
-            definition=package.problem.operation,
+            circuit=runtime.circuit,
+            definition=runtime.operation,
             connections=manual.connections,
             terminal_aliases=terminal_aliases,
+            catalog_composed=runtime.catalog_composed,
+            composition_warnings=runtime.warnings,
         )
         passed = True
         try:

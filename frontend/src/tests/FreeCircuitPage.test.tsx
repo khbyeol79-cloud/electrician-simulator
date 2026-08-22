@@ -50,9 +50,21 @@ describe('자유회로 실험', () => {
     await user.click(await screen.findByRole('button', { name: '자유회로 만들기' }))
     await user.click(await screen.findByRole('button', { name: '현재 결선으로 동작시험' }))
 
-    expect(await screen.findByText('공통 논리 엔진 실행 중')).toBeInTheDocument()
+    expect(await screen.findByText('기존 호환 모드 실행 중')).toBeInTheDocument()
     expect(screen.getByText('정답 채점 없음')).toBeInTheDocument()
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/api/free-circuits/self_hold_01/sessions', expect.objectContaining({ method: 'POST' })))
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes('wiring-attempts/submit'))).toBe(false)
+  })
+
+  it('shows actual-wiring catalog composition without exposing answer grading', async () => {
+    installApiMock({ actualOperation: true })
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/free-circuit']}><App /></MemoryRouter>)
+    await user.click(await screen.findByRole('button', { name: '자유회로 만들기' }))
+    await user.click(await screen.findByRole('button', { name: '현재 결선으로 동작시험' }))
+
+    expect(await screen.findByText('실제 결선 모드 실행 중')).toBeInTheDocument()
+    expect(screen.getByText('공통 기구 카탈로그 적용')).toBeInTheDocument()
+    expect(screen.getByText('정답 채점 없음')).toBeInTheDocument()
   })
 })

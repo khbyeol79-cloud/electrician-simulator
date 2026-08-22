@@ -37,7 +37,9 @@ class OperationEngine:
 
     def __init__(self, *, session_id: str, problem_id: str, wiring_attempt_id: int,
                  circuit: CircuitDefinition, definition: OperationDefinition,
-                 connections: list[WiringConnection], terminal_aliases: dict[str, str] | None = None):
+                 connections: list[WiringConnection], terminal_aliases: dict[str, str] | None = None,
+                 catalog_composed: bool = False,
+                 composition_warnings: tuple[str, ...] | list[str] | None = None):
         self.session_id = session_id
         self.problem_id = problem_id
         self.wiring_attempt_id = wiring_attempt_id
@@ -45,6 +47,15 @@ class OperationEngine:
         self.definition = definition
         self.connections = connections
         self.terminal_aliases = terminal_aliases or {}
+        self.catalog_composed = catalog_composed
+        self.definition_faults = [
+            OperationFault(
+                code=f"unverified_behavior_model:{index + 1}",
+                message=message,
+                severity="warning",
+            )
+            for index, message in enumerate(composition_warnings or [])
+        ]
         self.powered = False
         self.tripped = False
         self.elapsed_ms = 0
@@ -74,8 +85,15 @@ class OperationEngine:
         contactors = {item.contactor_id: item for item in self.definition.contactors}
         errors: list[str] = []
         for contact in self.circuit.contacts:
-            if contact.controlled_by_coil_id not in coil_ids:
+            if contact.controller_type == "coil" and contact.controller_id not in coil_ids:
                 errors.append(f"접점 {contact.contact_id}의 코일 참조가 없습니다.")
+            elif contact.controller_type == "timer" and contact.controller_id not in self.timers:
+                errors.append(f"접점 {contact.contact_id}의 타이머 참조가 없습니다.")
+            elif (
+                contact.controller_type == "protection"
+                and contact.controller_id not in self.protection_status
+            ):
+                errors.append(f"접점 {contact.contact_id}의 보호장치 참조가 없습니다.")
         for timer in self.definition.timers:
             if timer.coil_id not in coil_ids:
                 errors.append(f"타이머 {timer.timer_id}의 코일 참조가 없습니다.")
@@ -117,8 +135,12 @@ class OperationEngine:
         return None
 
     def _contact_active(self, contact) -> bool:
+        if contact.controller_type == "timer":
+            return self.timers[contact.controller_id].completed
+        if contact.controller_type == "protection":
+            return self.protection_status[contact.controller_id] != "normal"
         timer = self._timer_for_contact(contact.contact_id)
-        return timer.completed if timer is not None else self.coils.get(contact.controlled_by_coil_id, False)
+        return timer.completed if timer is not None else self.coils.get(contact.controller_id, False)
 
     def _conductive_graph(self) -> ConductiveGraph:
         graph = ConductiveGraph([(item.from_terminal, item.to) for item in self.connections])
@@ -166,6 +188,11 @@ class OperationEngine:
         result = dict(requested)
         self.interlock_runtime = {item.interlock_id: ("ready", None) for item in self.definition.interlocks}
         for interlock in self.definition.interlocks:
+            if (
+                self.definition.simulation_mode == "actual_wiring"
+                and interlock.type == "electrical"
+            ):
+                continue
             pair = [contactors[item] for item in interlock.contactor_ids if item in contactors]
             energized = [item for item in pair if result.get(item.coil_id, False)]
             if len(energized) < 2:
@@ -190,6 +217,8 @@ class OperationEngine:
 
     def _apply_protections(self, requested: dict[str, bool]) -> dict[str, bool]:
         result = dict(requested)
+        if self.definition.simulation_mode == "actual_wiring":
+            return result
         for protection in self.definition.protection_devices:
             if self.protection_status[protection.protection_device_id] != "normal":
                 for coil_id in protection.protected_coil_ids:
@@ -296,8 +325,14 @@ class OperationEngine:
         return "forward" if inversions % 2 == 0 else "reverse"
 
     def _motor_is_protected(self, motor_id: str) -> bool:
+        if self.definition.simulation_mode == "actual_wiring":
+            return False
         return any(motor_id in item.protected_motor_ids and self.protection_status[item.protection_device_id] != "normal"
                    for item in self.definition.protection_devices)
+
+    def _append_fault(self, fault: OperationFault) -> None:
+        if not any(item.code == fault.code for item in self.faults):
+            self.faults.append(fault)
 
     def _update_outputs(self, graph: ConductiveGraph) -> None:
         line = self._terminal(self.definition.power.line_terminal_id)
@@ -305,6 +340,9 @@ class OperationEngine:
         for item in self.definition.indicators:
             self.indicators[item.indicator_id] = "on" if self.powered and self._load_energized(graph, line, returning, self._terminal(item.terminal_a_id), self._terminal(item.terminal_b_id)) else "off"
         for motor in self.definition.motors:
+            if self.definition.simulation_mode == "actual_wiring":
+                self._update_actual_wiring_motor(graph, motor)
+                continue
             forward = bool(motor.forward_coil_id and self.coils.get(motor.forward_coil_id))
             reverse = bool(motor.reverse_coil_id and self.coils.get(motor.reverse_coil_id))
             if self._motor_is_protected(motor.motor_id):
@@ -341,6 +379,113 @@ class OperationEngine:
                     self.motors[motor.motor_id] = direction
             else:
                 self.motors[motor.motor_id] = "stopped"
+        if self.definition.simulation_mode == "actual_wiring":
+            self._append_actual_wiring_diagnostics()
+
+    def _phase_mapping(self, graph: ConductiveGraph, motor) -> tuple[list[int], bool]:
+        if len(motor.phase_terminal_ids) != 3 or len(motor.phase_source_terminal_ids) != 3:
+            return [], True
+        mapped: list[int] = []
+        ambiguous = False
+        for terminal in motor.phase_terminal_ids:
+            matches = [
+                index
+                for index, source in enumerate(motor.phase_source_terminal_ids)
+                if graph.connected(self._terminal(source), self._terminal(terminal))
+            ]
+            if len(matches) > 1:
+                ambiguous = True
+            mapped.append(matches[0] if len(matches) == 1 else -1)
+        return mapped, ambiguous
+
+    def _update_actual_wiring_motor(self, graph: ConductiveGraph, motor) -> None:
+        if not self.powered or self.tripped:
+            self.motors[motor.motor_id] = "power_off"
+            return
+        mapped, ambiguous = self._phase_mapping(graph, motor)
+        linked_contactors = [
+            item for item in self.definition.contactors if item.motor_id == motor.motor_id
+        ]
+        energized = [item for item in linked_contactors if self.coils.get(item.coil_id, False)]
+        if len(energized) > 1:
+            self.motors[motor.motor_id] = "simultaneous_fault"
+            self._append_fault(OperationFault(
+                code="simultaneous_contactor",
+                message="정·역 전자접촉기가 동시에 여자되었습니다.",
+                severity="danger",
+                trip_required=True,
+            ))
+            return
+        if ambiguous:
+            self.motors[motor.motor_id] = "connection_error"
+            self._append_fault(OperationFault(
+                code=f"motor_multiple_phases:{motor.motor_id}",
+                message=f"{motor.label}의 한 단자에 둘 이상의 상이 연결되었습니다.",
+                severity="danger",
+                trip_required=True,
+            ))
+            return
+        complete = len(mapped) == 3 and set(mapped) == {0, 1, 2}
+        if complete:
+            direction = self._phase_parity(mapped, motor.forward_phase_order)
+            self.motors[motor.motor_id] = (
+                direction if direction != "invalid" else "phase_sequence_error"
+            )
+            if linked_contactors and not energized:
+                self._append_fault(OperationFault(
+                    code=f"contactor_bypassed:{motor.motor_id}",
+                    message=f"{motor.label}에 전자접촉기 주접점을 우회한 3상 경로가 있습니다.",
+                    severity="danger",
+                ))
+            return
+        if any(index >= 0 for index in mapped) or energized:
+            self.motors[motor.motor_id] = "phase_loss"
+            self._append_fault(OperationFault(
+                code=f"motor_phase_loss:{motor.motor_id}",
+                message=f"{motor.label}의 결상 또는 상 연결 오류가 감지되었습니다.",
+                severity="error",
+            ))
+        elif self._motor_has_tripped_protection(motor.motor_id):
+            self.motors[motor.motor_id] = "protection_trip"
+        else:
+            self.motors[motor.motor_id] = "stopped"
+
+    def _motor_has_tripped_protection(self, motor_id: str) -> bool:
+        return any(
+            motor_id in item.protected_motor_ids
+            and self.protection_status[item.protection_device_id] != "normal"
+            for item in self.definition.protection_devices
+        )
+
+    def _append_actual_wiring_diagnostics(self) -> None:
+        contactors = {item.contactor_id: item for item in self.definition.contactors}
+        for interlock in self.definition.interlocks:
+            if interlock.type != "electrical":
+                continue
+            pair = [contactors[item] for item in interlock.contactor_ids if item in contactors]
+            energized = [item for item in pair if self.coils.get(item.coil_id, False)]
+            if len(energized) > 1:
+                self.interlock_runtime[interlock.interlock_id] = ("fault", "all")
+                self._append_fault(OperationFault(
+                    code=f"interlock_bypassed:{interlock.interlock_id}",
+                    message=f"{interlock.label}의 NC 접점이 우회되어 두 접촉기가 동시에 여자되었습니다.",
+                    severity="danger",
+                    trip_required=True,
+                ))
+        for protection in self.definition.protection_devices:
+            if self.protection_status[protection.protection_device_id] == "normal":
+                continue
+            coil_running = any(self.coils.get(coil_id, False) for coil_id in protection.protected_coil_ids)
+            motor_running = any(
+                self.motors.get(motor_id) in {"forward", "reverse"}
+                for motor_id in protection.protected_motor_ids
+            )
+            if coil_running or motor_running:
+                self._append_fault(OperationFault(
+                    code=f"protection_bypassed:{protection.protection_device_id}",
+                    message=f"{protection.label} 보호 접점을 우회한 운전 경로가 감지되었습니다.",
+                    severity="danger",
+                ))
 
     def _event(self, message: str) -> None:
         if not self.events or self.events[-1] != message:
@@ -453,6 +598,8 @@ class OperationEngine:
         }
         return OperationSessionState(
             session_id=self.session_id, problem_id=self.problem_id, wiring_attempt_id=self.wiring_attempt_id,
+            simulation_mode=self.definition.simulation_mode,
+            catalog_composed=self.catalog_composed,
             powered=self.powered, power_state="tripped" if self.tripped else "on" if self.powered else "off",
             controls={item.control_id: ControlState(label=item.label, control_type=item.control_type,
                 mode=item.mode, contact_type=item.contact_type, active=self.controls[item.control_id])
@@ -463,6 +610,6 @@ class OperationEngine:
                 for timer_id, timer in self.timers.items()},
             indicators=dict(self.indicators), motors=dict(self.motors), protections=protections,
             interlocks=interlocks,
-            active_faults=[item.code for item in self.faults] + [key for key, value in self.protection_status.items() if value != "normal"],
-            faults=list(self.faults), stable=self.stable, elapsed_ms=self.elapsed_ms, events=list(self.events),
+            active_faults=[item.code for item in [*self.definition_faults, *self.faults]] + [key for key, value in self.protection_status.items() if value != "normal"],
+            faults=[*self.definition_faults, *self.faults], stable=self.stable, elapsed_ms=self.elapsed_ms, events=list(self.events),
         )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .mounting_attempt import MountingDefinition
 from .operation_setup import DeviceLayoutDefinition
@@ -57,6 +57,10 @@ class CircuitDevice(BaseModel):
     device_type_id: str = Field(pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$")
     label: str = Field(min_length=1, max_length=80)
     socket_type_id: str | None = None
+    behavior_model_id: str | None = Field(
+        default=None,
+        pattern=r"^[a-z0-9]+(?:_[a-z0-9]+)*$",
+    )
     board_position: BoardPosition
     installed_initially: bool = False
 
@@ -93,8 +97,28 @@ class CircuitContact(BaseModel):
     switched_terminal_id: str
     nc_terminal_id: str | None = None
     no_terminal_id: str | None = None
-    controlled_by_coil_id: str
+    controller_type: Literal["coil", "timer", "protection"] = "coil"
+    controller_id: str | None = None
+    controlled_by_coil_id: str | None = None
     normal_state: Literal["open", "closed"]
+
+    @model_validator(mode="after")
+    def normalize_controller(self):
+        if self.controller_type == "coil":
+            controller_id = self.controller_id or self.controlled_by_coil_id
+            if not controller_id:
+                raise ValueError("코일 접점에는 제어 코일 ID가 필요합니다.")
+            if (
+                self.controller_id
+                and self.controlled_by_coil_id
+                and self.controller_id != self.controlled_by_coil_id
+            ):
+                raise ValueError("접점의 controller_id와 제어 코일 ID가 일치하지 않습니다.")
+            self.controller_id = controller_id
+            self.controlled_by_coil_id = controller_id
+        elif not self.controller_id:
+            raise ValueError("타이머·보호 접점에는 controller_id가 필요합니다.")
+        return self
 
 
 class CircuitCoil(BaseModel):

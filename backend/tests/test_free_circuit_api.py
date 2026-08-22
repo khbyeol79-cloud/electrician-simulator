@@ -8,6 +8,7 @@ from app.core.config import Settings
 from app.main import create_app
 from test_circuit_analysis_api import stage4_paths
 from test_operation_simulation import demo_connections
+from actual_wiring_test_utils import actual_connections, source_definition
 
 
 def test_free_circuit_workspace_uses_common_engine_without_answer_data(tmp_path):
@@ -131,3 +132,28 @@ def test_free_circuit_diagnostics_do_not_grade_answer(tmp_path):
         assert response.json()["status"] == "attention"
         assert any(item["code"] == "empty_wiring" for item in response.json()["diagnostics"])
         assert "expected_nets" not in response.text
+
+
+def test_free_circuit_session_composes_catalog_for_actual_wiring(tmp_path):
+    headers = {"X-User-Id": "actual_wiring_user"}
+    circuit, operation = source_definition()
+    payload = {
+        "name": "실제 결선 엔진 시험",
+        "circuit": circuit.model_dump(mode="json"),
+        "operation": operation.model_dump(by_alias=True, mode="json"),
+        "connections": [
+            item.model_dump(by_alias=True, mode="json") for item in actual_connections()
+        ],
+    }
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        saved = client.put("/api/free-circuits/actual_runtime", headers=headers, json=payload)
+        assert saved.status_code == 200, saved.text
+        created = client.post(
+            "/api/free-circuits/actual_runtime/sessions", headers=headers
+        )
+        assert created.status_code == 201, created.text
+        state = created.json()
+        assert state["simulation_mode"] == "actual_wiring"
+        assert state["catalog_composed"] is True
+        assert "MC1-MAIN1" in state["contacts"]
+        assert "expected_nets" not in created.text

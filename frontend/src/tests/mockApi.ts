@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.11.0',
+  version: '0.11.1',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.11.0',
+  version: '0.11.1',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -125,11 +125,13 @@ function response(data: unknown, status = 200): Response {
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number; actualOperation?: boolean }) {
   const problems = options?.problems ?? [problemSummary]
   let operationState: OperationSessionState = {
     session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
     powered: false, power_state: 'off',
+    simulation_mode: options?.actualOperation ? 'actual_wiring' : 'legacy_assisted',
+    catalog_composed: Boolean(options?.actualOperation),
     controls: {
       PB0: { label: 'PB0 정지', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NC', active: false },
       PB1: { label: 'PB1 기동', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NO', active: false },

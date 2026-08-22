@@ -70,6 +70,12 @@ class CircuitReferenceValidator:
                 issues.append(self._issue("unknown_socket_type", f"존재하지 않는 소켓 유형입니다: {device.socket_type_id}", f"{field}.socket_type_id", problem_id))
             if device_type.socket_type_id != device.socket_type_id:
                 issues.append(self._issue("incompatible_socket_type", f"장치 유형과 소켓 유형이 일치하지 않습니다: {device.device_id}", f"{field}.socket_type_id", problem_id))
+            if device.behavior_model_id:
+                behavior = self.catalog.get_device_behavior(device.behavior_model_id)
+                if behavior is None:
+                    issues.append(self._issue("unknown_behavior_model", f"존재하지 않는 기구 동작 모델입니다: {device.behavior_model_id}", f"{field}.behavior_model_id", problem_id))
+                elif behavior.device_type_id != device.device_type_id:
+                    issues.append(self._issue("behavior_device_type_mismatch", f"기구 종류와 동작 모델이 일치하지 않습니다: {device.device_id}", f"{field}.behavior_model_id", problem_id))
 
         device_pin_pairs: list[tuple[str, int]] = []
         for index, terminal in enumerate(circuit.terminals):
@@ -119,8 +125,8 @@ class CircuitReferenceValidator:
                     issues.append(self._issue("unknown_contact_terminal", f"접점 단자가 존재하지 않습니다: {terminal_id}", field, problem_id))
             if contact.common_terminal_id == contact.switched_terminal_id:
                 issues.append(self._issue("same_contact_terminals", "접점 양단은 서로 다른 단자여야 합니다.", field, problem_id))
-            if contact.controlled_by_coil_id not in coils:
-                issues.append(self._issue("unknown_contact_coil", f"접점을 제어하는 코일이 없습니다: {contact.controlled_by_coil_id}", f"{field}.controlled_by_coil_id", problem_id))
+            if contact.controller_type == "coil" and contact.controller_id not in coils:
+                issues.append(self._issue("unknown_contact_coil", f"접점을 제어하는 코일이 없습니다: {contact.controller_id}", f"{field}.controller_id", problem_id))
             expected_state = "open" if contact.contact_type == "NO" else "closed" if contact.contact_type == "NC" else None
             if expected_state and contact.normal_state != expected_state:
                 issues.append(self._issue("invalid_contact_normal_state", f"{contact.contact_type} 접점의 기본 상태가 올바르지 않습니다.", f"{field}.normal_state", problem_id))
@@ -183,6 +189,7 @@ class CircuitReferenceValidator:
             motor_ids = {item.motor_id for item in operation.motors}
             contactor_ids = {item.contactor_id for item in operation.contactors}
             protection_ids = {item.protection_device_id for item in operation.protection_devices}
+            timer_ids = {item.timer_id for item in operation.timers}
             operation_id_groups = (
                 ("duplicate_operation_control_id", "조작기구 ID", "operation.controls", [item.control_id for item in operation.controls]),
                 ("duplicate_operation_motor_id", "모터 ID", "operation.motors", [item.motor_id for item in operation.motors]),
@@ -241,6 +248,18 @@ class CircuitReferenceValidator:
                 for motor_id in protection.protected_motor_ids:
                     if motor_id not in motor_ids:
                         issues.append(self._issue("unknown_operation_protected_motor", f"보호 대상 모터가 없습니다: {motor_id}", f"operation.protection_devices.{index}.protected_motor_ids", problem_id))
+                for contact_id in protection.protection_contact_ids:
+                    contact = contacts.get(contact_id)
+                    if contact is None:
+                        issues.append(self._issue("unknown_operation_protection_contact", f"보호장치 접점이 없습니다: {contact_id}", f"operation.protection_devices.{index}.protection_contact_ids", problem_id))
+                    elif contact.controller_type != "protection" or contact.controller_id != protection.protection_device_id:
+                        issues.append(self._issue("invalid_operation_protection_contact", f"보호장치 접점의 controller가 일치하지 않습니다: {contact_id}", f"operation.protection_devices.{index}.protection_contact_ids", problem_id))
+
+            for index, contact in enumerate(circuit.contacts):
+                if contact.controller_type == "timer" and contact.controller_id not in timer_ids:
+                    issues.append(self._issue("unknown_contact_timer", f"접점을 제어하는 타이머가 없습니다: {contact.controller_id}", f"circuit.contacts.{index}.controller_id", problem_id))
+                if contact.controller_type == "protection" and contact.controller_id not in protection_ids:
+                    issues.append(self._issue("unknown_contact_protection", f"접점을 제어하는 보호장치가 없습니다: {contact.controller_id}", f"circuit.contacts.{index}.controller_id", problem_id))
 
             for test_index, test in enumerate(answer.operation_tests):
                 for step_index, step in enumerate(test.get("steps", [])):

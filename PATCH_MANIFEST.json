@@ -1,191 +1,254 @@
 {
-  "base_version": "0.10.1",
-  "target_version": "0.11.0",
-  "created_at": "2026-08-22T19:15:00+09:00",
+  "base_version": "0.11.0",
+  "target_version": "0.11.1",
+  "created_at": "2026-08-22T20:08:17+09:00",
   "added_files": [
-    "TEST_RESULTS_0.11.0.md",
-    "backend/app/domain/device_behavior.py",
-    "backend/app/services/device_instance_factory.py",
-    "backend/tests/test_device_behavior_catalog.py",
-    "backend/tests/test_device_instance_factory.py",
-    "catalog/device_behaviors.json",
-    "docs/device-behavior-audit-0.11.0.md",
-    "frontend/dist/assets/index-DZLDjMmg.js",
-    "schemas/device-behavior-catalog.schema.json"
+    "DELETED_FILES.txt",
+    "TEST_RESULTS_0.11.1.md",
+    "backend/app/services/runtime_circuit_composer.py",
+    "backend/tests/actual_wiring_test_utils.py",
+    "backend/tests/test_actual_wiring_engine.py",
+    "backend/tests/test_actual_wiring_interlocks.py",
+    "backend/tests/test_runtime_circuit_composer.py",
+    "docs/actual-wiring-runtime-0.11.1.md",
+    "frontend/dist/assets/index-B0sLCTUY.js",
+    "scripts/run_actual_wiring_demo.py"
   ],
   "modified_files": [
     "APPLY_PATCH_KO.md",
     "PATCH_MANIFEST.json",
     "README.md",
     "backend/app/__init__.py",
-    "backend/app/api/catalog.py",
+    "backend/app/api/free_circuit.py",
+    "backend/app/api/operation.py",
     "backend/app/core/config.py",
-    "backend/app/domain/__init__.py",
+    "backend/app/domain/operation_definition.py",
+    "backend/app/domain/problem_definition.py",
     "backend/app/services/__init__.py",
-    "backend/app/services/catalog_service.py",
-    "backend/tests/test_problem_api.py",
-    "catalog/README.md",
+    "backend/app/services/circuit_reference_validator.py",
+    "backend/app/services/device_instance_factory.py",
+    "backend/app/simulation/engine.py",
+    "backend/tests/test_device_instance_factory.py",
+    "backend/tests/test_free_circuit_api.py",
     "frontend/dist/index.html",
     "frontend/package-lock.json",
     "frontend/package.json",
+    "frontend/src/api/client.ts",
     "frontend/src/components/StatusBar.tsx",
     "frontend/src/pages/FreeCircuitPage.tsx",
-    "frontend/src/tests/mockApi.ts"
+    "frontend/src/pages/OperationTestPage.tsx",
+    "frontend/src/tests/FreeCircuitPage.test.tsx",
+    "frontend/src/tests/mockApi.ts",
+    "schemas/problem.schema.json"
   ],
   "deleted_files": [
-    "frontend/dist/assets/index-ChnLszOu.js"
+    "frontend/dist/assets/index-DZLDjMmg.js"
   ],
   "manifest_self_hash_excluded": true,
   "files": [
     {
       "path": "APPLY_PATCH_KO.md",
       "change_type": "modified",
-      "size": 1943,
-      "sha256": "4d5a4b6c93e23650d4c6caf35edfcd7635c1b23fe0feb0605b8ed18f713db20c"
+      "size": 2645,
+      "sha256": "6252ba99de7481c752c7c6fea12419cce5bb1f63c115f0026a278cce40d264b5"
+    },
+    {
+      "path": "DELETED_FILES.txt",
+      "change_type": "added",
+      "size": 39,
+      "sha256": "f1e5ea9ebdaf8c9cbf5e36aae0ccf6d2faadd5c206f73ce6ce3b588b4bcc2416"
+    },
+    {
+      "path": "README.md",
+      "change_type": "modified",
+      "size": 20613,
+      "sha256": "ceaaafc7c375019016d2efcb6c71aeecfce611491890aeaeb78720ee15ba2cf3"
+    },
+    {
+      "path": "TEST_RESULTS_0.11.1.md",
+      "change_type": "added",
+      "size": 3619,
+      "sha256": "7fafb4444e9bc64e3a3b122fa595adcfabf0d6d67517347e81704ddd519d0509"
     },
     {
       "path": "backend/app/__init__.py",
       "change_type": "modified",
       "size": 69,
-      "sha256": "d447b04eef6d0404648608048c5998918acc47edbfe2f5cb73f0fe7112c3ed4d"
+      "sha256": "f10d4eb038ab618a8fccfad8fd914e0b445924df01da2705591094c71e181d99"
     },
     {
-      "path": "backend/app/api/catalog.py",
+      "path": "backend/app/api/free_circuit.py",
       "change_type": "modified",
-      "size": 1555,
-      "sha256": "de2c84d75fb464fb4f89446eec1d31d5b6a92ff2b9b79a95c1b59b9839e0bf11"
+      "size": 13442,
+      "sha256": "9c37b6c1b0cf8388b8e2bbd4fa4ce419a380ae1df04472aa1045a95b810be90a"
+    },
+    {
+      "path": "backend/app/api/operation.py",
+      "change_type": "modified",
+      "size": 12708,
+      "sha256": "88a02bb4b122ee485b7688e3effa8df3660bdba56c58bc02e28f9ade2ea2ff30"
     },
     {
       "path": "backend/app/core/config.py",
       "change_type": "modified",
       "size": 1915,
-      "sha256": "a4a2c2f239df3510ad13370b7c05535a4b7d6ce264fdf5ceed1054846ed1942d"
+      "sha256": "fb3eebb8c1f2c95c11b5e93707ad86ec635ae53ec559af93184d2d12ba196dec"
     },
     {
-      "path": "backend/app/domain/__init__.py",
+      "path": "backend/app/domain/operation_definition.py",
       "change_type": "modified",
-      "size": 2989,
-      "sha256": "cc3bde2c1c6b9423d622d3244e43a75f1767e2a996e26df72ed597ec77732cdc"
+      "size": 8699,
+      "sha256": "8359e6e4f60003ecd169600df434e4e50b9b3afd13ff9965cc6c8f5b5dc1a563"
     },
     {
-      "path": "backend/app/domain/device_behavior.py",
-      "change_type": "added",
-      "size": 7114,
-      "sha256": "5df29d08bc6387ed3cd404db290e85e263a58f471230cf02d9660b95cf2f1631"
+      "path": "backend/app/domain/problem_definition.py",
+      "change_type": "modified",
+      "size": 7219,
+      "sha256": "ef5d767c31d152620e62120670b3a2a67cc285fe1044df042374531737abd1ad"
     },
     {
       "path": "backend/app/services/__init__.py",
       "change_type": "modified",
-      "size": 571,
-      "sha256": "d9a2937fbcae8569ed903f628411546f760f4fa50dd1a4a34edc652f87854897"
+      "size": 809,
+      "sha256": "4c82d8448f279c211bfbc3e36e25adb25b14fd2c821db79079a98eb056109480"
     },
     {
-      "path": "backend/app/services/catalog_service.py",
+      "path": "backend/app/services/circuit_reference_validator.py",
       "change_type": "modified",
-      "size": 20575,
-      "sha256": "97c76078ee84270f6d650d2b8e9ba5b56a244ec5452e1b4740b739e4057b431b"
+      "size": 22401,
+      "sha256": "f489470d215f9cc011784d4bbfd0e70630907124069ee20364d44075f39a77fd"
     },
     {
       "path": "backend/app/services/device_instance_factory.py",
-      "change_type": "added",
-      "size": 11277,
-      "sha256": "e0643bce425fb4c9e2cfd71eca05da6930e55f08675eee81c145776399aea504"
+      "change_type": "modified",
+      "size": 11560,
+      "sha256": "cf9551ca5a6fbbf59423711be7388971a659475b45a8b6714856ca98d2efea89"
     },
     {
-      "path": "backend/tests/test_device_behavior_catalog.py",
+      "path": "backend/app/services/runtime_circuit_composer.py",
       "change_type": "added",
-      "size": 6827,
-      "sha256": "3c7deefe5733af4510713a066aa9822efdd80005ad28e875b2c384a5262f2af5"
+      "size": 11005,
+      "sha256": "a9d6c6b6be99eaa9a6285e6d84b6ec4aa845520c29118ee385a3309e29cfdaed"
+    },
+    {
+      "path": "backend/app/simulation/engine.py",
+      "change_type": "modified",
+      "size": 33508,
+      "sha256": "ae023f9e8883856a6f1c0cc16910cb7a8b2fbf26ea8423081699a57065ce9cd9"
+    },
+    {
+      "path": "backend/tests/actual_wiring_test_utils.py",
+      "change_type": "added",
+      "size": 4514,
+      "sha256": "fd9e030855be01536e82c355b8bd81aa5a46771e29198b4dd9232aa68a2879d5"
+    },
+    {
+      "path": "backend/tests/test_actual_wiring_engine.py",
+      "change_type": "added",
+      "size": 3841,
+      "sha256": "17a9b30995c6693edead070442522785b1b3aade22b80910b4fb1d8a64b64c7b"
+    },
+    {
+      "path": "backend/tests/test_actual_wiring_interlocks.py",
+      "change_type": "added",
+      "size": 3219,
+      "sha256": "e060074f3eadd9075a509b16c1a11be63c5d822ce52891c173f1bc0f2c164d42"
     },
     {
       "path": "backend/tests/test_device_instance_factory.py",
-      "change_type": "added",
-      "size": 6266,
-      "sha256": "df0f6606da827ea7523bc9255fe0bbdf91aa0b02570aad181fbb3d9d8542a7a5"
-    },
-    {
-      "path": "backend/tests/test_problem_api.py",
       "change_type": "modified",
-      "size": 3960,
-      "sha256": "3d2d3da83b8bcde83b0c8fc4bc3e33e1b59ec9513eda83b1b3ac2ad05f3701b9"
+      "size": 6508,
+      "sha256": "2a3d9c265f8dcc22a5e26c20999235297f761642891853e161bd324003f0bca6"
     },
     {
-      "path": "catalog/device_behaviors.json",
-      "change_type": "added",
-      "size": 32966,
-      "sha256": "cf152cac129f09cdd0bfe0507c4dd35b80e99edb837c98a190faaff8f6bfb847"
-    },
-    {
-      "path": "catalog/README.md",
+      "path": "backend/tests/test_free_circuit_api.py",
       "change_type": "modified",
-      "size": 1132,
-      "sha256": "be8fb1d3d0d7ff43df099fa08a95043b6bb86e5843ba0107ec66568f494f8a9e"
+      "size": 7766,
+      "sha256": "0564ea03ec0ecd5daf13a47abc58cc7aac6eb63fa5f2ea0a4d50530c23ccf8f8"
     },
     {
-      "path": "docs/device-behavior-audit-0.11.0.md",
+      "path": "backend/tests/test_runtime_circuit_composer.py",
       "change_type": "added",
-      "size": 8683,
-      "sha256": "8209e213f3e3e7447a0c0419d90b977c38040913237668a5ddae7786ddd9d8fb"
+      "size": 4434,
+      "sha256": "7ed85016c825382aae64142fac65addf59447d98600625684812de8a1bcb5f0d"
     },
     {
-      "path": "frontend/dist/assets/index-DZLDjMmg.js",
+      "path": "docs/actual-wiring-runtime-0.11.1.md",
       "change_type": "added",
-      "size": 323629,
-      "sha256": "fa3dafd0b4db3cf42f99fca179e19e97de6cf58c1e642516c69f5bc2dacccc0b"
+      "size": 6723,
+      "sha256": "df7a0bb0a76346423bf32b8961c4b030747f2b01b12c2889cfbbcd9d449636d5"
+    },
+    {
+      "path": "frontend/dist/assets/index-B0sLCTUY.js",
+      "change_type": "added",
+      "size": 323925,
+      "sha256": "b52f2a402a3876009369af61432f1351b6088ac66a73f4aa9c3f97e7488e55b1"
     },
     {
       "path": "frontend/dist/index.html",
       "change_type": "modified",
       "size": 484,
-      "sha256": "9820a6c1e98d82cbaed784074544e6183dc48b3dba54c9dbb547aecb7027ec02"
+      "sha256": "df03eb0b618b54a0648be0996831d6cebcf484f13ece7abcfa206dcb1ebe29d7"
     },
     {
       "path": "frontend/package-lock.json",
       "change_type": "modified",
       "size": 103225,
-      "sha256": "5fef86ec3d6c57cf45e39895387c217100f51367f6cf75f4e076f03030b87f79"
+      "sha256": "2b86da8aa7ff74eb084a183cf795033f6b3bb84c68e601e9db5cc26c01b98b14"
     },
     {
       "path": "frontend/package.json",
       "change_type": "modified",
       "size": 739,
-      "sha256": "4946b438cc658feffbe6921e196856950fa9e9c7663514b1491a46723e6d507f"
+      "sha256": "0790b8ad9881f7377aa4e8b98b95157f58c832f60e6fd938d01cb1d6ca99b692"
+    },
+    {
+      "path": "frontend/src/api/client.ts",
+      "change_type": "modified",
+      "size": 23823,
+      "sha256": "ac91e9d18e192726755ba6b9cae011dfa123823d17e30baa42d3ccf6e024d2f7"
     },
     {
       "path": "frontend/src/components/StatusBar.tsx",
       "change_type": "modified",
       "size": 1234,
-      "sha256": "d8de718ddb2c3b7a353bd8677ef9ee03abdc6b0a343dfdf9e8c2f4080a2632f9"
+      "sha256": "9655d55876efa63f0eb4cc4af3abb6abe0124b68c55c09235e62a3d49bcfd7b7"
     },
     {
       "path": "frontend/src/pages/FreeCircuitPage.tsx",
       "change_type": "modified",
-      "size": 22980,
-      "sha256": "2a7af610ff7bbdaa44be66bd6675ce2bc850fd38fbfb5beb6e1029d705cf5a03"
+      "size": 23118,
+      "sha256": "0fc4703e807dc08d8671bac26088f3593c02e2c432b356f6326806664a983694"
+    },
+    {
+      "path": "frontend/src/pages/OperationTestPage.tsx",
+      "change_type": "modified",
+      "size": 16838,
+      "sha256": "acda92e81e49d44789b4136eb9b85f388a3c8c0115bb984359e2d772d547b373"
+    },
+    {
+      "path": "frontend/src/tests/FreeCircuitPage.test.tsx",
+      "change_type": "modified",
+      "size": 3940,
+      "sha256": "0450ceeced3e524ff21c60f9ca9bf5740f18ad51697dc623654c5f9d86fad9ff"
     },
     {
       "path": "frontend/src/tests/mockApi.ts",
       "change_type": "modified",
-      "size": 24008,
-      "sha256": "a725493273cf91467eb6e1e33e64bee3625cdfe1c995091745f4066f04b37d7b"
+      "size": 24177,
+      "sha256": "dc1d8dc59c89fc0cbc440abe050fbef8f7906366e0b82eeb331e3b0fea06ddd8"
     },
     {
-      "path": "README.md",
+      "path": "schemas/problem.schema.json",
       "change_type": "modified",
-      "size": 19176,
-      "sha256": "3cac215ef94d68c71e4489bbf7e8dc833085a52a3a5dc1fda69c1d21ddc85ce8"
+      "size": 19139,
+      "sha256": "3aad7ee32740fcd1313e64be0516af5a760f147ddded1bf6c73157f2e4a93bc2"
     },
     {
-      "path": "schemas/device-behavior-catalog.schema.json",
+      "path": "scripts/run_actual_wiring_demo.py",
       "change_type": "added",
-      "size": 8902,
-      "sha256": "56a4aad0494103aae2500a5ac12d3dac37a489ebe1f2c6035b16edb2d54df545"
-    },
-    {
-      "path": "TEST_RESULTS_0.11.0.md",
-      "change_type": "added",
-      "size": 3676,
-      "sha256": "0ab7271c1b5d85200016eede28af87e5d3292871868fff671b44fc48f85b326d"
+      "size": 3126,
+      "sha256": "90eed8b33419172c45444f171082d141e90c95f113d53318ef79dd42a8c76954"
     }
   ]
 }

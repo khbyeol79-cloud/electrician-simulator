@@ -184,6 +184,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
           <h3>{setup.operation_ready ? '논리 동작시험 준비 완료' : setup.preview_allowed ? '읽기 전용 미리보기' : '결선 확인 필요'}</h3>
           <p>{setup.message}</p>
           <small>배선 기준: {setup.wiring_source === 'accepted_submission' ? '정상 제출 스냅샷' : setup.wiring_source === 'draft_preview' ? '임시저장 미리보기' : '없음'}</small>
+          {session && <small>계산 방식: {session.simulation_mode === 'actual_wiring' ? '실제 결선' : '기존 호환'}{session.catalog_composed ? ' · 기구 카탈로그 적용' : ''}</small>}
         </section>
 
         {session && <>

@@ -17,6 +17,7 @@ from app.domain.free_circuit import (
 )
 from app.repositories.free_circuit_repository import FreeCircuitRepository
 from app.simulation import OperationEngine, SimulationDefinitionError
+from app.services import DeviceBehaviorRuntimeComposer, RuntimeCompositionError
 
 
 router = APIRouter(prefix="/api/free-circuits", tags=["free-circuit"])
@@ -56,6 +57,18 @@ class FreeCircuitDiagnosticsResponse(BaseModel):
 
 def _repository(request: Request) -> FreeCircuitRepository:
     return FreeCircuitRepository(request_database(request))
+
+
+def _runtime_definition(request: Request, circuit, operation):
+    problem_repository = getattr(request.app.state, "problem_repository", None)
+    if problem_repository is None:
+        raise HTTPException(status_code=503, detail="공통 기구 카탈로그를 준비할 수 없습니다.")
+    try:
+        return DeviceBehaviorRuntimeComposer(problem_repository.catalog).compose(
+            circuit, operation
+        )
+    except RuntimeCompositionError as exc:
+        raise HTTPException(status_code=422, detail=f"자유회로 구성을 확인해 주세요. {exc}") from exc
 
 
 def _template(request: Request, template_id: str) -> FreeCircuitTemplate:
@@ -223,15 +236,18 @@ def create_free_circuit_session(workspace_id: WorkspaceId, request: Request):
         for terminal in device.terminals
         if terminal.operation_terminal_id and terminal.terminal_id in submitted_terminal_ids
     }
+    runtime = _runtime_definition(request, workspace.circuit, workspace.operation)
     try:
         engine = OperationEngine(
             session_id=session_id,
             problem_id=f"free:{workspace_id}",
             wiring_attempt_id=0,
-            circuit=workspace.circuit,
-            definition=workspace.operation,
+            circuit=runtime.circuit,
+            definition=runtime.operation,
             connections=workspace.connections,
             terminal_aliases=terminal_aliases,
+            catalog_composed=runtime.catalog_composed,
+            composition_warnings=runtime.warnings,
         )
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"자유회로 정의를 확인해 주세요. {exc}") from exc
@@ -255,15 +271,18 @@ def get_diagnostics(workspace_id: WorkspaceId, request: Request):
                 message=f"{coil.coil_id} 코일의 전원 경로가 아직 완성되지 않았을 수 있습니다.",
             ))
     try:
+        runtime = _runtime_definition(request, workspace.circuit, workspace.operation)
         engine = OperationEngine(
             session_id="diagnostic", problem_id=f"free:{workspace_id}", wiring_attempt_id=0,
-            circuit=workspace.circuit, definition=workspace.operation, connections=workspace.connections,
+            circuit=runtime.circuit, definition=runtime.operation, connections=workspace.connections,
+            catalog_composed=runtime.catalog_composed,
+            composition_warnings=runtime.warnings,
         )
         diagnostics.extend(FreeCircuitDiagnostic(
             severity=fault.severity, code=fault.code,
             message=fault.message.replace("감지되었습니다", "가능성이 확인되었습니다"),
         ) for fault in engine.faults)
-    except SimulationDefinitionError as exc:
+    except (SimulationDefinitionError, RuntimeCompositionError) as exc:
         diagnostics.append(FreeCircuitDiagnostic(severity="error", code="invalid_definition", message=str(exc)))
     status = "normal" if not diagnostics else "attention"
     return FreeCircuitDiagnosticsResponse(status=status, diagnostics=diagnostics)

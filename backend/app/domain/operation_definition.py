@@ -97,6 +97,7 @@ class OperationProtectionDevice(BaseModel):
     protection_type: Literal["eocr"] = "eocr"
     protected_coil_ids: list[str] = Field(min_length=1, max_length=20)
     protected_motor_ids: list[str] = Field(default_factory=list, max_length=10)
+    protection_contact_ids: list[str] = Field(default_factory=list, max_length=20)
     reset_mode: Literal["manual", "automatic", "restart_required"] = "manual"
     allowed_fault_types: list[Literal["overload"]] = Field(default_factory=lambda: ["overload"], min_length=1)
 
@@ -106,6 +107,7 @@ class OperationDefinition(BaseModel):
 
     schema_version: Literal["1.0"] = "1.0"
     simulation_status: Literal["preview", "functional"] = "preview"
+    simulation_mode: Literal["legacy_assisted", "actual_wiring"] = "legacy_assisted"
     power: OperationPower
     controls: list[OperationControl] = Field(default_factory=list, max_length=50)
     timers: list[OperationTimer] = Field(default_factory=list, max_length=20)
@@ -206,6 +208,8 @@ class OperationSessionState(BaseModel):
     session_id: str
     problem_id: str
     wiring_attempt_id: int
+    simulation_mode: Literal["legacy_assisted", "actual_wiring"] = "legacy_assisted"
+    catalog_composed: bool = False
     powered: bool
     power_state: Literal["off", "on", "tripped"]
     controls: dict[str, ControlState]

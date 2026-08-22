@@ -97,11 +97,15 @@ def test_indicator_color_is_instance_setting(factory):
     assert green.indicators[0].display_color == "green"
 
 
-def test_eocr_protection_relationship_is_deferred(factory):
+def test_eocr_protection_contacts_are_runtime_fragments(factory):
     instance = factory.create(request("eocr_12p_training", "EOCR"))
     assert "overload_protection" in instance.deferred_operation_capabilities
-    assert "protection_contacts" in instance.deferred_operation_capabilities
-    assert not instance.contacts
+    assert "protection_contacts" not in instance.deferred_operation_capabilities
+    assert {item.contact_id for item in instance.contacts} == {
+        "EOCR-TRIP-NC", "EOCR-TRIP-NO"
+    }
+    assert {item.controller_type for item in instance.contacts} == {"protection"}
+    assert {item.controller_id for item in instance.contacts} == {"EOCR"}
     assert len(instance.intrinsic_connections) == 3
 
 

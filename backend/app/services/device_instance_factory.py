@@ -54,6 +54,7 @@ class DeviceInstanceFactory:
             device_type_id=model.device_type_id,
             label=request.label,
             socket_type_id=socket_type_id,
+            behavior_model_id=model.model_id,
             board_position=request.board_position,
             installed_initially=request.installed_initially,
         )
@@ -88,16 +89,21 @@ class DeviceInstanceFactory:
 
         circuit_contacts: list[CircuitContact] = []
         for item in model.contacts:
-            if item.actuation not in {"coil", "timer"}:
+            if item.actuation == "manual":
                 continue
             if item.actuation == "coil":
                 controlled_by_coil_id = coil_ids[item.controlled_by_key]
-            else:
+                controller_id = controlled_by_coil_id
+            elif item.actuation == "timer":
                 if model.timer is None:
                     raise DeviceInstanceError(
                         f"{model.model_id}의 계시 접점에 타이머 정의가 없습니다."
                     )
                 controlled_by_coil_id = coil_ids[model.timer.coil_key]
+                controller_id = f"{request.instance_id}-{model.timer.id_suffix}"
+            else:
+                controlled_by_coil_id = None
+                controller_id = request.instance_id
             circuit_contacts.append(
                 CircuitContact(
                     contact_id=contact_ids[item.contact_key],
@@ -107,6 +113,8 @@ class DeviceInstanceFactory:
                     switched_terminal_id=terminal_ids[item.switched_terminal_key],
                     nc_terminal_id=(terminal_ids[item.nc_terminal_key] if item.nc_terminal_key else None),
                     no_terminal_id=(terminal_ids[item.no_terminal_key] if item.no_terminal_key else None),
+                    controller_type=item.actuation,
+                    controller_id=controller_id,
                     controlled_by_coil_id=controlled_by_coil_id,
                     normal_state=item.normal_state,
                 )
@@ -181,9 +189,6 @@ class DeviceInstanceFactory:
             for capability in ("power_source", "three_phase_load", "overload_protection")
             if capability in model.capabilities
         ]
-        if any(item.actuation == "protection" for item in model.contacts):
-            deferred.append("protection_contacts")
-
         return DeviceInstanceDefinition(
             model_id=model.model_id,
             instance_id=request.instance_id,
