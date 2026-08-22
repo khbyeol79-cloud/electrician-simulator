@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
-import { boardItemLabelArea, buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
+import { boardItemLabelArea, buildExternalWireLayouts, buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
+import { calculatePanDelta } from '../components/circuit/useSvgViewport'
 import { buildConnectionEndpointOffsets, pathHasSelfOverlap, routeConnection, routeConnections } from '../features/wiring/engine/orthogonalRouter'
 import { terminalBlockBank, terminalBlockUsage } from '../features/wiring/engine/terminalCapacity'
 import { WiringPage } from '../pages/WiringPage'
@@ -73,6 +74,69 @@ describe('제어함 결선', () => {
     await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
     expect(screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
+  })
+
+  it('separates two external TB leads and recenters the remaining lead after deletion', async () => {
+    const tbPin = { terminal_id: 'TB5-01', label: '1', number: 1, side: 'bottom' as const, x: 80, y: 100, max_connections: 2, enabled: true, terminal_role: 'free_junction' as const }
+    const board: BoardDefinition = {
+      ...wiringBoard,
+      items: [{ item_id: 'TB5', label: 'TB5', item_type: 'terminal_block', socket_type_id: null, row: 0, x: 55, y: 40, width: 50, height: 60, pins: [tbPin], label_area: { x: 60, y: 55, width: 40, height: 22 } }, ...wiringBoard.items],
+    }
+    const detail = {
+      ...trainingDetail,
+      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [
+        { device_id: 'PB0', label: 'PB0 정지', placement: 'top' as const, terminals: [{ terminal_id: 'PB0-1', label: '1', terminal_role: 'external' as const, operation_terminal_id: null, max_connections: 1 as const, wire_color: 'yellow' as const }] },
+        { device_id: 'PB1', label: 'PB1 기동', placement: 'top' as const, terminals: [{ terminal_id: 'PB1-1', label: '1', terminal_role: 'external' as const, operation_terminal_id: null, max_connections: 1 as const, wire_color: 'yellow' as const }] },
+      ] },
+    }
+    installApiMock({ board })
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    for (const externalId of ['PB0-1', 'PB1-1']) {
+      await user.click(screen.getByRole('button', { name: new RegExp(`${externalId} 외부 기구선`) }))
+      await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
+    }
+
+    const first = screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })
+    const second = screen.getByRole('button', { name: 'PB1-1에서 TB5-01로 연결된 전선' })
+    expect(first.querySelector('.wire-visible')?.getAttribute('points')).not.toBe(second.querySelector('.wire-visible')?.getAttribute('points'))
+    await user.click(first)
+    expect(first).toHaveClass('selected')
+    await user.click(screen.getByRole('button', { name: '선택 전선 삭제' }))
+    expect(screen.queryByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'PB1-1에서 TB5-01로 연결된 전선' }).querySelector('.wire-visible')).toHaveAttribute('points', '80,40 80,10')
+  })
+
+  it('uses stable left-right external ports for TB5 and TB6', () => {
+    const board = trainingBoardData as unknown as BoardDefinition
+    const connections = [
+      { from: 'PB0-1', to: 'TB5-01', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+      { from: 'PB1-1', to: 'TB5-01', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+      { from: 'GL-1', to: 'TB6-01', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+      { from: 'RL-1', to: 'TB6-01', wire_color: 'yellow' as const, pair_display_color: '#64748b' },
+    ]
+    const layouts = buildExternalWireLayouts(board, connections, new Set(['PB0-1', 'PB1-1', 'GL-1', 'RL-1']))
+    const tb5 = layouts.filter((wire) => wire.boardTerminalId === 'TB5-01')
+    const tb6 = layouts.filter((wire) => wire.boardTerminalId === 'TB6-01')
+    expect(tb5).toHaveLength(2)
+    expect(tb6).toHaveLength(2)
+    expect(tb5[0].points).not.toBe(tb5[1].points)
+    expect(tb6[0].points).not.toBe(tb6[1].points)
+    expect(tb5.every((wire) => Number(wire.points.split(/[ ,]/)[1]) < Number(wire.points.split(/[ ,]/)[3]))).toBe(false)
+    expect(tb6.every((wire) => Number(wire.points.split(/[ ,]/)[1]) < Number(wire.points.split(/[ ,]/)[3]))).toBe(true)
+    const single = buildExternalWireLayouts(board, connections.slice(1, 2), new Set(['PB1-1']))[0]
+    const tb5Pin = board.items.find((item) => item.item_id === 'TB5')!.pins.find((pin) => pin.terminal_id === 'TB5-01')!
+    expect(single.points.startsWith(`${tb5Pin.x},`)).toBe(true)
+  })
+
+  it('maps compact diagram pointer motion to viewBox units without changing the main default', () => {
+    const compact = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 2.4, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: true })
+    const previous = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 2.4, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: false })
+    expect(compact.x).toBe(previous.x * 4)
+    expect(compact.y).toBe(previous.y * 4)
+    const main = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 1, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: false })
+    expect(main).toEqual({ x: 10, y: 5 })
   })
 
   it('counts two external and two internal TB wires in separate physical banks', () => {

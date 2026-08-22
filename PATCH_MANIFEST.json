@@ -1,189 +1,62 @@
 {
-  "base_version": "0.9.4",
-  "target_version": "0.10.0",
-  "created_at": "2026-08-21T15:21:34.581925+00:00",
+  "base_version": "0.10.0",
+  "target_version": "0.10.1",
+  "created_at": "2026-08-22T18:29:35+09:00",
   "added_files": [
-    "docs/implementation-status-0.10.0.md",
-    "frontend/dist/assets/index-BUK8lGZO.css",
-    "frontend/dist/assets/index-BzsPT0Md.js",
-    "frontend/src/pages/FreeCircuitPage.tsx",
-    "frontend/src/tests/FreeCircuitPage.test.tsx"
+    "APPLY_PATCH_KO.md",
+    "PATCH_MANIFEST.json",
+    "TEST_RESULTS_0.10.1.md",
+    "frontend/dist/assets/index-ChnLszOu.js",
+    "frontend/src/features/wiring/engine/boardGeometry.ts"
   ],
   "modified_files": [
     "README.md",
     "backend/app/__init__.py",
     "backend/app/api/free_circuit.py",
     "backend/app/core/config.py",
-    "backend/app/database/sqlite_database.py",
-    "backend/app/domain/__init__.py",
-    "backend/app/domain/free_circuit.py",
-    "backend/app/repositories/free_circuit_repository.py",
-    "backend/app/simulation/graph.py",
-    "backend/tests/test_database.py",
     "backend/tests/test_free_circuit_api.py",
     "frontend/dist/index.html",
     "frontend/package-lock.json",
     "frontend/package.json",
-    "frontend/src/App.tsx",
     "frontend/src/api/client.ts",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/StageNavigation.tsx",
     "frontend/src/components/StatusBar.tsx",
-    "frontend/src/styles/global.css",
+    "frontend/src/components/circuit/CircuitDiagram.tsx",
+    "frontend/src/components/circuit/useSvgViewport.ts",
+    "frontend/src/features/operation/components/OperationBoard.tsx",
+    "frontend/src/features/wiring/components/WiringBoard.tsx",
+    "frontend/src/pages/FreeCircuitPage.tsx",
+    "frontend/src/tests/FreeCircuitPage.test.tsx",
+    "frontend/src/tests/OperationPage.test.tsx",
+    "frontend/src/tests/WiringPage.test.tsx",
     "frontend/src/tests/mockApi.ts"
   ],
   "deleted_files": [
-    "frontend/dist/assets/index-COasMRqz.js",
-    "frontend/dist/assets/index-CndwQ2Uu.css"
+    "frontend/dist/assets/index-BzsPT0Md.js"
   ],
+  "manifest_self_hash_excluded": true,
   "files": [
-    {
-      "path": "APPLY_PATCH_KO.md",
-      "size": 1946,
-      "sha256": "5f7ed8041b19c1407a9c8c2f50f3192d044f0ed19aee34a68c43e70704064473"
-    },
-    {
-      "path": "README.md",
-      "size": 17908,
-      "sha256": "e5e205784f59a156d81732ba219545dc36daa8cc8f19643fc422c4b6868a55c8"
-    },
-    {
-      "path": "TEST_RESULTS_0.10.0.txt",
-      "size": 1080,
-      "sha256": "20439c70752fb6a6c3c0561c752464f75220a8cc1342410761758adb1495e60d"
-    },
-    {
-      "path": "backend/app/__init__.py",
-      "size": 69,
-      "sha256": "209a9da1a817cc02c7f3b7256912a3d0335ed73c1a5a81f80105b14c6f0e4f85"
-    },
-    {
-      "path": "backend/app/api/free_circuit.py",
-      "size": 11124,
-      "sha256": "a853c50f428a3f454bf85f1b25324ef3b169ff22d74a6d3f1d56d850fe00c42a"
-    },
-    {
-      "path": "backend/app/core/config.py",
-      "size": 1915,
-      "sha256": "e015d38a87688aa550ff7b8c09a4c559c3cee298210803181d92a2f7efe8b5ba"
-    },
-    {
-      "path": "backend/app/database/sqlite_database.py",
-      "size": 8337,
-      "sha256": "e00af17a153f16df225b947647ae0ec0d1754ea89f806e28f1a17bf4834edc38"
-    },
-    {
-      "path": "backend/app/domain/__init__.py",
-      "size": 2732,
-      "sha256": "ccb2f29cfda35f6dccc5aaf4d287a86b72cfbdb730b2fd1895184b235d2f1575"
-    },
-    {
-      "path": "backend/app/domain/free_circuit.py",
-      "size": 2083,
-      "sha256": "2dcaae6bc985fe68455a6c1edfb2aafd1d66c805ed19ae249ef0784ad86dc7c0"
-    },
-    {
-      "path": "backend/app/repositories/free_circuit_repository.py",
-      "size": 5145,
-      "sha256": "3a1f4cddc91a6ca0cfd54e52c062fd09028fd95663f2cdb65b8b3e69e57e42ed"
-    },
-    {
-      "path": "backend/app/simulation/graph.py",
-      "size": 929,
-      "sha256": "f026bd5c8c83da879b6e6576c3960382879605822617a8bb446e2db928c2b756"
-    },
-    {
-      "path": "backend/tests/test_database.py",
-      "size": 2394,
-      "sha256": "3229b1edfbe1d8b5ea99d75c1f25447f52bb80d7a0952c721d026ce4f4e1c4c8"
-    },
-    {
-      "path": "backend/tests/test_free_circuit_api.py",
-      "size": 5360,
-      "sha256": "a4641b507ad9ae48b784af4750c55067bc0ac4e32ce6c1e2041f2b1846801591"
-    },
-    {
-      "path": "docs/implementation-status-0.10.0.md",
-      "size": 1952,
-      "sha256": "9cd636d08cde6845243576903f4d95f83be1e40660d7a3a8234c0cfca469ce8f"
-    },
-    {
-      "path": "frontend/dist/assets/index-BUK8lGZO.css",
-      "size": 40700,
-      "sha256": "bb016ea1fe7b8d2ccbe4824cec2feb6fc8cd01ccb4d4a5ffe31de9b873cdebfa"
-    },
-    {
-      "path": "frontend/dist/assets/index-BzsPT0Md.js",
-      "size": 323021,
-      "sha256": "cd6065f13740310ba5494a2514a67a4b6338d25db4d850f711dc57839c6a418c"
-    },
-    {
-      "path": "frontend/dist/index.html",
-      "size": 484,
-      "sha256": "174c300977cd1c804983b959c15645713fc14e1f8b18ef6baba2dfd333121a42"
-    },
-    {
-      "path": "frontend/package-lock.json",
-      "size": 103225,
-      "sha256": "b68996256d8ea24b7eb2a0fe59a5ceaa9d84cbb7a0545fb00b1f5e2c861c3bbb"
-    },
-    {
-      "path": "frontend/package.json",
-      "size": 739,
-      "sha256": "1ee3a131872e30a7be81d889b4a5394eaa546ca19bcbbb2516b3fe396f3a45fd"
-    },
-    {
-      "path": "frontend/src/App.tsx",
-      "size": 5117,
-      "sha256": "a330562e63aff7cda3a78ed4c305f3ca26fc5d6d6a020902599c7e6c7ca85f90"
-    },
-    {
-      "path": "frontend/src/api/client.ts",
-      "size": 23587,
-      "sha256": "8b74b9641f279f0295a4dfc3fd83b2cb42a683bf4e3f7de8c2377a9f4be6da99"
-    },
-    {
-      "path": "frontend/src/components/Header.tsx",
-      "size": 1602,
-      "sha256": "2c0cc9a603f762809f83b25a832a6d95455edce5b7a61b63b8172bacd8601ac6"
-    },
-    {
-      "path": "frontend/src/components/StageNavigation.tsx",
-      "size": 3417,
-      "sha256": "066e9912fc85ad22b1e2c54724349526fa1162f02e4ec08eb02154e09efe691b"
-    },
-    {
-      "path": "frontend/src/components/StatusBar.tsx",
-      "size": 1234,
-      "sha256": "d33b1513213822acc2e1d53ad4b535dba3567aac4142d631805c80fdda47ac07"
-    },
-    {
-      "path": "frontend/src/pages/FreeCircuitPage.tsx",
-      "size": 23291,
-      "sha256": "7e246ede41a6bfd9008e6e7c8e5d4fd692d753a0cf8589385fd9bb5d1fbee5cb"
-    },
-    {
-      "path": "frontend/src/styles/global.css",
-      "size": 46480,
-      "sha256": "ff1a4a3f39421102c5c6eac3261efc2719017fbd76b105026ebb34ba1a010a87"
-    },
-    {
-      "path": "frontend/src/tests/FreeCircuitPage.test.tsx",
-      "size": 2236,
-      "sha256": "707313b6d1ed046c8970e43d32e1fce8419e4e227611c177bbedf4e7e9b4d496"
-    },
-    {
-      "path": "frontend/src/tests/mockApi.ts",
-      "size": 23985,
-      "sha256": "56eba667033e2613ed362e39f4d07c95ab3c119deead6a7de992336d34c4531d"
-    }
-  ],
-  "verification": {
-    "patch_replay": "passed",
-    "python_tests": 80,
-    "frontend_tests": 50,
-    "typescript": "passed",
-    "production_build": "passed",
-    "problem_validation": "5 valid, 0 errors, 1 warning"
-  }
+    { "path": "APPLY_PATCH_KO.md", "size": 1886, "sha256": "c830fe021ddc89306f17561c39254772edb8a9b2367434c6489d4e285d47c62f" },
+    { "path": "TEST_RESULTS_0.10.1.md", "size": 1839, "sha256": "e27cb894dd02558d4b6a7f97dfbb48cc5dc992964de24509f8076c159414d0ec" },
+    { "path": "README.md", "size": 18259, "sha256": "d10bc0c856b2d28c0cb132cd508c8299a383c4473d06994e1027e2bf2bc2665b" },
+    { "path": "backend/app/__init__.py", "size": 69, "sha256": "12e8d8e3a8204f6a7e06510000f6cee3b8cf07282dd892586648ceda8ba30358" },
+    { "path": "backend/app/core/config.py", "size": 1915, "sha256": "2a217b9f03cb8f7998d4fd831f5be8fbf64aeaf487e3bb3056c0ea06828c95b2" },
+    { "path": "backend/app/api/free_circuit.py", "size": 12378, "sha256": "c1197c9e1a7f2377eabe2d8fc7376794c7708fa7edb184befda91e319fcc50a9" },
+    { "path": "backend/tests/test_free_circuit_api.py", "size": 6562, "sha256": "cffc314c9f92b1ccd6f26de963784e59cd48df123a6d76bd004b05a026f0a778" },
+    { "path": "frontend/package.json", "size": 739, "sha256": "c9948dcae27562bae15c8452818091859712233481390719ada057206e8bba18" },
+    { "path": "frontend/package-lock.json", "size": 103225, "sha256": "b711a1807f8f9011f6a892afe9dff34a5e6be3382af0ce472144805ae0637fca" },
+    { "path": "frontend/src/api/client.ts", "size": 23531, "sha256": "dfb75dbe998d2fdd89499480b408693e308609fcecafbf5d2bb292dfb7f96248" },
+    { "path": "frontend/src/components/StatusBar.tsx", "size": 1234, "sha256": "6c2cfca1911f974b74f7ec2e1cc11e440b246f3373bfa734bb08b74ba348d7b7" },
+    { "path": "frontend/src/components/circuit/CircuitDiagram.tsx", "size": 9185, "sha256": "80c5df8272bdafb8346babb19225085b2f8da0826553522a413e1e0e1e26662a" },
+    { "path": "frontend/src/components/circuit/useSvgViewport.ts", "size": 3598, "sha256": "f5f5d9c17c18e364e2bddcd74b06a82464681e2f67509f227ff10ad7e2d9f78e" },
+    { "path": "frontend/src/features/wiring/components/WiringBoard.tsx", "size": 14737, "sha256": "0a8fb736bf2317a783fde1fecb84a5d383697d7894ae0c1d5a1b17e9ee72cbc0" },
+    { "path": "frontend/src/features/wiring/engine/boardGeometry.ts", "size": 4106, "sha256": "255bcbfadedecc7b8db5474576985f64b0ccf08e8d16247eaba9efd4c85b2432" },
+    { "path": "frontend/src/features/operation/components/OperationBoard.tsx", "size": 4868, "sha256": "78130cba9b62f3a6506502f64aed471138787597ce197ab79b37526c6479faeb" },
+    { "path": "frontend/src/pages/FreeCircuitPage.tsx", "size": 22947, "sha256": "a797aac22061f405b8ce229a092e3536384ffa39b168b20f432d3579c3691aed" },
+    { "path": "frontend/src/tests/mockApi.ts", "size": 24008, "sha256": "081c366c54239cf3ba95ecd2f93d61eaefb56bf86866373b21e93589b3d006db" },
+    { "path": "frontend/src/tests/WiringPage.test.tsx", "size": 24837, "sha256": "e10d8db615b74f483daa651172cf7a8c8462e849fa775b45847d39e6f00b7032" },
+    { "path": "frontend/src/tests/OperationPage.test.tsx", "size": 9615, "sha256": "e006bad88cda8a3bf6b8e6e96b99f7b34e615b3208a1da1bbf468da6f9006c73" },
+    { "path": "frontend/src/tests/FreeCircuitPage.test.tsx", "size": 3230, "sha256": "a60153c38409b4cfad81d0afd90dd509c015cd813399fde83b985f7b5f01888b" },
+    { "path": "frontend/dist/index.html", "size": 484, "sha256": "4dae8670055833374d0bd663b0d140ef568a91820790c0e6aff337f6b5ca7ac5" },
+    { "path": "frontend/dist/assets/index-ChnLszOu.js", "size": 323596, "sha256": "84a28e7af9466b6d71f9d0cc0128282e2e1e44604791e9aacadcd40451893610" }
+  ]
 }

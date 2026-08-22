@@ -1,8 +1,9 @@
 import type { BoardDefinition, BoardItem, BoardPin, ExternalWiringDevice, WiringConnection } from '../../../api/client'
+import { boardItemLabelArea, buildExternalWireLayouts, WIRE_COLORS } from '../engine/boardGeometry'
 import { routeConnections } from '../engine/orthogonalRouter'
 import { isFreeJunction, terminalBlockUsage, type TerminalBlockUsage } from '../engine/terminalCapacity'
 
-export const WIRE_COLORS = { brown: '#7a3f25', black: '#171b22', gray: '#77808a', yellow: '#e0a500' }
+export { boardItemLabelArea, buildExternalWireLayouts, WIRE_COLORS } from '../engine/boardGeometry'
 
 export const DEVICE_SUMMARY_COLORS: Record<string, string> = {
   MCCB: '#dc2626',
@@ -54,17 +55,6 @@ export function summaryLabelY(pin: BoardPin) {
   return pin.side === 'top' ? pin.y - 18 : pin.y + 31
 }
 
-export function boardItemLabelArea(item: BoardItem) {
-  if (item.item_type !== 'terminal_block') return item.label_area
-  const width = Math.min(item.label_area.width, 220)
-  const height = Math.min(item.label_area.height, 24)
-  const topPinCount = item.pins.filter((pin) => pin.side === 'top').length
-  const y = topPinCount > item.pins.length / 2
-    ? item.y + item.height - height - 3
-    : item.y + 3
-  return { x: item.x + (item.width - width) / 2, y, width, height }
-}
-
 export function BoardItemBody({ item }: { item: BoardItem }) {
   if (item.item_type === 'terminal_block') {
     return <g className="board-item-body terminal-block-body"><rect x={item.x} y={item.y} width={item.width} height={item.height} rx="5" />{item.pins.map((pin) => <rect key={pin.terminal_id} x={pin.x - 16} y={item.y + 8} width="32" height={item.height - 16} rx="2" />)}</g>
@@ -110,24 +100,14 @@ export function WiringBoard({ board, connections, externalDevices, mode, selecte
   const counts = new Map<string, number>()
   connections.forEach((item) => { counts.set(item.from, (counts.get(item.from) ?? 0) + 1); counts.set(item.to, (counts.get(item.to) ?? 0) + 1) })
   const externalIds = new Set((externalDevices ?? []).flatMap((device) => device.terminals.map((terminal) => terminal.terminal_id)))
-  const externalWires = connections.flatMap((connection, connectionIndex) => {
-    const externalId = externalIds.has(connection.from) ? connection.from : externalIds.has(connection.to) ? connection.to : null
-    const boardId = externalId === connection.from ? connection.to : connection.from
-    if (!externalId || !boardTerminals.has(boardId)) return []
-    const owner = board.items.find((item) => item.pins.some((pin) => pin.terminal_id === boardId))!
-    const pin = owner.pins.find((item) => item.terminal_id === boardId)!
-    const isTop = owner.item_id === 'TB5'
-    const edgeY = isTop ? owner.y : owner.y + owner.height
-    const endY = isTop ? Math.max(10, edgeY - 34) : Math.min(board.height - 10, edgeY + 34)
-    return [{ connection, connectionIndex, externalId, points: `${pin.x},${edgeY} ${pin.x},${endY}`, labelX: pin.x, labelY: isTop ? endY - 3 : endY + 12 }]
-  })
+  const externalWires = buildExternalWireLayouts(board, connections, externalIds)
   return <div className="wiring-board-scroll">
     <svg className="wiring-board" role="img" aria-label="제어함 결선판" viewBox={`0 0 ${board.width} ${board.height}`} onClick={onClearSelection}>
       <g transform={`translate(${board.width * (1 - zoom) / 2} ${board.height * (1 - zoom) / 2}) scale(${zoom})`}>
         <rect className="board-background" x="4" y="4" width={board.width - 8} height={board.height - 8} rx="8" />
         <g className="routing-channel-layer">{board.routing_channels.map((channel) => <rect key={channel.channel_id} className={channel.channel_type} x={channel.x} y={channel.y} width={channel.width} height={channel.height} />)}</g>
         <g className="board-item-layer">{board.items.map((item) => <BoardItemBody key={item.item_id} item={item} />)}</g>
-        {mode === 'graphic' && <g className="wire-layer">{routed.map((wire) => { const connectionIndex = connections.findIndex((item) => [item.from, item.to].sort().join('|') === [wire.from, wire.to].sort().join('|')); const points = wire.points.map((point) => `${point.x},${point.y}`).join(' '); const selected = selectedWire === connectionIndex; return <g key={`${wire.from}|${wire.to}`} className={`board-wire editable${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={points} />}<polyline className="wire-visible" points={points} style={{ stroke: WIRE_COLORS[wire.wire_color] }} /><polyline className="wire-hit" points={points} /></g> })}{externalWires.map((wire) => { const boardId = wire.externalId === wire.connection.from ? wire.connection.to : wire.connection.from; const selected = selectedWire === wire.connectionIndex; return <g key={`${wire.externalId}-${wire.connectionIndex}`} className={`board-wire external${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.externalId}에서 ${boardId}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(wire.connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(wire.connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={wire.points} />}<polyline className="wire-visible" points={wire.points} style={{ stroke: WIRE_COLORS[wire.connection.wire_color] }} /><polyline className="wire-hit" points={wire.points} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor="middle">{wire.externalId}</text></g> })}</g>}
+        {mode === 'graphic' && <g className="wire-layer">{routed.map((wire) => { const connectionIndex = connections.findIndex((item) => [item.from, item.to].sort().join('|') === [wire.from, wire.to].sort().join('|')); const points = wire.points.map((point) => `${point.x},${point.y}`).join(' '); const selected = selectedWire === connectionIndex; return <g key={`${wire.from}|${wire.to}`} className={`board-wire editable${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.from}에서 ${wire.to}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={points} />}<polyline className="wire-visible" points={points} style={{ stroke: WIRE_COLORS[wire.wire_color] }} /><polyline className="wire-hit" points={points} /></g> })}{externalWires.map((wire) => { const selected = selectedWire === wire.connectionIndex; return <g key={`${wire.externalTerminalId}-${wire.connectionIndex}`} className={`board-wire external editable${selected ? ' selected' : ''}`} role="button" tabIndex={0} aria-label={`${wire.externalTerminalId}에서 ${wire.boardTerminalId}로 연결된 전선`} onClick={(event) => { event.stopPropagation(); onWireSelect(wire.connectionIndex) }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onWireSelect(wire.connectionIndex) } }}>{selected && <polyline className="wire-selection-halo" points={wire.points} />}<polyline className="wire-visible" points={wire.points} style={{ stroke: WIRE_COLORS[wire.connection.wire_color] }} /><polyline className="wire-hit" points={wire.points} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor={wire.labelAnchor}>{wire.externalTerminalId}</text></g> })}</g>}
         <g className="board-pin-layer">{board.items.flatMap((item) => item.pins.map((pin) => { const pinSummary = mode === 'summary' ? summary.get(pin.terminal_id) : undefined; const usage = isFreeJunction(pin) ? terminalBlockUsage(connections, pin.terminal_id, externalIds) : undefined; return <Pin key={pin.terminal_id} pin={pin} selected={selectedPin === pin.terminal_id} summary={pinSummary} summarySelected={selectedSummaryTerminal === pin.terminal_id || Boolean(pinSummary?.some((item) => item.connectionIndex === selectedWire))} connectionCount={counts.get(pin.terminal_id) ?? 0} terminalBlockConnectionUsage={usage} onClick={() => onPinClick(pin.terminal_id)} onPointerDown={() => onPinPointerDown(pin.terminal_id)} onPointerUp={() => onPinPointerUp(pin.terminal_id)} onExternalDrop={(externalId) => onExternalDrop(externalId, pin.terminal_id)} onSummarySelect={onSummarySelect} /> }))}</g>
         <g className="board-label-layer">{board.items.map((item) => { const labelArea = boardItemLabelArea(item); return <g key={item.item_id} className={item.item_type === 'terminal_block' ? 'terminal-block-label' : undefined}><rect x={labelArea.x} y={labelArea.y} width={labelArea.width} height={labelArea.height} rx="5" style={mode === 'summary' ? { stroke: deviceSummaryColor(item.item_id) } : undefined} />{mode === 'summary' && <circle className="device-color-dot" cx={labelArea.x + 11} cy={labelArea.y + labelArea.height / 2} r="5" style={{ fill: deviceSummaryColor(item.item_id) }} />}<text x={labelArea.x + labelArea.width / 2} y={labelArea.y + labelArea.height / 2 + 5} textAnchor="middle">{item.label}</text></g> })}</g>
       </g>

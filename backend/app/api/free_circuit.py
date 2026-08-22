@@ -4,7 +4,7 @@ from secrets import token_urlsafe
 from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Path, Request, Response
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.core.user_context import request_database, request_user_id
 from app.domain import OperationSessionState
@@ -31,6 +31,14 @@ TEMPLATE_IDS = (
 class CreateFromTemplateRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str = Field(min_length=1, max_length=120)
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("작업공간 이름을 입력해 주세요.")
+        return normalized
 
 
 class FreeCircuitDiagnostic(BaseModel):
@@ -71,6 +79,27 @@ def _template(request: Request, template_id: str) -> FreeCircuitTemplate:
         device_layout=package.problem.device_layout,
         wiring_semantics=package.problem.wiring_semantics,
     )
+
+
+def _workspace_from_template(template: FreeCircuitTemplate, name: str) -> FreeCircuitWorkspaceUpdate:
+    return FreeCircuitWorkspaceUpdate(
+        name=name,
+        circuit=template.circuit,
+        operation=template.operation,
+        connections=[],
+        board=template.board,
+        device_layout=template.device_layout,
+        wiring_semantics=template.wiring_semantics,
+        editor=FreeCircuitEditorState(template_id=template.template_id),
+    )
+
+
+def _new_workspace_id(repository: FreeCircuitRepository) -> str:
+    for _ in range(16):
+        workspace_id = f"fc_{token_urlsafe(12)}"
+        if repository.get(workspace_id) is None:
+            return workspace_id
+    raise HTTPException(status_code=503, detail="새 작업공간 ID를 생성할 수 없습니다. 잠시 후 다시 시도해 주세요.")
 
 
 def _validate_workspace(workspace: FreeCircuitWorkspaceUpdate) -> None:
@@ -136,26 +165,25 @@ def list_templates(request: Request):
 
 
 @router.post("/templates/{template_id}/workspaces/{workspace_id}", response_model=FreeCircuitWorkspaceResponse, status_code=201)
-def create_from_template(
+def create_from_template_with_id(
     template_id: str,
     workspace_id: WorkspaceId,
     request: Request,
     payload: CreateFromTemplateRequest = Body(...),
 ):
     template = _template(request, template_id)
-    if _repository(request).get(workspace_id) is not None:
+    repository = _repository(request)
+    if repository.get(workspace_id) is not None:
         raise HTTPException(status_code=409, detail="같은 ID의 자유회로 작업공간이 이미 있습니다.")
-    workspace = FreeCircuitWorkspaceUpdate(
-        name=payload.name,
-        circuit=template.circuit,
-        operation=template.operation,
-        connections=[],
-        board=template.board,
-        device_layout=template.device_layout,
-        wiring_semantics=template.wiring_semantics,
-        editor=FreeCircuitEditorState(template_id=template_id),
-    )
-    return _repository(request).save(workspace_id, workspace)
+    return repository.save(workspace_id, _workspace_from_template(template, payload.name))
+
+
+@router.post("/templates/{template_id}/workspaces", response_model=FreeCircuitWorkspaceResponse, status_code=201)
+def create_from_template(template_id: str, request: Request, payload: CreateFromTemplateRequest = Body(...)):
+    template = _template(request, template_id)
+    repository = _repository(request)
+    workspace_id = _new_workspace_id(repository)
+    return repository.save(workspace_id, _workspace_from_template(template, payload.name))
 
 
 @router.get("/{workspace_id}", response_model=FreeCircuitWorkspaceResponse)

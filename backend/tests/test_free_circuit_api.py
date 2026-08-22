@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
@@ -71,6 +73,32 @@ def test_free_circuit_templates_create_list_and_keep_users_separate(tmp_path):
         other = client.get("/api/free-circuits", headers={"X-User-Id": "student_b"})
         assert own.json()[0]["workspace_id"] == "self_hold_01"
         assert other.json() == []
+
+
+def test_free_circuit_template_generates_unique_workspace_ids_from_name_only(tmp_path):
+    headers = {"X-User-Id": "automatic_id_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        created = [
+            client.post(
+                "/api/free-circuits/templates/operation_demo_001/workspaces",
+                headers=headers,
+                json={"name": f"  자동 작업공간 {index}  "},
+            )
+            for index in range(3)
+        ]
+        assert all(response.status_code == 201 for response in created)
+        ids = {response.json()["workspace_id"] for response in created}
+        assert len(ids) == 3
+        assert all(re.fullmatch(r"fc_[A-Za-z0-9_-]+", workspace_id) for workspace_id in ids)
+        assert created[0].json()["name"] == "자동 작업공간 0"
+        listed = client.get("/api/free-circuits", headers=headers).json()
+        assert {item["workspace_id"] for item in listed} == ids
+        blank = client.post(
+            "/api/free-circuits/templates/operation_demo_001/workspaces",
+            headers=headers,
+            json={"name": "   "},
+        )
+        assert blank.status_code == 422
 
 
 def test_free_circuit_rejects_unknown_duplicate_and_tb_bank_over_capacity(tmp_path):

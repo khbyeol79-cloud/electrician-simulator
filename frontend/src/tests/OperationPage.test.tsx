@@ -7,6 +7,7 @@ import { installApiMock, trainingDetail } from './mockApi'
 import forwardBoardData from '../../../problems/forward_reverse_interlock_demo_001/board.json'
 import forwardAnswerData from '../../../docs/test-answer-forward-reverse-0.9.3.json'
 import type { BoardDefinition, WiringConnection } from '../api/client'
+import { boardItemLabelArea } from '../features/wiring/components/WiringBoard'
 
 afterEach(() => {
   cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); window.localStorage.clear()
@@ -40,6 +41,17 @@ describe('동작시험', () => {
     expect(within(board).getByText('PWR-L1')).toBeInTheDocument()
     expect(within(board).getByText('RL-2')).toBeInTheDocument()
     expect(within(board).getByText('M1-W')).toBeInTheDocument()
+    const rlWire = within(board).getByText('RL-2').parentElement?.querySelector('.wire-visible')?.getAttribute('points')
+    const glWire = within(board).getByText('GL-2').parentElement?.querySelector('.wire-visible')?.getAttribute('points')
+    expect(rlWire).toBeTruthy()
+    expect(glWire).toBeTruthy()
+    expect(rlWire).not.toBe(glWire)
+    const tb5 = (forwardBoardData as unknown as BoardDefinition).items.find((item) => item.item_id === 'TB5')!
+    const tb6 = (forwardBoardData as unknown as BoardDefinition).items.find((item) => item.item_id === 'TB6')!
+    const tb5Label = within(board).getByText(tb5.label).parentElement!
+    const tb6Label = within(board).getByText(tb6.label).parentElement!
+    expect(tb5Label.querySelector('rect')).toHaveAttribute('y', String(boardItemLabelArea(tb5).y))
+    expect(tb6Label.querySelector('rect')).toHaveAttribute('y', String(boardItemLabelArea(tb6).y))
   })
 
   it('renders accepted wiring and fixed devices as read-only', async () => {

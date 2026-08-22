@@ -62,7 +62,7 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
   draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
   readOnly?: boolean; compact?: boolean; ariaLabel?: string
 }) {
-  const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4 } : undefined)
+  const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4, mapClientToViewBox: true } : undefined)
   const zoomStep = compact ? 0.3 : 0.15
   const questionMap = Object.fromEntries(questions.map((question) => [question.question_id, question]))
   return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}`}>
@@ -77,7 +77,7 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
     <svg
       className="circuit-svg" role="img" aria-label={ariaLabel}
       viewBox={`${diagram.view_box.x} ${diagram.view_box.y} ${diagram.view_box.width} ${diagram.view_box.height}`}
-      onPointerDown={viewport.pointerDown} onPointerMove={viewport.pointerMove} onPointerUp={viewport.pointerUp}
+      onPointerDown={viewport.pointerDown} onPointerMove={viewport.pointerMove} onPointerUp={viewport.pointerUp} onPointerCancel={viewport.pointerUp}
       onWheel={viewport.wheel} onClick={(event) => { if (event.target === event.currentTarget && !viewport.consumeDragClick()) onClear() }}
     >
       <g transform={`translate(${viewport.pan.x} ${viewport.pan.y}) scale(${viewport.zoom})`}>

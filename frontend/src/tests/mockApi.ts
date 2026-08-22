@@ -106,12 +106,12 @@ export const mountingDefinition = {
 const health = {
   status: 'ok',
   app_name: '전기기능사 시퀀스 결선 시뮬레이터',
-  version: '0.10.0',
+  version: '0.10.1',
 }
 
 const appInfo = {
   app_name: health.app_name,
-  version: '0.10.0',
+  version: '0.10.1',
   mode: 'web',
   database_ready: true,
   problems_path_ready: true,
@@ -162,7 +162,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
     if (url === '/api/app-info') return response(appInfo)
     if (url === '/api/free-circuits/templates') return response([{ template_id: 'operation_demo_001', name: '자기유지 실험 보드', description: '자기유지 기초 실험', board: wiringBoard, circuit: freeCircuit.circuit, operation: freeCircuit.operation, device_layout: trainingDetail.device_layout, wiring_semantics: freeCircuit.wiring_semantics }])
     if (url === '/api/free-circuits' && (!init?.method || init.method === 'GET')) return response(freeCreated ? [{ workspace_id: freeCircuit.workspace_id, name: freeCircuit.name, schema_version: '1.0', template_id: 'operation_demo_001', connection_count: freeCircuit.connections.length, updated_at: freeCircuit.updated_at }] : [])
-    if (url.includes('/api/free-circuits/templates/') && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
+    if (url === '/api/free-circuits/templates/operation_demo_001/workspaces' && init?.method === 'POST') { freeCreated = true; return response(freeCircuit, 201) }
     if (url === '/api/free-circuits/self_hold_01' && (!init?.method || init.method === 'GET')) return response(freeCircuit)
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'PUT') { Object.assign(freeCircuit, JSON.parse(String(init.body))); return response(freeCircuit) }
     if (url === '/api/free-circuits/self_hold_01' && init?.method === 'DELETE') { freeCreated = false; return response(undefined, 204) }

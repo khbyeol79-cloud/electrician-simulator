@@ -288,8 +288,8 @@ export function getFreeCircuitWorkspace(workspaceId: string, signal?: AbortSigna
   return getJson<FreeCircuitWorkspace>(`/api/free-circuits/${encodeURIComponent(workspaceId)}`, signal)
 }
 
-export function createFreeCircuitWorkspace(templateId: string, workspaceId: string, name: string) {
-  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/templates/${encodeURIComponent(templateId)}/workspaces/${encodeURIComponent(workspaceId)}`, 'POST', { name })
+export function createFreeCircuitWorkspace(templateId: string, name: string) {
+  return mutationJson<FreeCircuitWorkspace>(`/api/free-circuits/templates/${encodeURIComponent(templateId)}/workspaces`, 'POST', { name })
 }
 
 export function saveFreeCircuitWorkspace(workspace: FreeCircuitWorkspace) {

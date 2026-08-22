@@ -20,12 +20,27 @@ describe('자유회로 실험', () => {
 
     expect(await screen.findByRole('heading', { name: '자유회로 실험', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('정답 없는 실제 결선 실험')).toBeInTheDocument()
+    expect(screen.queryByLabelText('작업공간 ID')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '자유회로 만들기' }))
 
     expect(await screen.findByRole('heading', { name: '자기유지 자유회로', level: 2 })).toBeInTheDocument()
     expect(screen.getByText('정답 데이터 없음')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: '제어함 결선판' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '결선 제출' })).not.toBeInTheDocument()
+  })
+
+  it('requires only a non-empty workspace name and uses the server-generated id', async () => {
+    const fetchMock = installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/free-circuit']}><App /></MemoryRouter>)
+    const name = await screen.findByLabelText('작업공간 이름')
+    await user.clear(name)
+    await user.click(screen.getByRole('button', { name: '자유회로 만들기' }))
+    expect(screen.getByText('작업공간 이름을 입력해 주세요.')).toBeInTheDocument()
+    await user.type(name, '새 모터 실험')
+    await user.click(screen.getByRole('button', { name: '자유회로 만들기' }))
+    expect(await screen.findByRole('img', { name: '제어함 결선판' })).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledWith('/api/free-circuits/templates/operation_demo_001/workspaces', expect.objectContaining({ method: 'POST' }))
   })
 
   it('saves current wiring and enters operation without an answer submission', async () => {

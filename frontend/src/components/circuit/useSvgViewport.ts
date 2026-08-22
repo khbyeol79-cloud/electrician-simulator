@@ -6,9 +6,26 @@ type SvgViewportOptions = {
   wheelStep?: number
   panSpeed?: number
   fitZoom?: number
+  mapClientToViewBox?: boolean
 }
 
-export function useSvgViewport({ minZoom = 0.65, maxZoom = 2.5, wheelStep = 0.1, panSpeed = 1, fitZoom = 0.82 }: SvgViewportOptions = {}) {
+export function calculatePanDelta({ dx, dy, zoom, panSpeed, clientWidth, clientHeight, viewBoxWidth, viewBoxHeight, mapClientToViewBox }: {
+  dx: number
+  dy: number
+  zoom: number
+  panSpeed: number
+  clientWidth: number
+  clientHeight: number
+  viewBoxWidth: number
+  viewBoxHeight: number
+  mapClientToViewBox: boolean
+}) {
+  const scaleX = mapClientToViewBox && clientWidth > 0 && viewBoxWidth > 0 ? viewBoxWidth / clientWidth : 1
+  const scaleY = mapClientToViewBox && clientHeight > 0 && viewBoxHeight > 0 ? viewBoxHeight / clientHeight : 1
+  return { x: (dx * scaleX / zoom) * panSpeed, y: (dy * scaleY / zoom) * panSpeed }
+}
+
+export function useSvgViewport({ minZoom = 0.65, maxZoom = 2.5, wheelStep = 0.1, panSpeed = 1, fitZoom = 0.82, mapClientToViewBox = false }: SvgViewportOptions = {}) {
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const drag = useRef<{ pointerId: number; x: number; y: number; moved: boolean } | undefined>(undefined)
@@ -29,15 +46,24 @@ export function useSvgViewport({ minZoom = 0.65, maxZoom = 2.5, wheelStep = 0.1,
     const dx = event.clientX - drag.current.x
     const dy = event.clientY - drag.current.y
     if (Math.abs(dx) + Math.abs(dy) > 3) drag.current.moved = true
-    setPan((value) => ({ x: value.x + (dx / zoom) * panSpeed, y: value.y + (dy / zoom) * panSpeed }))
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const viewBox = event.currentTarget.viewBox.baseVal
+    const delta = calculatePanDelta({
+      dx, dy, zoom, panSpeed,
+      clientWidth: bounds.width, clientHeight: bounds.height,
+      viewBoxWidth: viewBox.width, viewBoxHeight: viewBox.height,
+      mapClientToViewBox,
+    })
+    setPan((value) => ({ x: value.x + delta.x, y: value.y + delta.y }))
     drag.current.x = event.clientX
     drag.current.y = event.clientY
-  }, [panSpeed, zoom])
+  }, [mapClientToViewBox, panSpeed, zoom])
   const pointerUp = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
     const currentDrag = drag.current
     if (currentDrag && currentDrag.pointerId === event.pointerId) {
       lastDragMoved.current = currentDrag.moved
       drag.current = undefined
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
     }
   }, [])
   const wheel = useCallback((event: React.WheelEvent<SVGSVGElement>) => {
