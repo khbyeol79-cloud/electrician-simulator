@@ -12,6 +12,14 @@ afterEach(() => {
 })
 
 describe('회로 데이터 진단', () => {
+  it('renders the official PDF schematic background for an audited draft', async () => {
+    installApiMock()
+    const official = { ...problemDetail, problem_type: 'official' as const, source_type: 'official', status: 'draft' as const, socket_questions: [] }
+    const { container } = render(<CircuitAnalysisPage problem={official} />)
+    await screen.findByRole('img', { name: '시퀀스 회로도' })
+    expect(container.querySelector('image')?.getAttribute('href')).toBe('/api/problems/practice_001/schematic')
+  })
+
   it('shows the unselected state without requesting circuit data', () => {
     const fetchMock = installApiMock()
     render(<CircuitAnalysisPage />)

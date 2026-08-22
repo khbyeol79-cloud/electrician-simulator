@@ -23,6 +23,7 @@ const MOTOR_LABELS: Record<string, string> = {
 
 export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }) {
   const navigate = useNavigate()
+  const officialDraft = problem?.problem_type === 'official' && problem.status === 'draft'
   const [setup, setSetup] = useState<OperationSetup>()
   const [session, setSession] = useState<OperationSessionState>()
   const [checkResult, setCheckResult] = useState<OperationCheckResult>()
@@ -35,7 +36,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
   const activeMomentaryRef = useRef(new Set<string>())
 
   useEffect(() => {
-    if (!problem) return
+    if (!problem || officialDraft) return
     const controller = new AbortController()
     let createdSession: string | undefined
     setLoading(true); setError(undefined); setSetup(undefined); setSession(undefined); setCheckResult(undefined)
@@ -59,7 +60,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
       if (createdSession) void deleteOperationSession(createdSession).catch(() => undefined)
       if (sessionRef.current === createdSession) sessionRef.current = undefined
     }
-  }, [problem])
+  }, [officialDraft, problem])
 
   const perform = useCallback((action: Record<string, unknown>) => {
     const sessionId = sessionRef.current
@@ -123,6 +124,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
   }, [problem, session?.coils])
 
   if (!problem) return <PlaceholderPage stage="3단계" title="동작시험" description="상단에서 연습할 문제를 먼저 선택해 주세요." icon="▶" />
+  if (officialDraft) return <PlaceholderPage stage="3단계 · 검증 대기" title="공식 동작 정의 교차검증 중" description="정답 네트워크와 문제별 동작 조건이 검증된 뒤 승인 결선 기반 동작시험이 열립니다." icon="▶" />
 
   const placements = setup?.device_layout?.fixed_placements ?? []
   const connections = setup?.wiring_snapshot?.connections ?? setup?.wiring_draft?.connections ?? []

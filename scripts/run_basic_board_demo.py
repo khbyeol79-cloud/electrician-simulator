@@ -46,7 +46,7 @@ def self_hold_connections(include_hold: bool = True) -> list[tuple[str, str, str
         ("X1-7", "TB6-01", "yellow"), ("PWR-N", "TB6-01", "black"),
     ]
     if include_hold:
-        result += [("X1-6", "TB5-02", "yellow"), ("X1-3", "TB5-03", "yellow")]
+        result += [("X1-1", "TB5-02", "yellow"), ("X1-3", "TB5-03", "yellow")]
     return result
 
 

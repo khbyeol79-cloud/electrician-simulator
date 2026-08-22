@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_005",
+  "title": "Q-Net 공개문제 005 · 교대 운전 후 두 전동기 동시 운전",
+  "version": 1,
+  "problem_type": "official",
+  "status": "draft",
+  "difficulty": "advanced",
+  "estimated_minutes": 270,
+  "tags": [
+    "Q-Net",
+    "공개문제-005",
+    "PDF대조중"
+  ],
+  "source": {
+    "type": "official",
+    "name": "Q-Net 전기기능사 실기 공개문제",
+    "reference": "전기기능사-005-A4, 2025-08-04.pdf | sha256:0265d821245f9c65f9ae9c181e77d270a5a940035a7ffb9e219b760d95305cd5 | 근거 6~9쪽",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

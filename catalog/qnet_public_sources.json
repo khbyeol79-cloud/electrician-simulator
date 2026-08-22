@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.0",
+  "edition": "2025-08-04",
+  "records": [
+    {
+      "number": "001",
+      "problem_id": "qnet_electrician_practical_001",
+      "source_file": "전기기능사-001-A4, 2025-08-04.pdf",
+      "size_bytes": 2084696,
+      "page_count": 11,
+      "sha256": "e531fc1044e9e4e31deab95bc140d5f711b95ce29c7977f8add32bbc952545dc",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "002",
+      "problem_id": "qnet_electrician_practical_002",
+      "source_file": "전기기능사-002-A4, 2025-08-04.pdf",
+      "size_bytes": 2081084,
+      "page_count": 11,
+      "sha256": "5816995f414c6dd4491a1e16a2658c4a1aa6a84d4b24005c3fa54fc462422d57",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "003",
+      "problem_id": "qnet_electrician_practical_003",
+      "source_file": "전기기능사-003-A4, 2025-08-04.pdf",
+      "size_bytes": 2083306,
+      "page_count": 11,
+      "sha256": "28b2e85830866e65e756ecda78938e4b8ad396067acdca1c92c864d759fd899e",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "004",
+      "problem_id": "qnet_electrician_practical_004",
+      "source_file": "전기기능사-004-A4, 2025-08-04.pdf",
+      "size_bytes": 2083706,
+      "page_count": 11,
+      "sha256": "58ad203c9a1804a60964153242fada3d8aeee04043ec576522652a0177cac874",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "005",
+      "problem_id": "qnet_electrician_practical_005",
+      "source_file": "전기기능사-005-A4, 2025-08-04.pdf",
+      "size_bytes": 2088683,
+      "page_count": 11,
+      "sha256": "0265d821245f9c65f9ae9c181e77d270a5a940035a7ffb9e219b760d95305cd5",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "006",
+      "problem_id": "qnet_electrician_practical_006",
+      "source_file": "전기기능사-006-A4, 2025-08-04.pdf",
+      "size_bytes": 2081231,
+      "page_count": 11,
+      "sha256": "15ded05a5503bc339fbcae0813774a292a8e6230c9b000abfd821958d912faed",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "007",
+      "problem_id": "qnet_electrician_practical_007",
+      "source_file": "전기기능사-007-A4, 2025-08-04.pdf",
+      "size_bytes": 2088004,
+      "page_count": 11,
+      "sha256": "4ccfc0d58dd543e3c4e82baa538b77b0f58306b429f4859bf9691c46861fc2b5",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "008",
+      "problem_id": "qnet_electrician_practical_008",
+      "source_file": "전기기능사-008-A4, 2025-08-04.pdf",
+      "size_bytes": 2091942,
+      "page_count": 11,
+      "sha256": "91bed0cfdd57e115602ea62eb325debf893d6ad6960e0099d334e2270fd3d868",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "009",
+      "problem_id": "qnet_electrician_practical_009",
+      "source_file": "전기기능사-009-A4, 2025-08-04.pdf",
+      "size_bytes": 2088924,
+      "page_count": 11,
+      "sha256": "3f346fbdfca16a40dc96e1b7d861b31e0296ed28763ed7424faf34ab23060ea2",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "010",
+      "problem_id": "qnet_electrician_practical_010",
+      "source_file": "전기기능사-010-A4, 2025-08-04.pdf",
+      "size_bytes": 1893529,
+      "page_count": 11,
+      "sha256": "e026b49d4e4e99595b0689ff2c890297dfc1f62d26a39db7b6e94263990f92ec",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "011",
+      "problem_id": "qnet_electrician_practical_011",
+      "source_file": "전기기능사-011-A4, 2025-08-04.pdf",
+      "size_bytes": 1891581,
+      "page_count": 11,
+      "sha256": "ee318956e2af04e72191498118af0b3c03e9170f9f540279d5afe9d39ff2e1a6",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "012",
+      "problem_id": "qnet_electrician_practical_012",
+      "source_file": "전기기능사-012-A4, 2025-08-04.pdf",
+      "size_bytes": 1889762,
+      "page_count": 11,
+      "sha256": "ebb2d9f3d27c484dbbbc9be29a75973b98e006886f4585c48f391f04ad7b4a17",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "013",
+      "problem_id": "qnet_electrician_practical_013",
+      "source_file": "전기기능사-013-A4, 2025-08-04.pdf",
+      "size_bytes": 1894809,
+      "page_count": 11,
+      "sha256": "72a2ccfaa1233c806816886b10a76642328721eedbe1387f7cf5a09661121897",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "014",
+      "problem_id": "qnet_electrician_practical_014",
+      "source_file": "전기기능사-014-A4, 2025-08-04.pdf",
+      "size_bytes": 1909020,
+      "page_count": 11,
+      "sha256": "788dca2cdec64d18175e663552095c79e8228877a2c3e673a9c402ab915640be",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "015",
+      "problem_id": "qnet_electrician_practical_015",
+      "source_file": "전기기능사-015-A4, 2025-08-04.pdf",
+      "size_bytes": 1909482,
+      "page_count": 11,
+      "sha256": "81e0802629fba8e35ff707f5dca2daca71088da89426c0e4b7825e3dd63de225",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "016",
+      "problem_id": "qnet_electrician_practical_016",
+      "source_file": "전기기능사-016-A4, 2025-08-04.pdf",
+      "size_bytes": 1897914,
+      "page_count": 11,
+      "sha256": "0833f699199b911f1055c5a124afed48bd54b67093adb224bce16a4eac187e52",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "017",
+      "problem_id": "qnet_electrician_practical_017",
+      "source_file": "전기기능사-017-A4, 2025-08-04.pdf",
+      "size_bytes": 1898734,
+      "page_count": 11,
+      "sha256": "8f5adbb38a566b1087cab92a50ba195302427093f26cbc8e3e0f65d99d66a71d",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "number": "018",
+      "problem_id": "qnet_electrician_practical_018",
+      "source_file": "전기기능사-018-A4, 2025-08-04.pdf",
+      "size_bytes": 1902830,
+      "page_count": 11,
+      "sha256": "4b19b5bd40e22108388e81c2547125eb62904ed57b31585022698c07dc601bc0",
+      "status": "draft",
+      "evidence_pages": [
+        6,
+        7,
+        8,
+        9
+      ]
+    }
+  ]
+}

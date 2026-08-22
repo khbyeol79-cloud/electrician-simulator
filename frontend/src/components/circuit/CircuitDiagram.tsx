@@ -57,10 +57,10 @@ function AnswerMarkers({ element, question, draft, result }: { element: DiagramE
   </g>
 }
 
-export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, showToolbar = !compact, ariaLabel = '시퀀스 회로도' }: {
+export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, showToolbar = !compact, ariaLabel = '시퀀스 회로도', backgroundHref }: {
   diagram: SchematicDiagram; questions: SocketQuestion[]; selectedQuestionId: string | null
   draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
-  readOnly?: boolean; compact?: boolean; showToolbar?: boolean; ariaLabel?: string
+  readOnly?: boolean; compact?: boolean; showToolbar?: boolean; ariaLabel?: string; backgroundHref?: string
 }) {
   const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4, mapClientToViewBox: true } : undefined)
   const zoomStep = compact ? 0.3 : 0.15
@@ -81,7 +81,8 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
       onWheel={viewport.wheel} onClick={(event) => { if (event.target === event.currentTarget && !viewport.consumeDragClick()) onClear() }}
     >
       <g transform={`translate(${viewport.pan.x} ${viewport.pan.y}) scale(${viewport.zoom})`}>
-        <g className="diagram-sections">{diagram.sections.map((section) => <g key={section.section_id}><rect x={section.bounds.x} y={section.bounds.y} width={section.bounds.width} height={section.bounds.height} /><text x={section.bounds.x + 18} y={section.bounds.y + 34}>{section.label}</text></g>)}</g>
+        {backgroundHref && <image href={backgroundHref} x={diagram.view_box.x} y={diagram.view_box.y} width={diagram.view_box.width} height={diagram.view_box.height} preserveAspectRatio="xMidYMid meet" />}
+        {!backgroundHref && <g className="diagram-sections">{diagram.sections.map((section) => <g key={section.section_id}><rect x={section.bounds.x} y={section.bounds.y} width={section.bounds.width} height={section.bounds.height} /><text x={section.bounds.x + 18} y={section.bounds.y + 34}>{section.label}</text></g>)}</g>}
         <g className="conductor-layer">{diagram.conductors.map((wire) => <g key={wire.conductor_id} className={`conductor ${wire.line_style}`}><polyline points={wire.points.map((p) => `${p.x},${p.y}`).join(' ')} />{wire.junctions.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="6" />)}</g>)}</g>
         <g className="symbol-layer">{diagram.elements.map((element) => {
           const selected = Boolean(!readOnly && element.interactive && element.question_id && element.question_id === selectedQuestionId)

@@ -42,16 +42,21 @@ def test_two_instances_never_share_ids(factory):
     assert first_ids.isdisjoint(second_ids)
 
 
-def test_relay_fragment_matches_current_training_ids(factory):
+def test_relay_fragment_matches_qnet_page_9_pin_map(factory):
     instance = factory.create(request("auxiliary_relay_8p_training_partial", "VR1"))
     assert instance.terminal_ids == {
         "coil_a": "VR1-2",
         "coil_b": "VR1-7",
-        "contact_1_common": "VR1-6",
+        "contact_1_common": "VR1-1",
+        "contact_1_nc": "VR1-4",
         "contact_1_no": "VR1-3",
+        "contact_2_common": "VR1-8",
+        "contact_2_nc": "VR1-5",
+        "contact_2_no": "VR1-6",
     }
     assert instance.coil_ids["main_coil"] == "VR1-COIL"
     assert instance.contact_ids["contact_1"] == "VR1-C1"
+    assert instance.contact_ids["contact_2"] == "VR1-C2"
     assert instance.coils[0].rated_voltage == 220
     assert instance.contacts[0].controlled_by_coil_id == "VR1-COIL"
 
@@ -62,7 +67,7 @@ def test_timer_fragment_resolves_delay_and_contact(factory):
     )
     assert instance.timers[0].delay_ms == 2500
     assert instance.timers[0].coil_id == "T1-COIL"
-    assert instance.timers[0].timed_contact_ids == ["T1-C1"]
+    assert instance.timers[0].timed_contact_ids == ["T1-C1", "T1-C2"]
     assert instance.contacts[0].controlled_by_coil_id == "T1-COIL"
 
 

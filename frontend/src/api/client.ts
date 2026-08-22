@@ -50,6 +50,8 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   wiring_semantics?: WiringSemantics | null
 }
 
+export const schematicUrl = (problemId: string) => `/api/problems/${encodeURIComponent(problemId)}/schematic`
+
 export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null; behavior_model_id?: string | null }
 export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed'; controller_type?: 'coil' | 'timer' | 'protection'; controller_id?: string | null }
 export type CircuitCoil = { coil_id: string; owner_device_id: string }

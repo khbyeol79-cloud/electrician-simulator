@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request, status
+from fastapi.responses import FileResponse
 
 from app.domain import CircuitSummary, ProblemSummary, PublicProblemDetail
 from app.repositories import ProblemRepository, ReloadStatistics
@@ -35,6 +36,14 @@ def get_circuit_summary(problem_id: str, request: Request) -> CircuitSummary:
     if summary is None:
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
     return summary
+
+
+@router.get("/{problem_id}/schematic", response_class=FileResponse)
+def get_schematic(problem_id: str, request: Request):
+    schematic = _repository(request).get_schematic_path(problem_id)
+    if schematic is None:
+        raise HTTPException(status_code=404, detail="회로도 원본을 찾을 수 없습니다.")
+    return FileResponse(schematic, media_type="image/svg+xml")
 
 
 @router.get("/{problem_id}", response_model=PublicProblemDetail)

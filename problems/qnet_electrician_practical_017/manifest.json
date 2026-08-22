@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_017",
+  "title": "Q-Net 공개문제 017 · 배타 리밋 조건과 순차 허가",
+  "version": 1,
+  "problem_type": "official",
+  "status": "draft",
+  "difficulty": "advanced",
+  "estimated_minutes": 270,
+  "tags": [
+    "Q-Net",
+    "공개문제-017",
+    "PDF대조중"
+  ],
+  "source": {
+    "type": "official",
+    "name": "Q-Net 전기기능사 실기 공개문제",
+    "reference": "전기기능사-017-A4, 2025-08-04.pdf | sha256:8f5adbb38a566b1087cab92a50ba195302427093f26cbc8e3e0f65d99d66a71d | 근거 6~9쪽",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

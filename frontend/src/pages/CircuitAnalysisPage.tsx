@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   getCircuitProgress, getDiagram, getSocketTypes, submitCircuitAttempt,
+  schematicUrl,
   type CircuitAttemptResult, type CircuitProgress, type PublicProblemDetail,
   type SchematicDiagram, type SocketType,
 } from '../api/client'
@@ -112,7 +113,7 @@ export function CircuitAnalysisPage({ problem }: { problem?: PublicProblemDetail
     {loading && <div className="circuit-loading">구조화된 회로도를 불러오는 중입니다.</div>}
     {error && <div className="circuit-load-error" role="alert"><strong>회로도를 표시할 수 없습니다.</strong><span>{error}</span><button type="button" onClick={() => window.location.reload()}>다시 불러오기</button></div>}
     {!loading && !error && diagram && <div className="circuit-layout">
-      <CircuitDiagram key={problem.problem_id} diagram={diagram} questions={problem.socket_questions} selectedQuestionId={selectedQuestionId} draft={draft} result={result} onSelect={(id) => { setSelectedQuestionId(id); setNotice(undefined) }} onClear={() => setSelectedQuestionId(null)} />
+      <CircuitDiagram key={problem.problem_id} diagram={diagram} questions={problem.socket_questions} selectedQuestionId={selectedQuestionId} draft={draft} result={result} onSelect={(id) => { setSelectedQuestionId(id); setNotice(undefined) }} onClear={() => setSelectedQuestionId(null)} backgroundHref={problem.problem_type === 'official' && problem.status === 'draft' ? schematicUrl(problem.problem_id) : undefined} />
       <CircuitQuestionPanel problem={problem} question={selectedQuestion} sockets={sockets} draft={draft} result={result} attemptCount={progress?.attempt_count ?? 0} notice={notice} onChange={updateAnswer} onSubmit={() => void submit()} onClear={clearSelected} />
     </div>}
   </section>

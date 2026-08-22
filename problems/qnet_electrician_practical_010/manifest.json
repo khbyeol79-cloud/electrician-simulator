@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_010",
+  "title": "Q-Net 공개문제 010 · 릴레이 허가와 리밋·타이머 기동",
+  "version": 1,
+  "problem_type": "official",
+  "status": "draft",
+  "difficulty": "advanced",
+  "estimated_minutes": 270,
+  "tags": [
+    "Q-Net",
+    "공개문제-010",
+    "PDF대조중"
+  ],
+  "source": {
+    "type": "official",
+    "name": "Q-Net 전기기능사 실기 공개문제",
+    "reference": "전기기능사-010-A4, 2025-08-04.pdf | sha256:e026b49d4e4e99595b0689ff2c890297dfc1f62d26a39db7b6e94263990f92ec | 근거 6~9쪽",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

@@ -158,22 +158,27 @@
     {
       "model_id": "auxiliary_relay_8p_training_partial",
       "device_type_id": "auxiliary_relay_8p",
-      "name": "8P 보조릴레이 현재 사용 접점 모델",
-      "definition_status": "reviewed",
-      "source_note": "현재 모든 문제에서 공통으로 사용하는 코일 2-7과 NO 접점 6-3만 기록했다. 사용하지 않는 나머지 8P 접점은 제조사 자료 확인 전까지 추측하지 않는다.",
+      "name": "8P 보조릴레이 2전환접점 모델",
+      "definition_status": "verified",
+      "source_note": "Q-Net 전기기능사 공개문제 001~018 공통 내부결선도 9쪽을 배선면 기준 8P 소켓 배열과 대조했다. 코일 2-7, 제1접점 COM 1/NC 4/NO 3, 제2접점 COM 8/NC 5/NO 6이다. 기존 model_id는 저장된 자유회로 작업공간 호환을 위해 유지한다.",
       "compatible_socket_type_ids": ["socket_8p_base"],
       "capabilities": ["coil", "relay_contacts"],
       "terminals": [
         { "terminal_key": "coil_a", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
         { "terminal_key": "coil_b", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_1_common", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_1_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
+        { "terminal_key": "contact_1_common", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
+        { "terminal_key": "contact_1_nc", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
+        { "terminal_key": "contact_1_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
+        { "terminal_key": "contact_2_common", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
+        { "terminal_key": "contact_2_nc", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
+        { "terminal_key": "contact_2_no", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
       ],
       "coils": [
         { "coil_key": "main_coil", "id_suffix": "COIL", "terminal_a_key": "coil_a", "terminal_b_key": "coil_b", "rated_voltage_property_key": "coil_voltage", "voltage_type_property_key": "coil_voltage_type", "frequency_property_key": "coil_frequency" }
       ],
       "contacts": [
-        { "contact_key": "contact_1", "id_suffix": "C1", "contact_type": "NO", "common_terminal_key": "contact_1_common", "switched_terminal_key": "contact_1_no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "open" }
+        { "contact_key": "contact_1", "id_suffix": "C1", "contact_type": "CHANGEOVER", "common_terminal_key": "contact_1_common", "switched_terminal_key": "contact_1_no", "nc_terminal_key": "contact_1_nc", "no_terminal_key": "contact_1_no", "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "closed" },
+        { "contact_key": "contact_2", "id_suffix": "C2", "contact_type": "CHANGEOVER", "common_terminal_key": "contact_2_common", "switched_terminal_key": "contact_2_no", "nc_terminal_key": "contact_2_nc", "no_terminal_key": "contact_2_no", "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "closed" }
       ],
       "intrinsic_connections": [],
       "configurable_properties": [
@@ -186,22 +191,27 @@
     {
       "model_id": "timer_8p_on_delay_training_partial",
       "device_type_id": "timer_8p",
-      "name": "8P 온딜레이 타이머 현재 사용 접점 모델",
-      "definition_status": "reviewed",
-      "source_note": "현재 문제의 코일 2-7과 계시 NO 접점 1-3을 기록했다. 나머지 핀 기능은 검증 전까지 포함하지 않는다.",
+      "name": "8P 온딜레이 타이머 2전환접점 모델",
+      "definition_status": "verified",
+      "source_note": "Q-Net 전기기능사 공개문제 001~018 공통 내부결선도 9쪽을 배선면 기준 8P 소켓 배열과 대조했다. 코일 2-7, 제1 계시접점 COM 1/NC 4/NO 3, 제2 계시접점 COM 8/NC 5/NO 6이다. 기존 model_id는 저장된 자유회로 작업공간 호환을 위해 유지한다.",
       "compatible_socket_type_ids": ["socket_8p_base"],
       "capabilities": ["coil", "timed_contacts"],
       "terminals": [
         { "terminal_key": "coil_a", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
         { "terminal_key": "coil_b", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_common", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
+        { "terminal_key": "timed_1_common", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
+        { "terminal_key": "timed_1_nc", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
+        { "terminal_key": "timed_1_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
+        { "terminal_key": "timed_2_common", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
+        { "terminal_key": "timed_2_nc", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
+        { "terminal_key": "timed_2_no", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
       ],
       "coils": [
         { "coil_key": "main_coil", "id_suffix": "COIL", "terminal_a_key": "coil_a", "terminal_b_key": "coil_b", "rated_voltage_property_key": "coil_voltage", "voltage_type_property_key": "coil_voltage_type", "frequency_property_key": "coil_frequency" }
       ],
       "contacts": [
-        { "contact_key": "timed_contact", "id_suffix": "C1", "contact_type": "NO", "common_terminal_key": "timed_common", "switched_terminal_key": "timed_no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "timer", "controlled_by_key": "main_timer", "normal_state": "open" }
+        { "contact_key": "timed_contact_1", "id_suffix": "C1", "contact_type": "CHANGEOVER", "common_terminal_key": "timed_1_common", "switched_terminal_key": "timed_1_no", "nc_terminal_key": "timed_1_nc", "no_terminal_key": "timed_1_no", "actuation": "timer", "controlled_by_key": "main_timer", "normal_state": "closed" },
+        { "contact_key": "timed_contact_2", "id_suffix": "C2", "contact_type": "CHANGEOVER", "common_terminal_key": "timed_2_common", "switched_terminal_key": "timed_2_no", "nc_terminal_key": "timed_2_nc", "no_terminal_key": "timed_2_no", "actuation": "timer", "controlled_by_key": "main_timer", "normal_state": "closed" }
       ],
       "intrinsic_connections": [],
       "configurable_properties": [
@@ -211,7 +221,7 @@
         { "property_key": "delay_ms", "value_type": "integer", "required": false, "default": 1000, "minimum": 1, "maximum": 3600000, "choices": [] }
       ],
       "control": null,
-      "timer": { "timer_key": "main_timer", "id_suffix": "TIMER", "coil_key": "main_coil", "mode": "on_delay", "delay_property_key": "delay_ms", "timed_contact_keys": ["timed_contact"], "retentive": false },
+      "timer": { "timer_key": "main_timer", "id_suffix": "TIMER", "coil_key": "main_coil", "mode": "on_delay", "delay_property_key": "delay_ms", "timed_contact_keys": ["timed_contact_1", "timed_contact_2"], "retentive": false },
       "indicator": null, "motor": null, "protection": null
     },
     {

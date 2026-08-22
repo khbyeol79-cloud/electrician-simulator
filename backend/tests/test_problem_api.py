@@ -83,6 +83,10 @@ def test_problem_api_never_exposes_answers_or_paths(tmp_path):
         for forbidden in ("socket_pin_answers", "required_connections", "expected_nets"):
             assert forbidden not in circuit_summary.text
 
+        schematic = client.get("/api/problems/practice_001/schematic")
+        assert schematic.status_code == 200
+        assert schematic.headers["content-type"].startswith("image/svg+xml")
+
 
 def test_problem_reload_and_missing_problem(tmp_path):
     settings = Settings(paths=api_paths(tmp_path))

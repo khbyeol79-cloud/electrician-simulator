@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_008",
+  "title": "Q-Net 공개문제 008 · 수위 운전 표시와 한시 정지",
+  "version": 1,
+  "problem_type": "official",
+  "status": "draft",
+  "difficulty": "advanced",
+  "estimated_minutes": 270,
+  "tags": [
+    "Q-Net",
+    "공개문제-008",
+    "PDF대조중"
+  ],
+  "source": {
+    "type": "official",
+    "name": "Q-Net 전기기능사 실기 공개문제",
+    "reference": "전기기능사-008-A4, 2025-08-04.pdf | sha256:91bed0cfdd57e115602ea62eb325debf893d6ad6960e0099d334e2270fd3d868 | 근거 6~9쪽",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

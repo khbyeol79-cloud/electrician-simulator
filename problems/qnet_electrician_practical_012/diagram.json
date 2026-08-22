@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "view_box": {
+    "x": 0,
+    "y": 0,
+    "width": 2337,
+    "height": 1654
+  },
+  "sections": [
+    {
+      "section_id": "official_pdf",
+      "label": "공식 회로도",
+      "bounds": {
+        "x": 1,
+        "y": 1,
+        "width": 2335,
+        "height": 1652
+      }
+    }
+  ],
+  "elements": [],
+  "conductors": []
+}

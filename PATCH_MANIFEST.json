@@ -1,164 +1,281 @@
 {
-  "base_version": "0.11.3",
-  "target_version": "0.12.0",
-  "created_at": "2026-08-22T13:51:53.269Z",
+  "base_version": "0.12.0",
+  "target_version": "0.13.0",
+  "created_at": "2026-08-22T14:32:12.545642+00:00",
   "added_files": [
-    "TEST_RESULTS_0.12.0.md",
-    "backend/app/services/free_circuit_assembly_service.py",
-    "docs/empty-board-manual-test-0.12.0.md",
+    "TEST_RESULTS_0.13.0.md",
+    "backend/tests/test_qnet_public_sources.py",
+    "catalog/qnet_public_sources.json",
+    "docs/qnet-18-manual-test-0.13.0.md",
+    "docs/qnet-18-problem-audit-0.13.0.md",
+    "frontend/dist/assets/index-BpmUwHtV.js",
     "frontend/dist/assets/index-CKpOb584.css",
-    "frontend/dist/assets/index-DQvwjnRU.js",
-    "scripts/run_empty_board_demo.py"
+    "frontend/dist/index.html",
+    "problems/qnet_electrician_practical_001/answer.json",
+    "problems/qnet_electrician_practical_001/board.json",
+    "problems/qnet_electrician_practical_001/diagram.json",
+    "problems/qnet_electrician_practical_001/manifest.json",
+    "problems/qnet_electrician_practical_001/problem.json",
+    "problems/qnet_electrician_practical_001/schematic.svg",
+    "problems/qnet_electrician_practical_002/answer.json",
+    "problems/qnet_electrician_practical_002/board.json",
+    "problems/qnet_electrician_practical_002/diagram.json",
+    "problems/qnet_electrician_practical_002/manifest.json",
+    "problems/qnet_electrician_practical_002/problem.json",
+    "problems/qnet_electrician_practical_002/schematic.svg",
+    "problems/qnet_electrician_practical_003/answer.json",
+    "problems/qnet_electrician_practical_003/board.json",
+    "problems/qnet_electrician_practical_003/diagram.json",
+    "problems/qnet_electrician_practical_003/manifest.json",
+    "problems/qnet_electrician_practical_003/problem.json",
+    "problems/qnet_electrician_practical_003/schematic.svg",
+    "problems/qnet_electrician_practical_004/answer.json",
+    "problems/qnet_electrician_practical_004/board.json",
+    "problems/qnet_electrician_practical_004/diagram.json",
+    "problems/qnet_electrician_practical_004/manifest.json",
+    "problems/qnet_electrician_practical_004/problem.json",
+    "problems/qnet_electrician_practical_004/schematic.svg",
+    "problems/qnet_electrician_practical_005/answer.json",
+    "problems/qnet_electrician_practical_005/board.json",
+    "problems/qnet_electrician_practical_005/diagram.json",
+    "problems/qnet_electrician_practical_005/manifest.json",
+    "problems/qnet_electrician_practical_005/problem.json",
+    "problems/qnet_electrician_practical_005/schematic.svg",
+    "problems/qnet_electrician_practical_006/answer.json",
+    "problems/qnet_electrician_practical_006/board.json",
+    "problems/qnet_electrician_practical_006/diagram.json",
+    "problems/qnet_electrician_practical_006/manifest.json",
+    "problems/qnet_electrician_practical_006/problem.json",
+    "problems/qnet_electrician_practical_006/schematic.svg",
+    "problems/qnet_electrician_practical_007/answer.json",
+    "problems/qnet_electrician_practical_007/board.json",
+    "problems/qnet_electrician_practical_007/diagram.json",
+    "problems/qnet_electrician_practical_007/manifest.json",
+    "problems/qnet_electrician_practical_007/problem.json",
+    "problems/qnet_electrician_practical_007/schematic.svg",
+    "problems/qnet_electrician_practical_008/answer.json",
+    "problems/qnet_electrician_practical_008/board.json",
+    "problems/qnet_electrician_practical_008/diagram.json",
+    "problems/qnet_electrician_practical_008/manifest.json",
+    "problems/qnet_electrician_practical_008/problem.json",
+    "problems/qnet_electrician_practical_008/schematic.svg",
+    "problems/qnet_electrician_practical_009/answer.json",
+    "problems/qnet_electrician_practical_009/board.json",
+    "problems/qnet_electrician_practical_009/diagram.json",
+    "problems/qnet_electrician_practical_009/manifest.json",
+    "problems/qnet_electrician_practical_009/problem.json",
+    "problems/qnet_electrician_practical_009/schematic.svg",
+    "problems/qnet_electrician_practical_010/answer.json",
+    "problems/qnet_electrician_practical_010/board.json",
+    "problems/qnet_electrician_practical_010/diagram.json",
+    "problems/qnet_electrician_practical_010/manifest.json",
+    "problems/qnet_electrician_practical_010/problem.json",
+    "problems/qnet_electrician_practical_010/schematic.svg",
+    "problems/qnet_electrician_practical_011/answer.json",
+    "problems/qnet_electrician_practical_011/board.json",
+    "problems/qnet_electrician_practical_011/diagram.json",
+    "problems/qnet_electrician_practical_011/manifest.json",
+    "problems/qnet_electrician_practical_011/problem.json",
+    "problems/qnet_electrician_practical_011/schematic.svg",
+    "problems/qnet_electrician_practical_012/answer.json",
+    "problems/qnet_electrician_practical_012/board.json",
+    "problems/qnet_electrician_practical_012/diagram.json",
+    "problems/qnet_electrician_practical_012/manifest.json",
+    "problems/qnet_electrician_practical_012/problem.json",
+    "problems/qnet_electrician_practical_012/schematic.svg",
+    "problems/qnet_electrician_practical_013/answer.json",
+    "problems/qnet_electrician_practical_013/board.json",
+    "problems/qnet_electrician_practical_013/diagram.json",
+    "problems/qnet_electrician_practical_013/manifest.json",
+    "problems/qnet_electrician_practical_013/problem.json",
+    "problems/qnet_electrician_practical_013/schematic.svg",
+    "problems/qnet_electrician_practical_014/answer.json",
+    "problems/qnet_electrician_practical_014/board.json",
+    "problems/qnet_electrician_practical_014/diagram.json",
+    "problems/qnet_electrician_practical_014/manifest.json",
+    "problems/qnet_electrician_practical_014/problem.json",
+    "problems/qnet_electrician_practical_014/schematic.svg",
+    "problems/qnet_electrician_practical_015/answer.json",
+    "problems/qnet_electrician_practical_015/board.json",
+    "problems/qnet_electrician_practical_015/diagram.json",
+    "problems/qnet_electrician_practical_015/manifest.json",
+    "problems/qnet_electrician_practical_015/problem.json",
+    "problems/qnet_electrician_practical_015/schematic.svg",
+    "problems/qnet_electrician_practical_016/answer.json",
+    "problems/qnet_electrician_practical_016/board.json",
+    "problems/qnet_electrician_practical_016/diagram.json",
+    "problems/qnet_electrician_practical_016/manifest.json",
+    "problems/qnet_electrician_practical_016/problem.json",
+    "problems/qnet_electrician_practical_016/schematic.svg",
+    "problems/qnet_electrician_practical_017/answer.json",
+    "problems/qnet_electrician_practical_017/board.json",
+    "problems/qnet_electrician_practical_017/diagram.json",
+    "problems/qnet_electrician_practical_017/manifest.json",
+    "problems/qnet_electrician_practical_017/problem.json",
+    "problems/qnet_electrician_practical_017/schematic.svg",
+    "problems/qnet_electrician_practical_018/answer.json",
+    "problems/qnet_electrician_practical_018/board.json",
+    "problems/qnet_electrician_practical_018/diagram.json",
+    "problems/qnet_electrician_practical_018/manifest.json",
+    "problems/qnet_electrician_practical_018/problem.json",
+    "problems/qnet_electrician_practical_018/schematic.svg",
+    "scripts/build_incremental_patch_0_13.py",
+    "scripts/import_qnet_public_sources.py",
+    "scripts/run_qnet_18_smoke_test.py"
   ],
   "modified_files": [
     "APPLY_PATCH_KO.md",
     "DELETED_FILES.txt",
-    "PATCH_MANIFEST.json",
     "README.md",
     "backend/app/__init__.py",
-    "backend/app/api/free_circuit.py",
+    "backend/app/api/problems.py",
     "backend/app/core/config.py",
-    "backend/app/database/sqlite_database.py",
-    "backend/app/domain/__init__.py",
-    "backend/app/domain/free_circuit.py",
-    "backend/app/domain/operation_definition.py",
-    "backend/app/repositories/free_circuit_repository.py",
-    "backend/app/services/free_circuit_template_service.py",
-    "backend/tests/test_database.py",
-    "backend/tests/test_free_circuit_api.py",
-    "frontend/dist/index.html",
+    "backend/app/repositories/problem_repository.py",
+    "backend/tests/test_device_behavior_catalog.py",
+    "backend/tests/test_device_instance_factory.py",
+    "backend/tests/test_problem_api.py",
+    "catalog/device_behaviors.json",
+    "docs/basic-board-manual-test-0.11.2.md",
+    "docs/empty-board-manual-test-0.12.0.md",
     "frontend/package-lock.json",
     "frontend/package.json",
     "frontend/src/api/client.ts",
     "frontend/src/components/StatusBar.tsx",
-    "frontend/src/features/wiring/components/WiringBoard.tsx",
-    "frontend/src/features/wiring/engine/orthogonalRouter.ts",
-    "frontend/src/pages/FreeCircuitPage.tsx",
-    "frontend/src/styles/global.css",
-    "frontend/src/tests/FreeCircuitPage.test.tsx",
-    "frontend/src/tests/WiringPage.test.tsx",
-    "frontend/src/tests/mockApi.ts",
-    "scripts/run_basic_board_demo.py"
+    "frontend/src/components/circuit/CircuitDiagram.tsx",
+    "frontend/src/components/circuit/CircuitQuestionPanel.tsx",
+    "frontend/src/pages/CircuitAnalysisPage.tsx",
+    "frontend/src/pages/OperationTestPage.tsx",
+    "frontend/src/pages/WiringPage.tsx",
+    "frontend/src/tests/CircuitDiagnostics.test.tsx",
+    "scripts/run_basic_board_demo.py",
+    "tools/validate_problem.py"
   ],
   "deleted_files": [
-    "frontend/dist/assets/index--9bDnFkN.css",
-    "frontend/dist/assets/index-BMWcA_B6.js",
-    "frontend/dist/assets/index-BRyuPtfc.js",
-    "frontend/dist/assets/index-ua2Oo1UU.js"
+    "frontend/dist/assets/index-DQvwjnRU.js"
   ],
   "excluded": [
     ".venv",
     "frontend/node_modules",
     "test caches",
-    "development and user databases",
-    "logs",
-    "user workspaces and learning records",
-    "previous ZIP files",
-    "TypeScript build cache"
+    "PDF 원본과 렌더링 임시파일",
+    "사용자 DB·자유회로 작업공간·로그",
+    "기존 ZIP"
   ],
   "manifest_self_hash_excluded": true,
   "files": [
     {
       "path": "APPLY_PATCH_KO.md",
       "change_type": "modified",
-      "size": 3837,
-      "sha256": "e079d7ce2c4442a7e3359f03c68a0505102a49c275369de961ef094303f0499f"
+      "size": 1588,
+      "sha256": "5e7f1015a150a9f13c2933451ce2ff6882a6b71c357f974a0eb6e157638fda60"
     },
     {
       "path": "DELETED_FILES.txt",
       "change_type": "modified",
-      "size": 157,
-      "sha256": "a1d5f69c763d49130e9cf1698a6256660a8f5b2d6f6cc27e72314de87c5d332b"
+      "size": 39,
+      "sha256": "efc1028c8226bef4a2b2befb8c155d0a4147a82b60d5737ae41af542f98adcee"
     },
     {
       "path": "README.md",
       "change_type": "modified",
-      "size": 21781,
-      "sha256": "418ac5ea73251a457f0534c21a52df49b30f158739fb1f32ee22b8281b3c8eda"
+      "size": 22861,
+      "sha256": "f275e45ac178f4e2c29b9a6604a0123249b6c28f33408598e16d6b2b4387b6ff"
     },
     {
-      "path": "TEST_RESULTS_0.12.0.md",
+      "path": "TEST_RESULTS_0.13.0.md",
       "change_type": "added",
-      "size": 3826,
-      "sha256": "0da20fc58ff49c017f62ab43918c3331c2a0fc2ac02c420ae45a3bc4d2c6657a"
+      "size": 1868,
+      "sha256": "e02ca74e4a94f5fd70cb5f6fcd08a22628c4ecbd073853de39d9de9ca844b3b7"
     },
     {
       "path": "backend/app/__init__.py",
       "change_type": "modified",
       "size": 69,
-      "sha256": "8879619d3f0b3c17e2be3fdfef4d2c61425a2b3dcb5e9c03947767898c798ec6"
+      "sha256": "4086ba67ecf102980960326b6e14270878474c61b741ce81eba9e51b1a2076b6"
     },
     {
-      "path": "backend/app/api/free_circuit.py",
+      "path": "backend/app/api/problems.py",
       "change_type": "modified",
-      "size": 17659,
-      "sha256": "752062d51b33eb6e8a5df576702db51404e497cdfd02b0ab9eb4db387754f12d"
+      "size": 2089,
+      "sha256": "38323d1d4c78bb3b44d4f275c27b8ec6afad0913b977c5b7e2225855cb0a2f4a"
     },
     {
       "path": "backend/app/core/config.py",
       "change_type": "modified",
       "size": 1915,
-      "sha256": "ee135a1d9fec14b86baf1b707cda653851201e5d94cc122d11476ff94b0537e5"
+      "sha256": "1e108b545e75c5a5f62c6da860cdb93c23c88da883beb763b8e1c501fd002eb6"
     },
     {
-      "path": "backend/app/database/sqlite_database.py",
+      "path": "backend/app/repositories/problem_repository.py",
       "change_type": "modified",
-      "size": 9162,
-      "sha256": "7d4af8b0f6a544d040258e53f1eb7f9c74adc79364ccacb62a89e7d632162b09"
+      "size": 7893,
+      "sha256": "6eb198a07cf9a025f1c9fed918b763e810636b32465907202200029b58f755b3"
     },
     {
-      "path": "backend/app/domain/__init__.py",
+      "path": "backend/tests/test_device_behavior_catalog.py",
       "change_type": "modified",
-      "size": 3357,
-      "sha256": "028c3a5d235d00f530b0c42bad617ad39f6095750273532a288bbf4a82048bfa"
+      "size": 7254,
+      "sha256": "1a4918ea2a7dc9538e119205337129e7d2be358da2b6763677460237cfe74cb0"
     },
     {
-      "path": "backend/app/domain/free_circuit.py",
+      "path": "backend/tests/test_device_instance_factory.py",
       "change_type": "modified",
-      "size": 4360,
-      "sha256": "c36f0476fe14a879e44ee1dacb880bc7372f36c4d95bec36d15d6bfca51969f0"
+      "size": 6709,
+      "sha256": "9efeace6d62d82c61091103aa10162a8709900ef456ee3b5799b206b3cdb0d25"
     },
     {
-      "path": "backend/app/domain/operation_definition.py",
+      "path": "backend/tests/test_problem_api.py",
       "change_type": "modified",
-      "size": 8707,
-      "sha256": "87f9f1a5dc16ca7a7ec495d1ef35709387722ac9829223a5431368e0b62af4f8"
+      "size": 4153,
+      "sha256": "72b89f86f63e8e1cde6b69ed211915299195a36d2cbb403c7698163f39195729"
     },
     {
-      "path": "backend/app/repositories/free_circuit_repository.py",
-      "change_type": "modified",
-      "size": 5453,
-      "sha256": "90fd0af658ef2d495e69ac2187ed7822c40f66d6822458070ed9a20ff2fccaf9"
-    },
-    {
-      "path": "backend/app/services/free_circuit_assembly_service.py",
+      "path": "backend/tests/test_qnet_public_sources.py",
       "change_type": "added",
-      "size": 21956,
-      "sha256": "ba9ea129d995a89ff8604d1eed6033e4d437bb8ab5a3cb51daa562e77743dbaa"
+      "size": 2528,
+      "sha256": "404cc1f9c6602679c91e73b711f7ec09123a251449390c1afe632ef435fc4ddf"
     },
     {
-      "path": "backend/app/services/free_circuit_template_service.py",
+      "path": "catalog/device_behaviors.json",
       "change_type": "modified",
-      "size": 13098,
-      "sha256": "cdbba93210048955edf2d1e605ec7ca6e0ba84b6c0fcd4f1e3a0aaaf3244626c"
+      "size": 35450,
+      "sha256": "e13f710f8edd8f8df174ffc6069fecf279b8f5cf58b4e7774b3487947dd51b89"
     },
     {
-      "path": "backend/tests/test_database.py",
-      "change_type": "modified",
-      "size": 3075,
-      "sha256": "7eebb3424bb5eadb4a6a17c3e93a3119160107ec5fc4f1f97afe6e7393848e75"
+      "path": "catalog/qnet_public_sources.json",
+      "change_type": "added",
+      "size": 7132,
+      "sha256": "1a841c03d4d18fd8ebde608eac01f959a02a5c902a41099e824668ebb7b896a3"
     },
     {
-      "path": "backend/tests/test_free_circuit_api.py",
+      "path": "docs/basic-board-manual-test-0.11.2.md",
       "change_type": "modified",
-      "size": 15712,
-      "sha256": "201635344d86db470f75598fb15f40035eecba4f53f8a92f0ec9cb8f6797feff"
+      "size": 8133,
+      "sha256": "33dbd6608b91b4e7ee0c8b14e90753362b47602ca293243f1505fe8aa452dcf4"
     },
     {
       "path": "docs/empty-board-manual-test-0.12.0.md",
+      "change_type": "modified",
+      "size": 3105,
+      "sha256": "2b6c030ab9b5d09258dca10868206b43748eeabace12814c0a40eb84a70bf2fe"
+    },
+    {
+      "path": "docs/qnet-18-manual-test-0.13.0.md",
       "change_type": "added",
-      "size": 3100,
-      "sha256": "8c77c543b9c35c8e4e5efaf2978252c431c224bc9ec4349a874c9a87d79682fc"
+      "size": 2084,
+      "sha256": "7a178f9eedb910cad629b244b2d9e069de8cfd3460b9b8a42de44f769460e30e"
+    },
+    {
+      "path": "docs/qnet-18-problem-audit-0.13.0.md",
+      "change_type": "added",
+      "size": 10440,
+      "sha256": "a70c3a748f24ff9b56c0ab7b0f84c13c70a79a1d8c4812a4c82752dc616587fe"
+    },
+    {
+      "path": "frontend/dist/assets/index-BpmUwHtV.js",
+      "change_type": "added",
+      "size": 333333,
+      "sha256": "5784c0b15bff86f5fbd291c15e1ebd6b5097a90bcd7285d72552d26a0eaa6904"
     },
     {
       "path": "frontend/dist/assets/index-CKpOb584.css",
@@ -167,94 +284,748 @@
       "sha256": "9f4ec1ae6950f8145b8ac04b09d96c4163000b604cdaa4f5be60d90fde7228b4"
     },
     {
-      "path": "frontend/dist/assets/index-DQvwjnRU.js",
-      "change_type": "added",
-      "size": 331998,
-      "sha256": "30636f91737e03508082eb64319d8e50df4f3e11d8f8ca1444d568051cc6db0b"
-    },
-    {
       "path": "frontend/dist/index.html",
-      "change_type": "modified",
+      "change_type": "added",
       "size": 484,
-      "sha256": "7130197e704322d2cde28b6a05fde1d5f9b91cfd6e84c21d3a3c07fb1d7b1e61"
+      "sha256": "8641ae184c31eaa5e6e541def62e350aa91b40519e65379b55b42a0ba6a7cfaa"
     },
     {
       "path": "frontend/package-lock.json",
       "change_type": "modified",
       "size": 103225,
-      "sha256": "210111fe173c011f23204a9f17744f22617f882cf3e526f889066149270ee497"
+      "sha256": "e2c92d19c6ca6c7302e9a7f9925919108776c19b4b46356ebf07d202b2077f81"
     },
     {
       "path": "frontend/package.json",
       "change_type": "modified",
       "size": 781,
-      "sha256": "b51928639aa0e95d6f834b75c37621335e4b447412680bc429007157c729ded3"
+      "sha256": "a2a32802c76b1f9c3a4e9c48a40d77a971ba16db28acb56087e11bc2d624cd37"
     },
     {
       "path": "frontend/src/api/client.ts",
       "change_type": "modified",
-      "size": 26241,
-      "sha256": "e4d4cb3d9fb4dacd783312ae849283d720763fee40353e3391f7f14989ffa941"
+      "size": 26352,
+      "sha256": "a3d01715aff9deb300befa8b8fce6acaf26f82f8ca2d79c10a2f8e831b69f707"
     },
     {
       "path": "frontend/src/components/StatusBar.tsx",
       "change_type": "modified",
       "size": 1234,
-      "sha256": "40e3c1b295caa5908161b243e1cbf269fc8f2fd9090d2a3fc8cce0576636eca3"
+      "sha256": "ec0409d351e303b0fe0aa51c27152eb6370878f031f7b2c00b25e499b1c1431f"
     },
     {
-      "path": "frontend/src/features/wiring/components/WiringBoard.tsx",
+      "path": "frontend/src/components/circuit/CircuitDiagram.tsx",
       "change_type": "modified",
-      "size": 15903,
-      "sha256": "238adeb32f1e01c3c7a4a37ea99b1ae49e6d5c987f1211243d8df684fcaf69d1"
+      "size": 9553,
+      "sha256": "03b2672e46878cd7a42337403441d6f89d55f5bbd80f71e3a73f2962447f9943"
     },
     {
-      "path": "frontend/src/features/wiring/engine/orthogonalRouter.ts",
+      "path": "frontend/src/components/circuit/CircuitQuestionPanel.tsx",
       "change_type": "modified",
-      "size": 9383,
-      "sha256": "caa8c2bd277d8be63cf2943ff27b162e5910887932936e8d6d6c9723b290de6e"
+      "size": 4506,
+      "sha256": "904d58d83a87ff4e99be3ffa679421736352aed83494a924b1ce1fda03828d5d"
     },
     {
-      "path": "frontend/src/pages/FreeCircuitPage.tsx",
+      "path": "frontend/src/pages/CircuitAnalysisPage.tsx",
       "change_type": "modified",
-      "size": 34208,
-      "sha256": "7c8438cfa0c4222da3743f214c66289954335077e4d3e45c839b22034be1627d"
+      "size": 6408,
+      "sha256": "e969169bc4ccaeb0baed25282d69d513b01bf8818c5889a86b050534bc26af05"
     },
     {
-      "path": "frontend/src/styles/global.css",
+      "path": "frontend/src/pages/OperationTestPage.tsx",
       "change_type": "modified",
-      "size": 48723,
-      "sha256": "dd1579b2bf25bae3a9459bc29e84fe7a3531352d11e3241af192a463e347b513"
+      "size": 15797,
+      "sha256": "136a119d5d48a34faa77d289dbb2116724f2c9fd9051b631c64d6357ca695d8f"
     },
     {
-      "path": "frontend/src/tests/FreeCircuitPage.test.tsx",
+      "path": "frontend/src/pages/WiringPage.tsx",
       "change_type": "modified",
-      "size": 11721,
-      "sha256": "2240c8d4566477169e138055c3ebbe05ccc88740c5e52c5e033776a34fb397be"
+      "size": 21106,
+      "sha256": "fa71f715b6156dd9013fc393174fdb6c391affd7c5aa465f81191cd58ede105b"
     },
     {
-      "path": "frontend/src/tests/WiringPage.test.tsx",
+      "path": "frontend/src/tests/CircuitDiagnostics.test.tsx",
       "change_type": "modified",
-      "size": 25448,
-      "sha256": "742594a23187da2845ba503b82ec48a96590d64f2ec13bedcde446410712d564"
+      "size": 4772,
+      "sha256": "25313c989a2b4f142c724bc1564b18750382e24c8981b7c6cf790e42c04b0908"
     },
     {
-      "path": "frontend/src/tests/mockApi.ts",
-      "change_type": "modified",
-      "size": 26899,
-      "sha256": "7c009706327f23e5c460c479d740a9f465eed291027065920d7fa6cf7a548160"
+      "path": "problems/qnet_electrician_practical_001/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "3cc64f754b803ea6168e5dd5031d8b78a83858ed153ee2cd651224ce99222c90"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_001/board.json",
+      "change_type": "added",
+      "size": 39072,
+      "sha256": "fab7eb21ce7c8a9ef696f9458bd285ffd1a8871580a7286224c311c2154b2c3a"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_001/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_001/manifest.json",
+      "change_type": "added",
+      "size": 806,
+      "sha256": "0d82effb38a283a374e0611716af868c46005d88d84a39a5a3cce37c207486a1"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_001/problem.json",
+      "change_type": "added",
+      "size": 11032,
+      "sha256": "095c0eb79d8f9dab11c4ec9bd2432517ad645d416a5acc463e791b2c7c0f1ed6"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_001/schematic.svg",
+      "change_type": "added",
+      "size": 381583,
+      "sha256": "5681d3cf68dd9c7a5a0ff0867a2da37c341c58de63e0d882d606c6e3729d3570"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "5b48edb669aa540373daaa6adf25dc87785777f0fc091587bed88c7f44d148c0"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/board.json",
+      "change_type": "added",
+      "size": 38257,
+      "sha256": "e69d5d530a8d1f7f87a11906fe51238811edfaec2c82da1bd30c81fa0a7f9a58"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/manifest.json",
+      "change_type": "added",
+      "size": 806,
+      "sha256": "d5910c1596f8b38d11c44943f292c22e01e5c0a4913c71730dfaa464a57f6db1"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/problem.json",
+      "change_type": "added",
+      "size": 10972,
+      "sha256": "e2ab3aa9552e89991886df394fdbf0e4d35b902430ff37c4dc4b40d288b9a7f0"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_002/schematic.svg",
+      "change_type": "added",
+      "size": 375219,
+      "sha256": "a0460b10683f8d00feaf67ca061dba6e47af4eaea42bfa5441780cba5dc8323a"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "89b358d4d20157357909dcfe50473966c6046c4436c5fe5164f4f0f81b7266d7"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/board.json",
+      "change_type": "added",
+      "size": 36628,
+      "sha256": "d2a9f7e6d653c7320a0e64111256b8505378f4381d04a74d49d853e406c53b25"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/manifest.json",
+      "change_type": "added",
+      "size": 801,
+      "sha256": "6fe5c6e705345db6b7a43f0514f4510cf82e8e4a6857878dffb4a05a8cf0c81a"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/problem.json",
+      "change_type": "added",
+      "size": 10967,
+      "sha256": "484a7d9023c919c3ab60ae11b82126e4bfd4c99100a860bb4edd84ce5e2380c9"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_003/schematic.svg",
+      "change_type": "added",
+      "size": 376947,
+      "sha256": "69018cadd0de87e74721318345a5c67fd98f00a3c1e9f1573d938e7efe40ff8e"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "e5bdd585915fbb44fe1b96c1d2b241939df9e605cc075ee26714959dbf6616e8"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/board.json",
+      "change_type": "added",
+      "size": 39062,
+      "sha256": "0bec18c8dbcf3b9d1ad28149c20ba61f0e799c4b375d04c1f4329aec10fbe073"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/manifest.json",
+      "change_type": "added",
+      "size": 801,
+      "sha256": "e549a820187ed7159332dcda6913d146d3db40f561902f76a6eab552ad598e08"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/problem.json",
+      "change_type": "added",
+      "size": 11027,
+      "sha256": "961594ef30418f3ef90920b9c10900605dff83e27d436d3a1a4210f8630fe1f4"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_004/schematic.svg",
+      "change_type": "added",
+      "size": 375559,
+      "sha256": "e0c814ecd781ec017c73fab7881e3e1d780bd19b6dc9076dbcab0a67d013e0cb"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "e7a2b84a4611dd71388ce886f90a8c46c39328cd500f04c0a915dc5f47835c55"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/board.json",
+      "change_type": "added",
+      "size": 39161,
+      "sha256": "67f421225b747912c038bce1312329e7e177ab30104369a33a09b3e28cb4fe65"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/manifest.json",
+      "change_type": "added",
+      "size": 806,
+      "sha256": "9bf9dbdf23dde9a9d61bec7afd775c08030f7e9ed01fd682abec212f56f1b5f8"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/problem.json",
+      "change_type": "added",
+      "size": 11032,
+      "sha256": "b78aacfe9f428658db903f552f36e2dfed475bf120635337114be785cb7f6b84"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_005/schematic.svg",
+      "change_type": "added",
+      "size": 382647,
+      "sha256": "afef6423d3eb06b9610f8f6f52f8400b4ddb899e0070d746f893073c621a4692"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "af6c92864c848c18617d02f42b37089c4077c21578ea518e5778b60c336b52ce"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/board.json",
+      "change_type": "added",
+      "size": 39159,
+      "sha256": "e0a966810427fe427df6670942bad1f2f42f26bc171a869468a4741b4061f1d7"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/manifest.json",
+      "change_type": "added",
+      "size": 802,
+      "sha256": "1a0a3762262f89ab26fe6267c4e53c837198bbcdb8aa64bbb5a2e3e114e7a409"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/problem.json",
+      "change_type": "added",
+      "size": 11028,
+      "sha256": "c2a00807602ca3be236f6b114ddcc2b06f23be03087761539e5145e801c7bf9d"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_006/schematic.svg",
+      "change_type": "added",
+      "size": 372679,
+      "sha256": "1c2ec3cacd2be80325f4788884a82461bc8191db1e124240944540e8453e8015"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "6fbeb35c04b8965186cd68d4f2e0cd4b602e68c10de53658979fc79063176f96"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/board.json",
+      "change_type": "added",
+      "size": 39138,
+      "sha256": "7f0331857d7bfcf5e444f36008809e8a003aed74f2f0bd0417090340f82b5f77"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/manifest.json",
+      "change_type": "added",
+      "size": 800,
+      "sha256": "fb9331814cac6b6d942d5d4c0bf4f31f3288dd61e2febfb3fec8b82473be605d"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/problem.json",
+      "change_type": "added",
+      "size": 11026,
+      "sha256": "5e81e921c0ba3dad5e580c3f8c98b4c899ef81f819e0ddc8b8f97ac944d7c1c4"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_007/schematic.svg",
+      "change_type": "added",
+      "size": 379343,
+      "sha256": "3ad895d58fc4757d3d7eebc0ab747ad9fd83fea82475ea995493adfad51e0082"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "65977e8abc674ea63799d79ac630fef67cb0623e87e02f83c3e95d36563a9cbe"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/board.json",
+      "change_type": "added",
+      "size": 39158,
+      "sha256": "c031f70d897b2efa08defa9ac55872cfa1347fc0abbd8046e385d39338a3219b"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/manifest.json",
+      "change_type": "added",
+      "size": 798,
+      "sha256": "cdb6346a738704e8c28d8ee1623351361ab1f5d9978cfb5e90272e654e5dc6df"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/problem.json",
+      "change_type": "added",
+      "size": 11024,
+      "sha256": "3dff8ca05ac4432aabb5e7f838a7a50ac340a8636fff148e73388b94baa51098"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_008/schematic.svg",
+      "change_type": "added",
+      "size": 380715,
+      "sha256": "cdc91cd76c95236413cf16cb6077f7d0c1f6e4d0af3be5c42a08ada2a0d99eae"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "77da60c409b898b8ef01454c64282d76453d7bc583a5d2a0781e7f5053a2a8b4"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/board.json",
+      "change_type": "added",
+      "size": 39068,
+      "sha256": "760506906252a0e243e41419ce99fd8818a3441751a77f3ba38b570f7b0ee721"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/manifest.json",
+      "change_type": "added",
+      "size": 807,
+      "sha256": "a55f07634b6f112697cca949738e9d9c9073d3299d8fbe82e2a4a86fbda15522"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/problem.json",
+      "change_type": "added",
+      "size": 11033,
+      "sha256": "951260cf130a00f9b56f94bf23c5b953cc3ad395f83d827988581c905ccac734"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_009/schematic.svg",
+      "change_type": "added",
+      "size": 380499,
+      "sha256": "193e7e3d62679291f4c5a2e8ca40c528fb29cfb7339da8134550d36b72cb3656"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "7dc04c6b3c3d8c2b376bce94d1f0d207ad6704432261eb59ba7b8f948e6ce95d"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/board.json",
+      "change_type": "added",
+      "size": 39076,
+      "sha256": "d6f882c5d877cdde065559c249cba419b295be6d5adf5fa37b9cb7353e86ded8"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/manifest.json",
+      "change_type": "added",
+      "size": 805,
+      "sha256": "3aab6c8d5c71e3e1101b62688ae035f22bfc54e96aad2cc0f4470a4a27d59b98"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/problem.json",
+      "change_type": "added",
+      "size": 10930,
+      "sha256": "94b1a51d0886dffc64808db8f7d68e67b769fcb0181cf5eb66797e77ae56670d"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_010/schematic.svg",
+      "change_type": "added",
+      "size": 321647,
+      "sha256": "486d06d7f1e65ddf1c2dd68a1e69a1116f3a4af194ec51eb9d84ccf4fdd0bf39"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "0c40292c0e864a6403cba01fd8abc8645891bb64ea62dba241ca290501c8c0e5"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/board.json",
+      "change_type": "added",
+      "size": 39195,
+      "sha256": "e5fd3f054c5c77d4a275a33ee457a8d4b63af58c071842f6b2b23c4c1356bd92"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/manifest.json",
+      "change_type": "added",
+      "size": 800,
+      "sha256": "9e8e76c88b5baf258d735b0b9f5d5298b5e435c7bc160aaff19b0d29c7b9ded5"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/problem.json",
+      "change_type": "added",
+      "size": 10925,
+      "sha256": "19c2bb22437018bcea9621bbac9e64c05375fc0c0fb80f66b508285b8c066bab"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_011/schematic.svg",
+      "change_type": "added",
+      "size": 321259,
+      "sha256": "db24d4f6b5e8a5a8d82cd2c95749460b343add0466a66c056dd068cec960ccf2"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "7be330042ca623acf2ec2d67bfe519c73d1a90e3d62d2e8464d8fb7f8303e98c"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/board.json",
+      "change_type": "added",
+      "size": 39172,
+      "sha256": "e531b029ffb8479f13871ca1c9d5e31e3b2d245f28bf6fd0f5d46c5f0801e2aa"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/manifest.json",
+      "change_type": "added",
+      "size": 805,
+      "sha256": "e6c651773600b25e83dd8a8aa8191d1219c919225bb1dc1a8da7b2c72e815dbe"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/problem.json",
+      "change_type": "added",
+      "size": 10930,
+      "sha256": "7cbf002f158037e6ad92b822eca59ea003eda7c489195c2a209c2d486f0f85aa"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_012/schematic.svg",
+      "change_type": "added",
+      "size": 317611,
+      "sha256": "9ee87de4c80255c3eaa8ad04ae661ec73590b89d84c7e5094ee4b8155817baf3"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "328a8754646647c1163f5198c98f51e2a2bebbe97ebfe2c60d094fc05866595d"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/board.json",
+      "change_type": "added",
+      "size": 39165,
+      "sha256": "ca5b07d8d13f13c894c44f7de680d553ba85ca4c214e06373ef1e9db389c6a51"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/manifest.json",
+      "change_type": "added",
+      "size": 804,
+      "sha256": "101efa5724c76a2964a881759a67b15ee6abce7f088e3d6fc9cde5516ca5419b"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/problem.json",
+      "change_type": "added",
+      "size": 10929,
+      "sha256": "78e905a9b54336f818be27dd1545ffe0a0314c110a7693cb247f58ed07a00681"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_013/schematic.svg",
+      "change_type": "added",
+      "size": 320211,
+      "sha256": "7ed0e48017f89928bee125814a7f181a1d83defba5e9e5e7e8035e00b6c0fb78"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "25c819da702f1477fd59855a4ef071ebfadfd7f287d3d7068adb08879c9c9f70"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/board.json",
+      "change_type": "added",
+      "size": 39172,
+      "sha256": "46a87171550ae3569592cc151539d201a46ea7dde4c50e38ab788884ce1cff91"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/manifest.json",
+      "change_type": "added",
+      "size": 801,
+      "sha256": "461e76885fbf4134ba0181679979b4e4439529dbeacf38ba882211fd9d22febc"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/problem.json",
+      "change_type": "added",
+      "size": 10926,
+      "sha256": "82ab71d9ce5117886f59c3662da9df61c64ee10ec1038ff1ed8917aae088b3d9"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_014/schematic.svg",
+      "change_type": "added",
+      "size": 336551,
+      "sha256": "c27e0679dac724a1b4ce6ce476a33ed54ba4936ec074d495afe9cd9663ae17c3"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "7c398195a098e2628e99f622def3b601f02261a6449850064e71494638c09d94"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/board.json",
+      "change_type": "added",
+      "size": 39078,
+      "sha256": "fd484feefa73e722ad224375b041eb4267577a01ca07f6df2bd911d7c702e8af"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/manifest.json",
+      "change_type": "added",
+      "size": 799,
+      "sha256": "04ed24b78f60d2beef4aad36b2cf58041832a56183e125c27bac544a1f79bf53"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/problem.json",
+      "change_type": "added",
+      "size": 10924,
+      "sha256": "4b453698788c0639dfcc2dc2634651f31a5120f3181f29b14bf8a4205a116b2a"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_015/schematic.svg",
+      "change_type": "added",
+      "size": 338043,
+      "sha256": "b4aab639c76c5d78f9468aa69e01a1a97e2e48c125cf7afca6d4fa7583e991fa"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "79c45eb4b0d47a3300d1ae1f7744152bb9a4a4d5b009c89d0e830eafe06dad8f"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/board.json",
+      "change_type": "added",
+      "size": 39072,
+      "sha256": "4b92b6cb86abf790ddb94a61814d1ec49ba1d3d9305bc035f7f7119912c579ea"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/manifest.json",
+      "change_type": "added",
+      "size": 801,
+      "sha256": "8043222ac3d5c26c00209d6c6b8ba9048e4c1398a8f24627c26addde573259ce"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/problem.json",
+      "change_type": "added",
+      "size": 10926,
+      "sha256": "584d748c88a6deb29cea18a1d9038f9e564cfb51b464065190ec25cbd79c8e83"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_016/schematic.svg",
+      "change_type": "added",
+      "size": 324499,
+      "sha256": "1502e66188a2a63a667efca55d3ad96d784dec545ddd845d31e2ece9c3ab88ed"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "52adfc6f9250deb5738fe32c95b2e6a741709e6dc7914010f507a0fb61bd9bf7"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/board.json",
+      "change_type": "added",
+      "size": 39144,
+      "sha256": "37e8481b9ee369918aa494e4eb24230b528c06eeb8098f8336f1d48f6e8771e8"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/manifest.json",
+      "change_type": "added",
+      "size": 798,
+      "sha256": "59b6f1d1fa2a1b7cda2539103b62ad0b047583adb3b2fa7b65b8fd2216962c20"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/problem.json",
+      "change_type": "added",
+      "size": 10923,
+      "sha256": "8d898fcd7dbe5d6f94ebd8a9f0e1178cc9dadb2b21b7d5fad22e15eabd0ccb60"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_017/schematic.svg",
+      "change_type": "added",
+      "size": 334675,
+      "sha256": "d9881c32d071b66e12e7b6b51084df7db84a03e1bfe237fbfcde402af873ca82"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/answer.json",
+      "change_type": "added",
+      "size": 664,
+      "sha256": "22bca7ed7e316d5118f5c9aa95322566a501e9f44848cbbc18021a67bd901ef4"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/board.json",
+      "change_type": "added",
+      "size": 39078,
+      "sha256": "e41cb162f192ede3b9b652e9a9ccd7ef2cfa44e31df4b768849e04317ec77864"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/diagram.json",
+      "change_type": "added",
+      "size": 359,
+      "sha256": "ab2bcbbb6f8106255c24c82b693e8c744c6524aa879f58fef54872ca92e59117"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/manifest.json",
+      "change_type": "added",
+      "size": 804,
+      "sha256": "9636e7ac6dbab24850fe65d61d7bb63eb766173d41cd57a9eecb803e13efec74"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/problem.json",
+      "change_type": "added",
+      "size": 10929,
+      "sha256": "0889eb36c2cac110b30ea75025238460fa5a0ee506e6f2588b892d285f90d585"
+    },
+    {
+      "path": "problems/qnet_electrician_practical_018/schematic.svg",
+      "change_type": "added",
+      "size": 332819,
+      "sha256": "c7b3a310cc5283659e9881e640828a4d9b0fbc3ac815678d61113febc969f17a"
+    },
+    {
+      "path": "scripts/build_incremental_patch_0_13.py",
+      "change_type": "added",
+      "size": 4261,
+      "sha256": "47be66d813ed42c4d646036dd5394ac9c5054d463991577e41a42f7b506fef3b"
+    },
+    {
+      "path": "scripts/import_qnet_public_sources.py",
+      "change_type": "added",
+      "size": 13138,
+      "sha256": "ecd7b3ccd2809d863f38c7ef834fc668108ebabfc5943208a68725594d946fd5"
     },
     {
       "path": "scripts/run_basic_board_demo.py",
       "change_type": "modified",
       "size": 9179,
-      "sha256": "f3c2a42ff8364977b15ef395fc2d2571a0aaa031a4d26d7cd7f536ab8399eca1"
+      "sha256": "a07428f8eadd607496294ce66457c02adbf4a716133dab6a0276569d1506d0c0"
     },
     {
-      "path": "scripts/run_empty_board_demo.py",
+      "path": "scripts/run_qnet_18_smoke_test.py",
       "change_type": "added",
-      "size": 3378,
-      "sha256": "c38f2e45ead30252371b9f87503dd0aeb6923b5dd8d0a54f5cc7f50bccdb20c5"
+      "size": 2728,
+      "sha256": "18e211a59303abfa725bf0f9b9900bfd3220a5d5526b0454f6fa6a773a10c885"
+    },
+    {
+      "path": "tools/validate_problem.py",
+      "change_type": "modified",
+      "size": 5708,
+      "sha256": "3db539ac91e6c0480f709f9865e2c584b090d0f8faf84e84c353f0d007146e11"
     }
   ]
 }

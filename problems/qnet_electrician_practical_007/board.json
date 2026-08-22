@@ -1,0 +1,1651 @@
+{
+  "schema_version": "1.0",
+  "board_id": "qnet_public_007_board_v1",
+  "width": 1400,
+  "height": 900,
+  "routing_margin": 36,
+  "routing_channels": [
+    {
+      "channel_id": "top_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 145,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "middle_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 425,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "bottom_lane",
+      "channel_type": "horizontal",
+      "x": 45,
+      "y": 735,
+      "width": 1310,
+      "height": 35
+    },
+    {
+      "channel_id": "left_outer",
+      "channel_type": "left_outer",
+      "x": 20,
+      "y": 30,
+      "width": 35,
+      "height": 835
+    },
+    {
+      "channel_id": "right_outer",
+      "channel_type": "right_outer",
+      "x": 1345,
+      "y": 30,
+      "width": 35,
+      "height": 835
+    }
+  ],
+  "forbidden_areas": [
+    {
+      "area_id": "TB5_body",
+      "x": 110,
+      "y": 45,
+      "width": 1180,
+      "height": 70
+    },
+    {
+      "area_id": "MCCB_body",
+      "x": 90,
+      "y": 210,
+      "width": 160,
+      "height": 150
+    },
+    {
+      "area_id": "EOCR_body",
+      "x": 300,
+      "y": 210,
+      "width": 160,
+      "height": 150
+    },
+    {
+      "area_id": "F_body",
+      "x": 510,
+      "y": 210,
+      "width": 120,
+      "height": 150
+    },
+    {
+      "area_id": "X1_body",
+      "x": 700,
+      "y": 200,
+      "width": 180,
+      "height": 170
+    },
+    {
+      "area_id": "X2_body",
+      "x": 990,
+      "y": 200,
+      "width": 180,
+      "height": 170
+    },
+    {
+      "area_id": "T2_body",
+      "x": 90,
+      "y": 500,
+      "width": 180,
+      "height": 170
+    },
+    {
+      "area_id": "MC1_body",
+      "x": 350,
+      "y": 500,
+      "width": 220,
+      "height": 170
+    },
+    {
+      "area_id": "MC2_body",
+      "x": 680,
+      "y": 500,
+      "width": 220,
+      "height": 170
+    },
+    {
+      "area_id": "T1_body",
+      "x": 1010,
+      "y": 500,
+      "width": 180,
+      "height": 170
+    },
+    {
+      "area_id": "TB6_body",
+      "x": 110,
+      "y": 785,
+      "width": 1180,
+      "height": 70
+    }
+  ],
+  "items": [
+    {
+      "item_id": "TB5",
+      "label": "TB5 (10P+10P)",
+      "item_type": "terminal_block",
+      "socket_type_id": null,
+      "row": 0,
+      "x": 110,
+      "y": 45,
+      "width": 1180,
+      "height": 70,
+      "pins": [
+        {
+          "terminal_id": "TB5-01",
+          "label": "1",
+          "number": null,
+          "side": "bottom",
+          "x": 139.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-02",
+          "label": "2",
+          "number": null,
+          "side": "bottom",
+          "x": 198.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-03",
+          "label": "3",
+          "number": null,
+          "side": "bottom",
+          "x": 257.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-04",
+          "label": "4",
+          "number": null,
+          "side": "bottom",
+          "x": 316.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-05",
+          "label": "5",
+          "number": null,
+          "side": "bottom",
+          "x": 375.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-06",
+          "label": "6",
+          "number": null,
+          "side": "bottom",
+          "x": 434.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-07",
+          "label": "7",
+          "number": null,
+          "side": "bottom",
+          "x": 493.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-08",
+          "label": "8",
+          "number": null,
+          "side": "bottom",
+          "x": 552.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-09",
+          "label": "9",
+          "number": null,
+          "side": "bottom",
+          "x": 611.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-10",
+          "label": "10",
+          "number": null,
+          "side": "bottom",
+          "x": 670.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-11",
+          "label": "11",
+          "number": null,
+          "side": "bottom",
+          "x": 729.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-12",
+          "label": "12",
+          "number": null,
+          "side": "bottom",
+          "x": 788.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-13",
+          "label": "13",
+          "number": null,
+          "side": "bottom",
+          "x": 847.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-14",
+          "label": "14",
+          "number": null,
+          "side": "bottom",
+          "x": 906.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-15",
+          "label": "15",
+          "number": null,
+          "side": "bottom",
+          "x": 965.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-16",
+          "label": "16",
+          "number": null,
+          "side": "bottom",
+          "x": 1024.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-17",
+          "label": "17",
+          "number": null,
+          "side": "bottom",
+          "x": 1083.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-18",
+          "label": "18",
+          "number": null,
+          "side": "bottom",
+          "x": 1142.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-19",
+          "label": "19",
+          "number": null,
+          "side": "bottom",
+          "x": 1201.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB5-20",
+          "label": "20",
+          "number": null,
+          "side": "bottom",
+          "x": 1260.5,
+          "y": 115,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        }
+      ],
+      "label_area": {
+        "x": 570.2,
+        "y": 65,
+        "width": 259.6,
+        "height": 30
+      }
+    },
+    {
+      "item_id": "MCCB",
+      "label": "MCCB",
+      "item_type": "component",
+      "socket_type_id": null,
+      "row": 1,
+      "x": 90,
+      "y": 210,
+      "width": 160,
+      "height": 150,
+      "pins": [
+        {
+          "terminal_id": "MCCB-L1",
+          "label": "L1",
+          "number": null,
+          "side": "top",
+          "x": 116.67,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MCCB-L2",
+          "label": "L2",
+          "number": null,
+          "side": "top",
+          "x": 170,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MCCB-L3",
+          "label": "L3",
+          "number": null,
+          "side": "top",
+          "x": 223.33,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MCCB-T1",
+          "label": "T1",
+          "number": null,
+          "side": "bottom",
+          "x": 116.67,
+          "y": 360,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MCCB-T2",
+          "label": "T2",
+          "number": null,
+          "side": "bottom",
+          "x": 170,
+          "y": 360,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MCCB-T3",
+          "label": "T3",
+          "number": null,
+          "side": "bottom",
+          "x": 223.33,
+          "y": 360,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 112,
+        "y": 264,
+        "width": 116,
+        "height": 42
+      }
+    },
+    {
+      "item_id": "F",
+      "label": "FUSE",
+      "item_type": "component",
+      "socket_type_id": null,
+      "row": 1,
+      "x": 315,
+      "y": 210,
+      "width": 120,
+      "height": 150,
+      "pins": [
+        {
+          "terminal_id": "F-1",
+          "label": "1",
+          "number": null,
+          "side": "top",
+          "x": 375,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "F-2",
+          "label": "2",
+          "number": null,
+          "side": "bottom",
+          "x": 375,
+          "y": 360,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 337,
+        "y": 264,
+        "width": 76,
+        "height": 42
+      }
+    },
+    {
+      "item_id": "EOCR",
+      "label": "EOCR",
+      "item_type": "socket_12p",
+      "socket_type_id": "socket_12p_base",
+      "row": 1,
+      "x": 540,
+      "y": 210,
+      "width": 220,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "EOCR-L1",
+          "label": "1",
+          "role_label": "L1",
+          "number": 1,
+          "side": "top",
+          "x": 558.3299999999999,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-L2",
+          "label": "2",
+          "role_label": "L2",
+          "number": 2,
+          "side": "top",
+          "x": 595,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-L3",
+          "label": "3",
+          "role_label": "L3",
+          "number": 3,
+          "side": "top",
+          "x": 631.6700000000001,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-96",
+          "label": "4",
+          "role_label": "96",
+          "number": 4,
+          "side": "top",
+          "x": 668.3299999999999,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-98",
+          "label": "5",
+          "role_label": "98",
+          "number": 5,
+          "side": "top",
+          "x": 705,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-A1",
+          "label": "6",
+          "role_label": "A1",
+          "number": 6,
+          "side": "top",
+          "x": 741.6700000000001,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-U",
+          "label": "7",
+          "role_label": "U",
+          "number": 7,
+          "side": "bottom",
+          "x": 558.3299999999999,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-V",
+          "label": "8",
+          "role_label": "V",
+          "number": 8,
+          "side": "bottom",
+          "x": 595,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-W",
+          "label": "9",
+          "role_label": "W",
+          "number": 9,
+          "side": "bottom",
+          "x": 631.6700000000001,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-95",
+          "label": "10",
+          "role_label": "95",
+          "number": 10,
+          "side": "bottom",
+          "x": 668.3299999999999,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-97",
+          "label": "11",
+          "role_label": "97",
+          "number": 11,
+          "side": "bottom",
+          "x": 705,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "EOCR-A2",
+          "label": "12",
+          "role_label": "A2",
+          "number": 12,
+          "side": "bottom",
+          "x": 741.6700000000001,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 588.4,
+        "y": 262.7,
+        "width": 123.2,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "FR",
+      "label": "FR",
+      "item_type": "socket_8p",
+      "socket_type_id": "socket_8p_base",
+      "row": 1,
+      "x": 765,
+      "y": 210,
+      "width": 180,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "FR-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 787.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 832.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 877.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 922.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 787.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 832.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-1",
+          "label": "1",
+          "number": 1,
+          "side": "bottom",
+          "x": 877.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FR-2",
+          "label": "2",
+          "number": 2,
+          "side": "bottom",
+          "x": 922.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 804.6,
+        "y": 262.7,
+        "width": 100.80000000000001,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "X",
+      "label": "X",
+      "item_type": "socket_8p",
+      "socket_type_id": "socket_8p_base",
+      "row": 1,
+      "x": 990,
+      "y": 210,
+      "width": 180,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "X-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 1012.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 1057.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 1102.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 1147.5,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 1012.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 1057.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-1",
+          "label": "1",
+          "number": 1,
+          "side": "bottom",
+          "x": 1102.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "X-2",
+          "label": "2",
+          "number": 2,
+          "side": "bottom",
+          "x": 1147.5,
+          "y": 380,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 1029.6,
+        "y": 262.7,
+        "width": 100.80000000000001,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "FLS",
+      "label": "FLS",
+      "item_type": "socket_8p",
+      "socket_type_id": "socket_8p_base",
+      "row": 1,
+      "x": 90,
+      "y": 500,
+      "width": 180,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "FLS-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 112.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 157.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 202.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 247.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 112.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 157.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-1",
+          "label": "1",
+          "number": 1,
+          "side": "bottom",
+          "x": 202.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "FLS-2",
+          "label": "2",
+          "number": 2,
+          "side": "bottom",
+          "x": 247.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 129.60000000000002,
+        "y": 552.7,
+        "width": 100.80000000000001,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "T",
+      "label": "T",
+      "item_type": "socket_8p",
+      "socket_type_id": "socket_8p_base",
+      "row": 1,
+      "x": 390,
+      "y": 500,
+      "width": 180,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "T-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 412.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 457.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 502.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 547.5,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 412.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 457.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-1",
+          "label": "1",
+          "number": 1,
+          "side": "bottom",
+          "x": 502.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "T-2",
+          "label": "2",
+          "number": 2,
+          "side": "bottom",
+          "x": 547.5,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 429.6,
+        "y": 552.7,
+        "width": 100.80000000000001,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "MC1",
+      "label": "MC1",
+      "item_type": "socket_12p",
+      "socket_type_id": "socket_12p_base",
+      "row": 2,
+      "x": 690,
+      "y": 500,
+      "width": 220,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "MC1-1",
+          "label": "1",
+          "number": 1,
+          "side": "top",
+          "x": 708.3299999999999,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-2",
+          "label": "2",
+          "number": 2,
+          "side": "top",
+          "x": 745,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 781.6700000000001,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L3",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 818.3299999999999,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "a1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 855,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "b1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 891.67,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "A1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 708.3299999999999,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "U",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 745,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "V",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-9",
+          "label": "9",
+          "number": 9,
+          "side": "bottom",
+          "x": 781.6700000000001,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "W",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-10",
+          "label": "10",
+          "number": 10,
+          "side": "bottom",
+          "x": 818.3299999999999,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "a2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-11",
+          "label": "11",
+          "number": 11,
+          "side": "bottom",
+          "x": 855,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "b2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC1-12",
+          "label": "12",
+          "number": 12,
+          "side": "bottom",
+          "x": 891.67,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "A2",
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 738.4,
+        "y": 552.7,
+        "width": 123.20000000000002,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "MC2",
+      "label": "MC2",
+      "item_type": "socket_12p",
+      "socket_type_id": "socket_12p_base",
+      "row": 2,
+      "x": 990,
+      "y": 500,
+      "width": 220,
+      "height": 170,
+      "pins": [
+        {
+          "terminal_id": "MC2-1",
+          "label": "1",
+          "number": 1,
+          "side": "top",
+          "x": 1008.3299999999999,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-2",
+          "label": "2",
+          "number": 2,
+          "side": "top",
+          "x": 1045,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 1081.67,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "L3",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-4",
+          "label": "4",
+          "number": 4,
+          "side": "top",
+          "x": 1118.33,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "a1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-5",
+          "label": "5",
+          "number": 5,
+          "side": "top",
+          "x": 1155,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "b1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-6",
+          "label": "6",
+          "number": 6,
+          "side": "top",
+          "x": 1191.67,
+          "y": 500,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "A1",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-7",
+          "label": "7",
+          "number": 7,
+          "side": "bottom",
+          "x": 1008.3299999999999,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "U",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-8",
+          "label": "8",
+          "number": 8,
+          "side": "bottom",
+          "x": 1045,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "V",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-9",
+          "label": "9",
+          "number": 9,
+          "side": "bottom",
+          "x": 1081.67,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "W",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-10",
+          "label": "10",
+          "number": 10,
+          "side": "bottom",
+          "x": 1118.33,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "a2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-11",
+          "label": "11",
+          "number": 11,
+          "side": "bottom",
+          "x": 1155,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "b2",
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "MC2-12",
+          "label": "12",
+          "number": 12,
+          "side": "bottom",
+          "x": 1191.67,
+          "y": 670,
+          "max_connections": 2,
+          "enabled": true,
+          "role_label": "A2",
+          "terminal_role": "functional"
+        }
+      ],
+      "label_area": {
+        "x": 1038.4,
+        "y": 552.7,
+        "width": 123.20000000000002,
+        "height": 64.6
+      }
+    },
+    {
+      "item_id": "TB6",
+      "label": "TB6 (10P+10P)",
+      "item_type": "terminal_block",
+      "socket_type_id": null,
+      "row": 3,
+      "x": 110,
+      "y": 785,
+      "width": 1180,
+      "height": 70,
+      "pins": [
+        {
+          "terminal_id": "TB6-01",
+          "label": "1",
+          "number": null,
+          "side": "top",
+          "x": 139.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-02",
+          "label": "2",
+          "number": null,
+          "side": "top",
+          "x": 198.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-03",
+          "label": "3",
+          "number": null,
+          "side": "top",
+          "x": 257.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-04",
+          "label": "4",
+          "number": null,
+          "side": "top",
+          "x": 316.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-05",
+          "label": "5",
+          "number": null,
+          "side": "top",
+          "x": 375.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-06",
+          "label": "6",
+          "number": null,
+          "side": "top",
+          "x": 434.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-07",
+          "label": "7",
+          "number": null,
+          "side": "top",
+          "x": 493.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-08",
+          "label": "8",
+          "number": null,
+          "side": "top",
+          "x": 552.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-09",
+          "label": "9",
+          "number": null,
+          "side": "top",
+          "x": 611.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-10",
+          "label": "10",
+          "number": null,
+          "side": "top",
+          "x": 670.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-11",
+          "label": "11",
+          "number": null,
+          "side": "top",
+          "x": 729.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-12",
+          "label": "12",
+          "number": null,
+          "side": "top",
+          "x": 788.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-13",
+          "label": "13",
+          "number": null,
+          "side": "top",
+          "x": 847.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-14",
+          "label": "14",
+          "number": null,
+          "side": "top",
+          "x": 906.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-15",
+          "label": "15",
+          "number": null,
+          "side": "top",
+          "x": 965.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-16",
+          "label": "16",
+          "number": null,
+          "side": "top",
+          "x": 1024.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-17",
+          "label": "17",
+          "number": null,
+          "side": "top",
+          "x": 1083.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-18",
+          "label": "18",
+          "number": null,
+          "side": "top",
+          "x": 1142.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-19",
+          "label": "19",
+          "number": null,
+          "side": "top",
+          "x": 1201.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        },
+        {
+          "terminal_id": "TB6-20",
+          "label": "20",
+          "number": null,
+          "side": "top",
+          "x": 1260.5,
+          "y": 785,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "free_junction"
+        }
+      ],
+      "label_area": {
+        "x": 570.2,
+        "y": 805,
+        "width": 259.6,
+        "height": 30
+      }
+    }
+  ]
+}

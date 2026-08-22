@@ -144,6 +144,17 @@ class ProblemRepository:
         package = self._packages.get(problem_id)
         return package.diagram if package else None
 
+    def get_schematic_path(self, problem_id: str) -> Path | None:
+        package = self._packages.get(problem_id)
+        if package is None:
+            return None
+        path = (package.package_dir / package.manifest.files.schematic).resolve()
+        try:
+            path.relative_to(package.package_dir.resolve())
+        except ValueError:
+            return None
+        return path if path.is_file() else None
+
     def get_board(self, problem_id: str):
         package = self._packages.get(problem_id)
         return package.board if package else None

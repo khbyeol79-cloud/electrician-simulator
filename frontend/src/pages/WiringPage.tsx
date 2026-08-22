@@ -12,6 +12,7 @@ import { PlaceholderPage } from './PlaceholderPage'
 
 export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   const navigate = useNavigate()
+  const officialDraft = problem?.problem_type === 'official' && problem.status === 'draft'
   const [board, setBoard] = useState<BoardDefinition>()
   const [referenceDiagram, setReferenceDiagram] = useState<SchematicDiagram>()
   const [circuitDraft, setCircuitDraft] = useState<CircuitDraft>({})
@@ -62,7 +63,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   ).length ?? 0, [circuitDraft, problem])
 
   useEffect(() => {
-    if (!problem) return
+    if (!problem || officialDraft) return
     const controller = new AbortController()
     setLoading(true); setReady(false); setError(undefined); setNotice(undefined); setResult(undefined)
     setSelectedPin(null); setSelectedWire(null); setSelectedSummaryTerminal(null); setHistory([]); setFuture([])
@@ -75,15 +76,15 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
       .catch((reason: unknown) => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : '제어함 배치를 불러올 수 없습니다.') })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [problem])
+  }, [officialDraft, problem])
 
   useEffect(() => {
-    if (!problem || !ready) return
+    if (!problem || officialDraft || !ready) return
     const timer = window.setTimeout(() => {
       saveWiringDraft(problem.problem_id, problem.version, mode, connections).catch((reason: unknown) => setNotice(reason instanceof Error ? reason.message : '임시 결선을 저장할 수 없습니다.'))
     }, 450)
     return () => window.clearTimeout(timer)
-  }, [connections, mode, problem, ready])
+  }, [connections, mode, officialDraft, problem, ready])
 
   const commit = (next: WiringConnection[]) => {
     setHistory((values) => [...values.slice(-29), connections]); setFuture([]); setConnections(next)
@@ -191,6 +192,7 @@ export function WiringPage({ problem }: { problem?: PublicProblemDetail }) {
   }, [])
 
   if (!problem) return <PlaceholderPage stage="2단계" title="제어함 결선" description="상단에서 연습할 문제를 먼저 선택해 주세요." icon="⎍" />
+  if (officialDraft) return <PlaceholderPage stage="2단계 · 검증 대기" title="공식 결선 데이터 교차검증 중" description="원본 회로도는 1단계에서 확인할 수 있습니다. 접점별 소켓 핀과 정답 네트워크 검증이 끝나기 전에는 결선 채점을 제공하지 않습니다." icon="⌁" />
 
   return <section className="workspace-page wiring-workspace">
     <header className="workspace-toolbar wiring-header"><div><span>2단계 · 실제 제어함 결선</span><h2>제어함 결선</h2></div><div className="wiring-stats"><span>연결 {connections.length}</span><span>제출 {progress?.attempt_count ?? 0}회</span></div></header>

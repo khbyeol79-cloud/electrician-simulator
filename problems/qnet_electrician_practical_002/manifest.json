@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_002",
+  "title": "Q-Net 공개문제 002 · 수위 자동·수동 운전과 교대 운전",
+  "version": 1,
+  "problem_type": "official",
+  "status": "draft",
+  "difficulty": "advanced",
+  "estimated_minutes": 270,
+  "tags": [
+    "Q-Net",
+    "공개문제-002",
+    "PDF대조중"
+  ],
+  "source": {
+    "type": "official",
+    "name": "Q-Net 전기기능사 실기 공개문제",
+    "reference": "전기기능사-002-A4, 2025-08-04.pdf | sha256:5816995f414c6dd4491a1e16a2658c4a1aa6a84d4b24005c3fa54fc462422d57 | 근거 6~9쪽",
+    "verified_date": null
+  },
+  "files": {
+    "problem": "problem.json",
+    "answer": "answer.json",
+    "schematic": "schematic.svg",
+    "diagram": "diagram.json",
+    "board": "board.json"
+  }
+}

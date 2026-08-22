@@ -178,10 +178,16 @@ def test_device_models_keep_scenario_relationships_out():
     assert motor.motor is not None and motor.motor.phase_terminal_keys == ["phase_u", "phase_v", "phase_w"]
 
 
-def test_partial_models_do_not_invent_unused_8p_pins():
+def test_qnet_page_9_verifies_all_8p_changeover_pins():
     catalog = CatalogService(PROJECT_ROOT / "catalog", PROJECT_ROOT / "schemas")
     relay = catalog.get_device_behavior("auxiliary_relay_8p_training_partial")
     timer = catalog.get_device_behavior("timer_8p_on_delay_training_partial")
     assert relay is not None and timer is not None
-    assert {item.pin_number for item in relay.terminals} == {2, 3, 6, 7}
-    assert {item.pin_number for item in timer.terminals} == {1, 2, 3, 7}
+    assert {item.pin_number for item in relay.terminals} == set(range(1, 9))
+    assert {item.pin_number for item in timer.terminals} == set(range(1, 9))
+    assert relay.definition_status == timer.definition_status == "verified"
+    assert [(item.common_terminal_key, item.nc_terminal_key, item.no_terminal_key) for item in relay.contacts] == [
+        ("contact_1_common", "contact_1_nc", "contact_1_no"),
+        ("contact_2_common", "contact_2_nc", "contact_2_no"),
+    ]
+    assert all(item.contact_type == "CHANGEOVER" for item in [*relay.contacts, *timer.contacts])

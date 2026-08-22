@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "problem_id": "qnet_electrician_practical_017",
+  "answer_version": 1,
+  "verification": {
+    "status": "unverified",
+    "verified_by": null,
+    "verified_at": null,
+    "notes": "PDF 회로의 접점별 소켓 핀 선택과 expected_nets 교차검증 전"
+  },
+  "socket_pin_answers": {},
+  "required_connections": [],
+  "expected_nets": [],
+  "allowed_alternatives": [],
+  "forbidden_connections": [],
+  "wiring_connections": [],
+  "wiring_forbidden_connections": [],
+  "mounting_answer": [],
+  "wire_color_rules": {
+    "L1": "brown",
+    "L2": "black",
+    "L3": "gray",
+    "control": "yellow"
+  },
+  "operation_tests": []
+}
