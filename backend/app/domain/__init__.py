@@ -3,6 +3,12 @@
 from .answer_definition import AnswerDefinition
 from .board_definition import BoardDefinition
 from .catalog import DeviceCatalog, DeviceType, SocketCatalog, SocketType
+from .device_behavior import (
+    DeviceBehaviorCatalog,
+    DeviceBehaviorModel,
+    DeviceInstanceCreate,
+    DeviceInstanceDefinition,
+)
 from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, CircuitQuestionResult
 from .problem_definition import ProblemDefinition
 from .problem_manifest import ProblemManifest
@@ -43,6 +49,10 @@ __all__ = [
     "BoardDefinition",
     "DeviceCatalog",
     "DeviceType",
+    "DeviceBehaviorCatalog",
+    "DeviceBehaviorModel",
+    "DeviceInstanceCreate",
+    "DeviceInstanceDefinition",
     "ProblemDefinition",
     "ProblemManifest",
     "FreeCircuitWorkspaceResponse",

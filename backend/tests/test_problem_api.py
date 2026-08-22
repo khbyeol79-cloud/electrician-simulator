@@ -61,6 +61,21 @@ def test_problem_api_never_exposes_answers_or_paths(tmp_path):
         assert "contacts" not in devices.text
         assert "coil" not in devices.text
 
+        behaviors = client.get("/api/catalog/device-behaviors")
+        assert behaviors.status_code == 200
+        assert len(behaviors.json()) == 16
+        assert "expected_nets" not in behaviors.text
+        assert "wiring_connections" not in behaviors.text
+        assert "TB5-" not in behaviors.text
+        assert "TB6-" not in behaviors.text
+
+        relay = client.get(
+            "/api/catalog/device-behaviors/auxiliary_relay_8p_training_partial"
+        )
+        assert relay.status_code == 200
+        assert relay.json()["device_type_id"] == "auxiliary_relay_8p"
+        assert client.get("/api/catalog/device-behaviors/missing_model").status_code == 404
+
         circuit_summary = client.get("/api/problems/practice_001/circuit-summary")
         assert circuit_summary.status_code == 200
         assert circuit_summary.json()["reference_integrity"] == "valid"

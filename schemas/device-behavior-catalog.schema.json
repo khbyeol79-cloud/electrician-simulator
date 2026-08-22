@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "device-behavior-catalog.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "models"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "models": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/model" }
+    }
+  },
+  "$defs": {
+    "key": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "maxLength": 50 },
+    "modelId": { "type": "string", "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$" },
+    "idSuffix": { "type": "string", "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$", "maxLength": 30 },
+    "terminal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["terminal_key", "terminal_suffix", "pin_number", "terminal_type", "electrical_role", "max_connections", "enabled"],
+      "properties": {
+        "terminal_key": { "$ref": "#/$defs/key" },
+        "terminal_suffix": { "type": "string", "pattern": "^[A-Za-z0-9]+$", "maxLength": 20 },
+        "pin_number": { "type": ["integer", "null"], "minimum": 1, "maximum": 100 },
+        "terminal_type": { "enum": ["socket_pin", "screw_terminal", "coil_terminal", "contact_terminal", "power_terminal", "ground_terminal", "external_terminal"] },
+        "electrical_role": { "enum": ["unassigned", "line", "neutral", "protective_earth", "control", "coil", "contact_common", "contact_no", "contact_nc", "load"] },
+        "max_connections": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "coil": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coil_key", "id_suffix", "terminal_a_key", "terminal_b_key", "rated_voltage_property_key", "voltage_type_property_key", "frequency_property_key"],
+      "properties": {
+        "coil_key": { "$ref": "#/$defs/key" },
+        "id_suffix": { "$ref": "#/$defs/idSuffix" },
+        "terminal_a_key": { "$ref": "#/$defs/key" },
+        "terminal_b_key": { "$ref": "#/$defs/key" },
+        "rated_voltage_property_key": { "$ref": "#/$defs/key" },
+        "voltage_type_property_key": { "$ref": "#/$defs/key" },
+        "frequency_property_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contact_key", "id_suffix", "contact_type", "common_terminal_key", "switched_terminal_key", "nc_terminal_key", "no_terminal_key", "actuation", "controlled_by_key", "normal_state"],
+      "properties": {
+        "contact_key": { "$ref": "#/$defs/key" },
+        "id_suffix": { "$ref": "#/$defs/idSuffix" },
+        "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] },
+        "common_terminal_key": { "$ref": "#/$defs/key" },
+        "switched_terminal_key": { "$ref": "#/$defs/key" },
+        "nc_terminal_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] },
+        "no_terminal_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] },
+        "actuation": { "enum": ["coil", "timer", "manual", "protection"] },
+        "controlled_by_key": { "$ref": "#/$defs/key" },
+        "normal_state": { "enum": ["open", "closed"] }
+      }
+    },
+    "intrinsicConnection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from_terminal_key", "to_terminal_key"],
+      "properties": {
+        "from_terminal_key": { "$ref": "#/$defs/key" },
+        "to_terminal_key": { "$ref": "#/$defs/key" }
+      }
+    },
+    "configurableProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property_key", "value_type", "required", "default", "minimum", "maximum", "choices"],
+      "properties": {
+        "property_key": { "$ref": "#/$defs/key" },
+        "value_type": { "enum": ["boolean", "integer", "number", "string", "color", "voltage_type"] },
+        "required": { "type": "boolean" },
+        "default": { "type": ["boolean", "integer", "number", "string", "null"] },
+        "minimum": { "type": ["number", "null"] },
+        "maximum": { "type": ["number", "null"] },
+        "choices": { "type": "array", "maxItems": 30, "items": { "type": ["boolean", "integer", "number", "string"] } }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_type", "mode", "contact_key", "initial_active"],
+      "properties": {
+        "control_type": { "enum": ["pushbutton", "limit_switch", "selector"] },
+        "mode": { "enum": ["momentary", "maintained"] },
+        "contact_key": { "$ref": "#/$defs/key" },
+        "initial_active": { "type": "boolean" }
+      }
+    },
+    "timer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timer_key", "id_suffix", "coil_key", "mode", "delay_property_key", "timed_contact_keys", "retentive"],
+      "properties": {
+        "timer_key": { "$ref": "#/$defs/key" },
+        "id_suffix": { "$ref": "#/$defs/idSuffix" },
+        "coil_key": { "$ref": "#/$defs/key" },
+        "mode": { "const": "on_delay" },
+        "delay_property_key": { "$ref": "#/$defs/key" },
+        "timed_contact_keys": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/key" } },
+        "retentive": { "type": "boolean" }
+      }
+    },
+    "indicator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["terminal_a_key", "terminal_b_key", "display_color_property_key"],
+      "properties": {
+        "terminal_a_key": { "$ref": "#/$defs/key" },
+        "terminal_b_key": { "$ref": "#/$defs/key" },
+        "display_color_property_key": { "$ref": "#/$defs/key" }
+      }
+    },
+    "motor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase_terminal_keys"],
+      "properties": {
+        "phase_terminal_keys": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/key" } }
+      }
+    },
+    "protection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protection_type", "reset_modes", "default_reset_mode", "allowed_fault_types", "contact_keys"],
+      "properties": {
+        "protection_type": { "const": "eocr" },
+        "reset_modes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "enum": ["manual", "automatic", "restart_required"] } },
+        "default_reset_mode": { "enum": ["manual", "automatic", "restart_required"] },
+        "allowed_fault_types": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "const": "overload" } },
+        "contact_keys": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/key" } }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "device_type_id", "name", "definition_status", "source_note", "compatible_socket_type_ids", "capabilities", "terminals", "coils", "contacts", "intrinsic_connections", "configurable_properties", "control", "timer", "indicator", "motor", "protection"],
+      "properties": {
+        "model_id": { "$ref": "#/$defs/modelId" },
+        "device_type_id": { "$ref": "#/$defs/modelId" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "definition_status": { "enum": ["unverified", "reviewed", "verified"] },
+        "source_note": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "compatible_socket_type_ids": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/modelId" } },
+        "capabilities": {
+          "type": "array", "minItems": 1, "maxItems": 20,
+          "items": { "enum": ["terminal_block", "switching", "overcurrent_isolation", "power_source", "manual_control", "limit_control", "coil", "relay_contacts", "timed_contacts", "contactor", "overload_protection", "indicator", "three_phase_load", "socket"] }
+        },
+        "terminals": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "$ref": "#/$defs/terminal" } },
+        "coils": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/coil" } },
+        "contacts": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/contact" } },
+        "intrinsic_connections": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/intrinsicConnection" } },
+        "configurable_properties": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/configurableProperty" } },
+        "control": { "anyOf": [{ "$ref": "#/$defs/control" }, { "type": "null" }] },
+        "timer": { "anyOf": [{ "$ref": "#/$defs/timer" }, { "type": "null" }] },
+        "indicator": { "anyOf": [{ "$ref": "#/$defs/indicator" }, { "type": "null" }] },
+        "motor": { "anyOf": [{ "$ref": "#/$defs/motor" }, { "type": "null" }] },
+        "protection": { "anyOf": [{ "$ref": "#/$defs/protection" }, { "type": "null" }] }
+      }
+    }
+  }
+}
