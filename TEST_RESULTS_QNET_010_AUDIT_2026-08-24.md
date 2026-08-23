@@ -1,28 +1,53 @@
-# Test Results - Q-Net 010 evidence audit
+# Test Results - Q-Net 010 private functional validation
 
-검사일: 2026-08-24 (Asia/Seoul)
+Date: 2026-08-24 (Asia/Seoul)
 
-기준: `ca87754f320be5c73d05bfb1dfaf6cc7cf5e3e7a`, tag `v0.13.0-stable-fuse`
+## Baseline
 
-## 새 환경 기준선
+- Base: `ca87754f320be5c73d05bfb1dfaf6cc7cf5e3e7a`, tag `v0.13.0-stable-fuse`
+- Preserved documentation commit: `7a65a59c2c76051b6e41157f2800671892b91546`
+- Python: 3.14.6, rebuilt project `.venv`
+- `pip check`: PASS
 
-- 기존 `.venv`를 프로젝트 절대경로 확인 후 삭제했다.
-- Python 3.14.6으로 `.venv`를 새로 생성했다.
-- `backend/requirements.txt`를 새로 설치하고 `pip check`를 통과했다.
+## Final automated results
 
-## 실행 결과
-
-| 검사 | 명령 | 결과 |
+| Check | Command | Result |
 | --- | --- | --- |
-| 백엔드 전체 | `.venv\Scripts\python.exe -m pytest` | 151 passed, warning 1 |
-| 문제 패키지 | `.venv\Scripts\python.exe scripts\validate_problems.py` | 23 packages, errors 0, warnings 19 |
-| 프런트엔드 | `npm test` | 7 files, 67 passed |
+| Full Python suite | `.venv\Scripts\python.exe -m pytest` | 185 passed, 1 deprecation warning |
+| Q-Net 010 private suite | `.venv\Scripts\python.exe -m pytest backend/tests/test_qnet_010_private_validation.py -q` | 34 passed |
+| Package validation | `.venv\Scripts\python.exe scripts\validate_problems.py` | 23 loaded, 0 errors, 19 intended unverified warnings |
+| Frontend | `npm test` | 7 files, 67 passed |
 | TypeScript | `npm run typecheck` | PASS |
-| 운영 빌드 | `npm run build` | PASS, 63 modules transformed |
-| 공식 전체 스크립트 | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test_all.ps1` | PASS |
+| Production build | `npm run build` | PASS, 63 modules |
+| Privacy regression | focused pytest command | 49 passed |
+| Basic board demo | `scripts/run_basic_board_demo.py` | PASS |
+| Empty board demo | `scripts/run_empty_board_demo.py` | PASS |
+| Q-Net inventory smoke | `scripts/run_qnet_18_smoke_test.py` | PASS, 18/18 |
+| Q-Net 010 smoke | same command with `--problem 010` | PASS, draft/unverified |
+| Readiness | `scripts/check_qnet_010_readiness.py --allow-blocked` | 19 PASS / 1 evidence BLOCKED |
 
-경고 19건은 공식 문제 답안의 `unverified` 상태에 관한 의도된 경고다. Python 경고 1건은 Starlette TestClient의 httpx 호환성 deprecation이며 실패가 아니다.
+The single Python warning is Starlette TestClient/httpx deprecation and is not a test failure.
 
-## Q-Net 010 결정
+## Q-Net 010 coverage
 
-기능 코드는 수정하지 않았다. 사용자 제공 현장 사진으로 한 홀더의 좌·우 퓨즈 두 개와 네 결선점 구조를 추가 확인했다. `1-2`, `3-4`는 실기 준비자들의 구현 명명 관례로 기록했지만 Q-Net 공식 단자 번호 문서가 아니므로 정답 네트워크와 동작시험을 작성하지 않았다. `draft/unverified` 차단 상태가 정상이다.
+The 34 dedicated tests cover:
+
+- canonical wiring;
+- missing and wrong terminals;
+- direct and phase-to-phase shorts;
+- separated-Net merges;
+- STOP, FUSE, EOCR, timer, MC main-contact, MC auxiliary-contact, and forced-coil bypasses;
+- isolated TB jumpers and reject policy;
+- terminal capacity overflow;
+- TB renumbering and alternate wire trees;
+- whole X1/X2/T1/T2 changeover-group swaps;
+- rejection of partial pin substitution;
+- actual-wiring PB1/PB2 timer flows;
+- STOP and EOCR behavior;
+- power/reset state isolation;
+- public grading and operation blocking;
+- API, source, and production-bundle answer secrecy.
+
+## Status decision
+
+Internal functional validation is complete, but the official physical FUSE numbering is not. Q-Net 010 therefore remains `draft/unverified` and inaccessible for public grading and operation.

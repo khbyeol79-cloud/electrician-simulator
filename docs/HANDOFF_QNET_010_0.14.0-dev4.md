@@ -1,38 +1,46 @@
-# Handoff - Q-Net 010 evidence gate
+# Handoff - Q-Net 010 private functional validation
 
-## 현재 상태
+## Repository state
 
-- Git 기준: `ca87754f320be5c73d05bfb1dfaf6cc7cf5e3e7a`, `v0.13.0-stable-fuse`
-- 작업 브랜치: `feature/qnet-010`
-- Q-Net 010: `draft/unverified`
-- 결선 채점: 차단
-- 동작시험: 차단
-- 001~009, 011~018: 수정하지 않음
+- Branch: `feature/qnet-010`
+- Base: `ca87754`, tag `v0.13.0-stable-fuse`
+- Preserved documentation commit: `7a65a59`
+- Q-Net 010 public status: `draft/unverified`
+- Q-Net 001-009 and 011-018: untouched
 
-## 이번 작업
+## Implemented
 
-깨진 `.venv`를 Python 3.14.6으로 재생성하고 전체 기준선을 통과시켰다. PDF 010 6~9쪽과 사용자 제공 현장 사진으로 한 홀더의 좌·우 퓨즈 두 개와 네 결선점 구조를 확인했다. `1-2`, `3-4`는 실기 준비자 명명 관례라는 사용자 설명을 구현 관례의 근거로 기록했으나 Q-Net 공식 번호 근거는 아니므로 기능 개방을 중단했다. `frontend/dist`는 직접 수정하지 않았으며 `frontend/src`의 기존 소스로 운영 빌드만 재생성했다.
+- reproducible catalog-based Q-Net 010 JSON builder;
+- complete functional circuit and actual-wiring operation definition;
+- 32 private functional Nets;
+- canonical wiring example without fixed TB signatures;
+- X1/X2/T1/T2 whole changeover-group alternatives;
+- Net candidate comparison in the existing grading path;
+- package-validator alignment with runtime external/TB capacity rules;
+- stable timer-contact reset recomputation;
+- 34 dedicated tests and public privacy/blocking enforcement.
 
-## 다음 담당자 입력 자료
+## Important design decisions
 
-다음 중 하나 이상이 필요하다.
+- FUSE `1-2`, `3-4` is a user-provided practical naming convention.
+- The implementation remains unverified because official physical numbering is absent.
+- No MC1-MC2 mutual interlock exists in PDF 010; none was invented.
+- MC auxiliary NC contacts gate WL indication.
+- General APIs suppress internal operation for unverified packages.
+- Public wiring submissions remain ungradable and cannot create accepted snapshots or operation sessions.
 
-1. 시험장에서 사용하는 2회로 퓨즈홀더의 제조사·모델명
-2. 제조사 단자도에서 1~4 번호와 각 카트리지 대응
-3. Q-Net이 제공한 별도 단자 번호 자료
+## Test baseline
 
-자료를 받으면 PDF 9쪽 MC/EOCR/8P 내부도와 다시 교차검증한다. 단자 번호가 확인되기 전에는 현재 카탈로그 모델을 공식 정답으로 간주하지 않는다.
+- Python: 185 passed
+- Q-Net 010 dedicated: 34 passed
+- Frontend: 67 passed
+- Privacy focused: 49 passed
+- Package validator: 0 errors
+- Readiness: 19 PASS / 1 evidence BLOCKED
+- Basic board, empty board, Q-Net 18, and Q-Net 010 smoke: PASS
 
-## 구현 순서
+## Remaining work
 
-1. FUSE 단자 근거를 검증 문서에 기록한다.
-2. 8P 두 전환접점의 교환 가능한 대안 네트워크를 채점 모델로 표현한다.
-3. TB5/TB6 번호를 expected net에서 제외한다.
-4. 정상, 누락, 오결선, 단락, 우회 결선 테스트를 먼저 작성한다.
-5. 비공개 `expected_nets`를 작성하고 결선 채점만 개방한다.
-6. 실제 결선 스냅샷 기반 operation과 STOP/FUSE/EOCR/타이머 우회 검사를 추가한다.
-7. 비노출 회귀시험과 전체 빌드를 다시 통과한 뒤에만 상태 승격을 검토한다.
+Obtain a manufacturer terminal diagram, Q-Net terminal-number document, or clear numbered field photo for the actual two-cartridge holder. Only then consider changing answer verification or public availability.
 
-## 보존 조건
-
-SQLite 데이터, 자유회로, 작업공간, 결선 기록의 마이그레이션·삭제를 하지 않는다. ZIP 패키징에서도 `.db`, `.sqlite*`, `.venv`, `node_modules`, `.git`을 제외한다.
+Do not migrate/delete SQLite data, drafts, accepted snapshots, workspaces, logs, or user records.

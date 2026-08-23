@@ -1,20 +1,836 @@
 {
   "schema_version": "1.0",
   "problem_id": "qnet_electrician_practical_010",
-  "answer_version": 1,
+  "answer_version": 2,
   "verification": {
     "status": "unverified",
     "verified_by": null,
     "verified_at": null,
-    "notes": "PDF 회로의 접점별 소켓 핀 선택과 expected_nets 교차검증 전"
+    "notes": "내부 자동검증용 개발 답안. FUSE 1-2/3-4는 사용자 제공 실기 명명이며 Q-Net 공식 단자번호가 아니므로 일반 채점과 동작시험은 차단한다."
   },
   "socket_pin_answers": {},
   "required_connections": [],
-  "expected_nets": [],
-  "allowed_alternatives": [],
+  "expected_nets": [
+    {
+      "net_id": "P01_L1_IN",
+      "terminals": [
+        "PWR-L1",
+        "MCCB-L1"
+      ]
+    },
+    {
+      "net_id": "P02_L2_IN",
+      "terminals": [
+        "PWR-L2",
+        "MCCB-L2"
+      ]
+    },
+    {
+      "net_id": "P03_L3_IN",
+      "terminals": [
+        "PWR-L3",
+        "MCCB-L3"
+      ]
+    },
+    {
+      "net_id": "P04_PE",
+      "terminals": [
+        "PWR-PE",
+        "M1-PE",
+        "M2-PE"
+      ]
+    },
+    {
+      "net_id": "P05_L1_LOAD",
+      "terminals": [
+        "MCCB-T1",
+        "EOCR-L1",
+        "F-1"
+      ]
+    },
+    {
+      "net_id": "P06_L2_LOAD",
+      "terminals": [
+        "MCCB-T2",
+        "EOCR-L2"
+      ]
+    },
+    {
+      "net_id": "P07_L3_LOAD",
+      "terminals": [
+        "MCCB-T3",
+        "EOCR-L3",
+        "F-3"
+      ]
+    },
+    {
+      "net_id": "P08_EOCR_U",
+      "terminals": [
+        "EOCR-U",
+        "MC1-1",
+        "MC2-1"
+      ]
+    },
+    {
+      "net_id": "P09_EOCR_V",
+      "terminals": [
+        "EOCR-V",
+        "MC1-2",
+        "MC2-2"
+      ]
+    },
+    {
+      "net_id": "P10_EOCR_W",
+      "terminals": [
+        "EOCR-W",
+        "MC1-3",
+        "MC2-3"
+      ]
+    },
+    {
+      "net_id": "P11_M1_U",
+      "terminals": [
+        "MC1-7",
+        "M1-U"
+      ]
+    },
+    {
+      "net_id": "P12_M1_V",
+      "terminals": [
+        "MC1-8",
+        "M1-V"
+      ]
+    },
+    {
+      "net_id": "P13_M1_W",
+      "terminals": [
+        "MC1-9",
+        "M1-W"
+      ]
+    },
+    {
+      "net_id": "P14_M2_U",
+      "terminals": [
+        "MC2-7",
+        "M2-U"
+      ]
+    },
+    {
+      "net_id": "P15_M2_V",
+      "terminals": [
+        "MC2-8",
+        "M2-V"
+      ]
+    },
+    {
+      "net_id": "P16_M2_W",
+      "terminals": [
+        "MC2-9",
+        "M2-W"
+      ]
+    },
+    {
+      "net_id": "C01_PROTECTED_LINE",
+      "terminals": [
+        "F-2",
+        "EOCR-A1",
+        "EOCR-95",
+        "EOCR-97"
+      ]
+    },
+    {
+      "net_id": "C02_STOP_IN",
+      "terminals": [
+        "EOCR-96",
+        "PB0-1"
+      ]
+    },
+    {
+      "net_id": "C03_CONTROL_BUS",
+      "terminals": [
+        "PB0-2",
+        "PB1-1",
+        "PB2-1",
+        "X1-1",
+        "X1-8",
+        "X2-1",
+        "X2-8",
+        "MC1-4",
+        "MC2-4"
+      ]
+    },
+    {
+      "net_id": "C04_X1_RUN",
+      "terminals": [
+        "PB1-2",
+        "X1-3",
+        "X1-2",
+        "LS1-1",
+        "T1-1"
+      ]
+    },
+    {
+      "net_id": "C05_T1_COIL",
+      "terminals": [
+        "LS1-2",
+        "T1-2"
+      ]
+    },
+    {
+      "net_id": "C06_MC1_COIL",
+      "terminals": [
+        "T1-3",
+        "MC1-6"
+      ]
+    },
+    {
+      "net_id": "C07_X2_RUN",
+      "terminals": [
+        "PB2-2",
+        "X2-3",
+        "X2-2",
+        "LS2-1",
+        "T2-1"
+      ]
+    },
+    {
+      "net_id": "C08_T2_COIL",
+      "terminals": [
+        "LS2-2",
+        "T2-2"
+      ]
+    },
+    {
+      "net_id": "C09_MC2_COIL",
+      "terminals": [
+        "T2-3",
+        "MC2-6"
+      ]
+    },
+    {
+      "net_id": "C10_X1_WL_IN",
+      "terminals": [
+        "X1-6",
+        "MC1-5"
+      ]
+    },
+    {
+      "net_id": "C11_X2_WL_IN",
+      "terminals": [
+        "X2-6",
+        "MC2-5"
+      ]
+    },
+    {
+      "net_id": "C12_WL",
+      "terminals": [
+        "MC1-11",
+        "MC2-11",
+        "WL-1"
+      ]
+    },
+    {
+      "net_id": "C13_RL",
+      "terminals": [
+        "MC1-10",
+        "RL-1"
+      ]
+    },
+    {
+      "net_id": "C14_GL",
+      "terminals": [
+        "MC2-10",
+        "GL-1"
+      ]
+    },
+    {
+      "net_id": "C15_YL",
+      "terminals": [
+        "EOCR-98",
+        "YL-1"
+      ]
+    },
+    {
+      "net_id": "C16_RETURN",
+      "terminals": [
+        "F-4",
+        "EOCR-A2",
+        "X1-7",
+        "T1-7",
+        "MC1-12",
+        "X2-7",
+        "T2-7",
+        "MC2-12",
+        "WL-2",
+        "RL-2",
+        "GL-2",
+        "YL-2"
+      ]
+    }
+  ],
+  "allowed_alternatives": [
+    {
+      "alternative_id": "X1_CONTACT_SWAP",
+      "label": "X1 동등 전환접점 교환",
+      "terminal_swaps": [
+        {
+          "left": [
+            "X1-1",
+            "X1-4",
+            "X1-3"
+          ],
+          "right": [
+            "X1-8",
+            "X1-5",
+            "X1-6"
+          ]
+        }
+      ]
+    },
+    {
+      "alternative_id": "X2_CONTACT_SWAP",
+      "label": "X2 동등 전환접점 교환",
+      "terminal_swaps": [
+        {
+          "left": [
+            "X2-1",
+            "X2-4",
+            "X2-3"
+          ],
+          "right": [
+            "X2-8",
+            "X2-5",
+            "X2-6"
+          ]
+        }
+      ]
+    },
+    {
+      "alternative_id": "T1_CONTACT_SWAP",
+      "label": "T1 동등 계시접점 교환",
+      "terminal_swaps": [
+        {
+          "left": [
+            "T1-1",
+            "T1-4",
+            "T1-3"
+          ],
+          "right": [
+            "T1-8",
+            "T1-5",
+            "T1-6"
+          ]
+        }
+      ]
+    },
+    {
+      "alternative_id": "T2_CONTACT_SWAP",
+      "label": "T2 동등 계시접점 교환",
+      "terminal_swaps": [
+        {
+          "left": [
+            "T2-1",
+            "T2-4",
+            "T2-3"
+          ],
+          "right": [
+            "T2-8",
+            "T2-5",
+            "T2-6"
+          ]
+        }
+      ]
+    }
+  ],
   "forbidden_connections": [],
-  "wiring_connections": [],
-  "wiring_forbidden_connections": [],
+  "wiring_connections": [
+    {
+      "connection_id": "W-001",
+      "from": "PWR-L1",
+      "to": "MCCB-L1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-002",
+      "from": "PWR-L2",
+      "to": "MCCB-L2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-003",
+      "from": "PWR-L3",
+      "to": "MCCB-L3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-004",
+      "from": "PWR-PE",
+      "to": "TB5-05",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-005",
+      "from": "M1-PE",
+      "to": "TB5-05",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-006",
+      "from": "TB5-05",
+      "to": "TB5-06",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-007",
+      "from": "TB5-06",
+      "to": "M2-PE",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-008",
+      "from": "MCCB-T1",
+      "to": "EOCR-L1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-009",
+      "from": "EOCR-L1",
+      "to": "F-1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-010",
+      "from": "MCCB-T2",
+      "to": "EOCR-L2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-011",
+      "from": "MCCB-T3",
+      "to": "EOCR-L3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-012",
+      "from": "EOCR-L3",
+      "to": "F-3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-013",
+      "from": "EOCR-U",
+      "to": "MC1-1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-014",
+      "from": "MC1-1",
+      "to": "MC2-1",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-015",
+      "from": "EOCR-V",
+      "to": "MC1-2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-016",
+      "from": "MC1-2",
+      "to": "MC2-2",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-017",
+      "from": "EOCR-W",
+      "to": "MC1-3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-018",
+      "from": "MC1-3",
+      "to": "MC2-3",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-019",
+      "from": "MC1-7",
+      "to": "M1-U",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-020",
+      "from": "MC1-8",
+      "to": "M1-V",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-021",
+      "from": "MC1-9",
+      "to": "M1-W",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-022",
+      "from": "MC2-7",
+      "to": "M2-U",
+      "wire_color": "brown"
+    },
+    {
+      "connection_id": "W-023",
+      "from": "MC2-8",
+      "to": "M2-V",
+      "wire_color": "black"
+    },
+    {
+      "connection_id": "W-024",
+      "from": "MC2-9",
+      "to": "M2-W",
+      "wire_color": "gray"
+    },
+    {
+      "connection_id": "W-025",
+      "from": "F-2",
+      "to": "EOCR-A1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-026",
+      "from": "EOCR-A1",
+      "to": "EOCR-95",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-027",
+      "from": "EOCR-95",
+      "to": "EOCR-97",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-028",
+      "from": "EOCR-96",
+      "to": "PB0-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-029",
+      "from": "PB0-2",
+      "to": "TB5-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-030",
+      "from": "PB1-1",
+      "to": "TB5-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-031",
+      "from": "TB5-01",
+      "to": "TB5-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-032",
+      "from": "PB2-1",
+      "to": "TB5-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-033",
+      "from": "TB5-02",
+      "to": "X1-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-034",
+      "from": "X1-1",
+      "to": "X1-8",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-035",
+      "from": "X1-8",
+      "to": "X2-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-036",
+      "from": "X2-1",
+      "to": "X2-8",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-037",
+      "from": "X2-8",
+      "to": "MC1-4",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-038",
+      "from": "MC1-4",
+      "to": "MC2-4",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-039",
+      "from": "PB1-2",
+      "to": "TB5-03",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-040",
+      "from": "TB5-03",
+      "to": "X1-3",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-041",
+      "from": "X1-3",
+      "to": "X1-2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-042",
+      "from": "X1-2",
+      "to": "TB5-07",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-043",
+      "from": "TB5-07",
+      "to": "LS1-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-044",
+      "from": "TB5-07",
+      "to": "T1-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-045",
+      "from": "LS1-2",
+      "to": "T1-2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-046",
+      "from": "T1-3",
+      "to": "MC1-6",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-047",
+      "from": "PB2-2",
+      "to": "TB5-04",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-048",
+      "from": "TB5-04",
+      "to": "X2-3",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-049",
+      "from": "X2-3",
+      "to": "X2-2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-050",
+      "from": "X2-2",
+      "to": "TB5-08",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-051",
+      "from": "TB5-08",
+      "to": "LS2-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-052",
+      "from": "TB5-08",
+      "to": "T2-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-053",
+      "from": "LS2-2",
+      "to": "T2-2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-054",
+      "from": "T2-3",
+      "to": "MC2-6",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-055",
+      "from": "X1-6",
+      "to": "MC1-5",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-056",
+      "from": "X2-6",
+      "to": "MC2-5",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-057",
+      "from": "MC1-11",
+      "to": "MC2-11",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-058",
+      "from": "MC2-11",
+      "to": "WL-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-059",
+      "from": "MC1-10",
+      "to": "RL-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-060",
+      "from": "MC2-10",
+      "to": "GL-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-061",
+      "from": "EOCR-98",
+      "to": "YL-1",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-062",
+      "from": "WL-2",
+      "to": "TB6-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-063",
+      "from": "RL-2",
+      "to": "TB6-01",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-064",
+      "from": "TB6-01",
+      "to": "TB6-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-065",
+      "from": "TB6-01",
+      "to": "TB6-04",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-066",
+      "from": "GL-2",
+      "to": "TB6-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-067",
+      "from": "YL-2",
+      "to": "TB6-02",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-068",
+      "from": "TB6-02",
+      "to": "TB6-03",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-069",
+      "from": "TB6-03",
+      "to": "F-4",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-070",
+      "from": "F-4",
+      "to": "EOCR-A2",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-071",
+      "from": "EOCR-A2",
+      "to": "X1-7",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-072",
+      "from": "X1-7",
+      "to": "T1-7",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-073",
+      "from": "T1-7",
+      "to": "MC1-12",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-074",
+      "from": "TB6-04",
+      "to": "X2-7",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-075",
+      "from": "X2-7",
+      "to": "T2-7",
+      "wire_color": "yellow"
+    },
+    {
+      "connection_id": "W-076",
+      "from": "T2-7",
+      "to": "MC2-12",
+      "wire_color": "yellow"
+    }
+  ],
+  "wiring_forbidden_connections": [
+    {
+      "from": "F-1",
+      "to": "F-3"
+    },
+    {
+      "from": "F-1",
+      "to": "F-4"
+    },
+    {
+      "from": "F-2",
+      "to": "F-3"
+    },
+    {
+      "from": "F-2",
+      "to": "F-4"
+    },
+    {
+      "from": "PWR-L1",
+      "to": "PWR-L2"
+    },
+    {
+      "from": "PWR-L1",
+      "to": "PWR-L3"
+    },
+    {
+      "from": "PWR-L2",
+      "to": "PWR-L3"
+    }
+  ],
   "mounting_answer": [],
   "wire_color_rules": {
     "L1": "brown",
@@ -22,5 +838,307 @@
     "L3": "gray",
     "control": "yellow"
   },
-  "operation_tests": []
+  "operation_tests": [
+    {
+      "test_id": "PB1_TIMER_MC1",
+      "label": "PB1·X1·LS1·T1·MC1·M1",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true,
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "X1-COIL": true
+            },
+            "indicators": {
+              "WL": "on"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "X1-COIL": true
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS1",
+          "expect": {
+            "coils": {
+              "T1-COIL": true
+            },
+            "timers": {
+              "T1-TIMER": {
+                "status": "timing"
+              }
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 999,
+          "expect": {
+            "coils": {
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1,
+          "expect": {
+            "coils": {
+              "MC1-COIL": true
+            },
+            "motors": {
+              "M1": "forward"
+            },
+            "indicators": {
+              "RL": "on",
+              "WL": "off"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "LS1",
+          "expect": {
+            "coils": {
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            },
+            "indicators": {
+              "RL": "off",
+              "WL": "on"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "PB2_TIMER_MC2",
+      "label": "PB2·X2·LS2·T2·MC2·M2",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB2",
+          "expect": {
+            "coils": {
+              "X2-COIL": true
+            },
+            "indicators": {
+              "WL": "on"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB2",
+          "expect": {
+            "coils": {
+              "X2-COIL": true
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS2",
+          "expect": {
+            "coils": {
+              "T2-COIL": true
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000,
+          "expect": {
+            "coils": {
+              "MC2-COIL": true
+            },
+            "motors": {
+              "M2": "forward"
+            },
+            "indicators": {
+              "GL": "on",
+              "WL": "off"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "LS2",
+          "expect": {
+            "coils": {
+              "MC2-COIL": false
+            },
+            "motors": {
+              "M2": "stopped"
+            },
+            "indicators": {
+              "GL": "off",
+              "WL": "on"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "STOP_BOTH",
+      "label": "PB0 전체 정지",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB0",
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped",
+              "M2": "stopped"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "EOCR_TRIP_RESET",
+      "label": "EOCR 트립·수동 리셋",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "trigger_fault",
+          "target_id": "EOCR",
+          "fault_type": "overload",
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "MC1-COIL": false
+            },
+            "protections": {
+              "EOCR": {
+                "status": "reset_required"
+              }
+            },
+            "indicators": {
+              "YL": "on"
+            }
+          }
+        },
+        {
+          "action": "reset_fault",
+          "target_id": "EOCR",
+          "expect": {
+            "protections": {
+              "EOCR": {
+                "status": "normal"
+              }
+            },
+            "indicators": {
+              "YL": "off"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "POWER_RESET",
+      "label": "전원 차단 초기화",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS1"
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000
+        },
+        {
+          "action": "set_power",
+          "value": false,
+          "expect": {
+            "powered": false,
+            "coils": {
+              "X1-COIL": false,
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "power_off"
+            },
+            "indicators": {
+              "RL": "off",
+              "WL": "off",
+              "YL": "off"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }

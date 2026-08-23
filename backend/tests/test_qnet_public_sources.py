@@ -31,7 +31,11 @@ def test_qnet_drafts_expose_sources_but_not_private_answers():
         public = repository.get_public(problem_id)
         assert package is not None and public is not None
         assert package.answer.verification.status == "unverified"
-        assert not package.answer.expected_nets
+        if number == "010":
+            assert package.answer.expected_nets
+            assert package.answer.operation_tests
+        else:
+            assert not package.answer.expected_nets
         assert public.operation is None
         assert len(public.wiring_semantics["external_devices"]) >= 10
         serialized = public.model_dump_json()

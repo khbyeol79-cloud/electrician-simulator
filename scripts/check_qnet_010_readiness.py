@@ -88,15 +88,35 @@ def check(root: Path) -> tuple[list[str], list[str]]:
     else:
         blocked.append("010 circuit가 structure_only/비어 있음")
 
-    if problem.get("operation"):
-        passed.append("010 공개 동작 정의 작성")
+    operation = problem.get("operation") or {}
+    if operation.get("simulation_status") == "functional" and operation.get("simulation_mode") == "actual_wiring":
+        passed.append("010 내부 실제결선 동작 정의 작성")
     else:
-        blocked.append("010 공개 operation 정의가 없음")
+        blocked.append("010 내부 actual_wiring operation 정의가 없음")
 
     if answer.get("expected_nets"):
         passed.append("010 expected_nets 작성")
+        if not any(
+            terminal.startswith(("TB5-", "TB6-"))
+            for net in answer["expected_nets"]
+            for terminal in net.get("terminals", [])
+        ):
+            passed.append("010 expected_nets의 TB 번호 독립성")
+        else:
+            blocked.append("010 expected_nets에 자유 TB 번호가 포함됨")
     else:
         blocked.append("010 expected_nets가 비어 있음")
+
+    required_alternatives = {
+        "X1_CONTACT_SWAP", "X2_CONTACT_SWAP", "T1_CONTACT_SWAP", "T2_CONTACT_SWAP"
+    }
+    alternative_ids = {
+        item.get("alternative_id") for item in answer.get("allowed_alternatives", [])
+    }
+    if required_alternatives <= alternative_ids:
+        passed.append("010 8P 릴레이·타이머 복수 정답 정의")
+    else:
+        blocked.append("010 8P 복수 정답 정의 부족")
 
     if answer.get("operation_tests"):
         passed.append("010 operation_tests 작성")
@@ -104,12 +124,10 @@ def check(root: Path) -> tuple[list[str], list[str]]:
         blocked.append("010 operation_tests가 비어 있음")
 
     verification = (answer.get("verification") or {}).get("status")
-    if manifest.get("status") == "verified" and verification == "verified" and not blocked:
-        passed.append("010 최종 verified 개방 조건 충족")
+    if manifest.get("status") == "draft" and verification == "unverified":
+        blocked.append("공식 근거 BLOCKED: FUSE 1-2/3-4는 사용자 제공 실기 명명이며 Q-Net·제조사 공식 번호 근거가 없음")
     else:
-        blocked.append(
-            f"010은 계속 차단해야 함: manifest={manifest.get('status')}, answer.verification={verification}"
-        )
+        blocked.append(f"010 공개 상태 재검토 필요: manifest={manifest.get('status')}, answer.verification={verification}")
     return passed, blocked
 
 

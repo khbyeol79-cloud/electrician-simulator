@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from itertools import product
 from typing import Iterable, Literal
 
 
@@ -42,6 +43,7 @@ class NetworkComparison:
     extra_component_count: int = 0
     isolated_junction_count: int = 0
     loop_count: int = 0
+    alternative_ids: tuple[str, ...] = ()
 
     @property
     def electrically_equivalent(self) -> bool:
@@ -99,3 +101,61 @@ def compare_networks(
             else:
                 comparison.extra_component_count += 1
     return comparison
+
+
+def expected_net_candidates(expected_nets: dict[str, frozenset[str]], alternatives) -> list[tuple[dict[str, frozenset[str]], tuple[str, ...]]]:
+    """기구의 동등 접점군을 전체 단위로 교환한 Net 후보를 만든다.
+
+    개별 핀을 느슨하게 치환하지 않고 COM·NC·NO 묶음을 함께 바꾸므로
+    전환접점의 의미가 보존된다. 각 대안은 독립적으로 적용할 수 있다.
+    """
+    candidates: list[tuple[dict[str, frozenset[str]], tuple[str, ...]]] = []
+    for enabled in product((False, True), repeat=len(alternatives)):
+        mapping: dict[str, str] = {}
+        selected: list[str] = []
+        valid = True
+        for use, alternative in zip(enabled, alternatives, strict=True):
+            if not use:
+                continue
+            selected.append(alternative.alternative_id)
+            for swap in alternative.terminal_swaps:
+                for left, right in zip(swap.left, swap.right, strict=True):
+                    if left in mapping or right in mapping:
+                        valid = False
+                        break
+                    mapping[left], mapping[right] = right, left
+                if not valid:
+                    break
+            if not valid:
+                break
+        if not valid:
+            continue
+        candidate = {
+            net_id: frozenset(mapping.get(terminal, terminal) for terminal in terminals)
+            for net_id, terminals in expected_nets.items()
+        }
+        item = (candidate, tuple(selected))
+        if item not in candidates:
+            candidates.append(item)
+    return candidates
+
+
+def compare_network_candidates(
+    components: list[NetworkComponent],
+    expected_nets: dict[str, frozenset[str]],
+    alternatives,
+) -> NetworkComparison:
+    comparisons: list[NetworkComparison] = []
+    for candidate, alternative_ids in expected_net_candidates(expected_nets, alternatives):
+        result = compare_networks(components, candidate)
+        result.alternative_ids = alternative_ids
+        comparisons.append(result)
+    return min(
+        comparisons,
+        key=lambda item: (
+            not item.electrically_equivalent,
+            -len(item.correct_net_ids),
+            item.merged_component_count + item.extra_component_count + len(item.missing_net_ids),
+            len(item.alternative_ids),
+        ),
+    )

@@ -400,18 +400,45 @@ class ProblemPackageValidator:
                         capacity_scope = "외부측·내부측 각각" if item.item_type == "terminal_block" else "전체"
                         issues.append(self._issue("error", "invalid_terminal_capacity", f"제어함 단자의 {capacity_scope} 최대 연결 수는 2여야 합니다: {pin.terminal_id}", file=manifest.files.board, problem_id=problem_id))
             if answer:
-                terminals = board.terminal_ids
+                external_limits = {
+                    terminal.terminal_id: terminal.max_connections
+                    for device in (problem.wiring_semantics.external_devices if problem and problem.wiring_semantics else [])
+                    for terminal in device.terminals
+                }
+                external_ids = set(external_limits)
+                terminals = board.terminal_ids | external_ids
                 for connection in [*answer.wiring_connections, *answer.wiring_forbidden_connections]:
                     if connection.from_terminal not in terminals or connection.to not in terminals:
                         issues.append(self._issue("error", "unknown_board_answer_terminal", "배선 답안이 보드에 없는 단자를 참조합니다.", file=manifest.files.answer, problem_id=problem_id))
                 pin_limits = {pin.terminal_id: pin.max_connections for item in board.items for pin in item.pins}
+                free_junction_ids = {
+                    pin.terminal_id
+                    for item in board.items
+                    for pin in item.pins
+                    if pin.terminal_role == "free_junction"
+                }
                 answer_counts = Counter(
                     terminal_id
                     for connection in answer.wiring_connections
                     for terminal_id in (connection.from_terminal, connection.to)
                 )
                 for terminal_id, count in answer_counts.items():
-                    maximum = pin_limits.get(terminal_id)
+                    maximum = pin_limits.get(terminal_id, external_limits.get(terminal_id))
+                    if terminal_id in free_junction_ids:
+                        side_counts = Counter()
+                        for connection in answer.wiring_connections:
+                            if terminal_id not in (connection.from_terminal, connection.to):
+                                continue
+                            other = connection.to if connection.from_terminal == terminal_id else connection.from_terminal
+                            side_counts["external" if other in external_ids else "internal"] += 1
+                        for side, side_count in side_counts.items():
+                            if side_count > maximum:
+                                issues.append(self._issue(
+                                    "error", "answer_terminal_capacity_exceeded",
+                                    f"배선 정답이 TB {side}측 최대 연결 수를 초과합니다: {terminal_id} ({side_count}/{maximum})",
+                                    file=manifest.files.answer, problem_id=problem_id,
+                                ))
+                        continue
                     if maximum is not None and count > maximum:
                         issues.append(self._issue(
                             "error", "answer_terminal_capacity_exceeded",

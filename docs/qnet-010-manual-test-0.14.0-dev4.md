@@ -1,31 +1,32 @@
-# Q-Net 010 manual check - 0.14.0-dev4
+# Q-Net 010 manual check - private functional validation
 
-## 목적
+## Public UI checks
 
-Q-Net 010이 근거 부족 상태에서 채점 또는 동작시험으로 잘못 개방되지 않는지 확인한다.
+1. Open Q-Net public problem 010.
+2. Confirm its state remains draft/unverified.
+3. Confirm the page-7 schematic can be inspected.
+4. Confirm one FUSE body shows two cartridges and four endpoints.
+5. Confirm no public response contains expected Nets, alternatives, wiring examples, or operation tests.
+6. Submit any wiring and confirm the result is ungradable.
+7. Open operation setup and confirm the evidence-pending message appears.
+8. Confirm operation preview/session creation is unavailable.
 
-## 확인 절차
+## Internal automated checks
 
-1. 문제 선택 화면에서 Q-Net 공개문제 010을 연다.
-2. 상태가 공식문제 초안 또는 미검증으로 표시되는지 확인한다.
-3. 회로도에서 PDF 7쪽 원본이 확대 가능하고 잘리지 않는지 확인한다.
-4. 제어함에서 F가 한 기구로 표시되고 결선점 네 개와 두 카트리지가 보이는지 확인한다.
-5. F의 왼쪽·오른쪽 카트리지가 화면에서 서로 연결된 것처럼 보이지 않는지 확인한다.
-6. 결선을 임시 저장해도 채점 완료로 처리되지 않는지 확인한다.
-7. 제출 시 “정답은 아직 검증되지 않아 채점할 수 없음” 안내가 표시되는지 확인한다.
-8. 동작시험이 정상 제출 스냅샷 없이 개방되지 않는지 확인한다.
-9. 브라우저 네트워크 응답과 로그에서 `expected_nets`, `operation_tests`, `answer.json`, 정답 결선이 노출되지 않는지 확인한다.
+The private test suite validates:
 
-## 기대 결과
+- canonical wiring and alternate TB numbering;
+- alternate wire trees within the same Net;
+- X1/X2/T1/T2 whole changeover-group swaps;
+- partial or semantically invalid pin swaps rejected;
+- missing wires, wrong terminals, shorts, separated-Net merges;
+- STOP, FUSE, EOCR, timer, MC, auxiliary-contact, and forced-coil bypasses;
+- isolated TB jumpers and terminal-capacity overflow;
+- PB1-X1-LS1-T1-MC1-M1/RL;
+- PB2-X2-LS2-T2-MC2-M2/GL;
+- WL transition, EOCR trip/YL, manual reset, STOP, and power reset;
+- repeated operation tests without prior-state leakage.
 
-- 원본 회로와 보드 미리보기는 제공한다.
-- FUSE의 4개 결선점 UI는 구조 검토용으로 제공한다.
-- 결선 채점과 실제 동작시험은 차단한다.
-- 정답 데이터는 일반 API, 프런트 번들, 로그에 나타나지 않는다.
+## Expected public result
 
-## 개방 전 추가 확인
-
-- 실제 퓨즈홀더의 1~4 단자 번호 자료
-- `1-2`, `3-4` 독립 회로의 이중 교차검증
-- 8P 교환 접점 대안별 expected-net 테스트
-- TB 번호를 바꾼 동등 결선과 우회 결선의 상반 판정
+The board and source schematic remain viewable. Grading and operation remain blocked. The implementation convention `1-2`, `3-4` must never be described as official Q-Net/manufacturer numbering.

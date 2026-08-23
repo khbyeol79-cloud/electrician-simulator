@@ -61,14 +61,20 @@ def get_operation_setup(problem_id: str, request: Request) -> OperationSetupResp
     accepted = wiring_repository.accepted_snapshot(problem_id, package.manifest.version)
     progress = wiring_repository.progress(problem_id)
     layout = package.problem.device_layout
-    operation = package.problem.operation
+    operation = (
+        package.problem.operation
+        if package.answer.verification.status != "unverified"
+        else None
+    )
     functional = operation is not None and operation.simulation_status == "functional"
     operation_ready = accepted is not None and layout is not None and functional
     preview_allowed = layout is not None and not operation_ready
     wiring_source = "accepted_submission" if accepted else "draft_preview" if draft and draft.connections else "none"
     wiring_exists = accepted is not None or bool(draft and draft.connections)
 
-    if layout is None:
+    if package.answer.verification.status == "unverified":
+        message = "이 공식문제는 근거 검증 대기 상태이므로 동작시험을 사용할 수 없습니다."
+    elif layout is None:
         message = "이 문제의 기구 배치 정보가 준비되지 않았습니다."
     elif operation_ready:
         message = "정상 결선 제출 스냅샷으로 동작시험을 시작할 수 있습니다."
@@ -105,6 +111,8 @@ def create_operation_session(problem_id: str, payload: OperationSessionCreate, r
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
     if payload.problem_version != package.manifest.version:
         raise HTTPException(status_code=409, detail="문제 버전이 변경되었습니다. 다시 불러와 주세요.")
+    if package.answer.verification.status == "unverified":
+        raise HTTPException(status_code=409, detail="이 문제의 동작시험은 아직 검증되지 않아 사용할 수 없습니다.")
     if package.problem.operation is None or package.problem.operation.simulation_status != "functional":
         raise HTTPException(status_code=409, detail="이 문제의 동작 시뮬레이션 데이터가 준비되지 않았습니다.")
     snapshot = WiringRepository(request_database(request)).accepted_snapshot(

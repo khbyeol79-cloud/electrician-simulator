@@ -1,30 +1,44 @@
-# Development Status — Q-Net 010 evidence audit
+# Development Status - Q-Net 010 private functional validation
 
-## 권장 기준
-현재 권장 빌드는 **0.13.0 stable-fuse**다.
+## Current baseline
 
-## 공식 Q-Net 문제
-001~018은 모두 계속 `draft` 상태다. 이번 안정화 빌드에서는 어떤 공식문제도 `verified`로 승격하지 않았다.
+- Base tag: `v0.13.0-stable-fuse`
+- Base commit: `ca87754f320be5c73d05bfb1dfaf6cc7cf5e3e7a`
+- Branch: `feature/qnet-010`
+- Program version policy: keep 0.13.0; this branch is not a verified release.
 
 ## Q-Net 010
-- 공식 회로 표시: 유지
-- 8P relay/timer: 검증값 유지
-- 12P MC/EOCR: 기존 검증값 유지
-- FUSE: 1기구 / 4단자 / 두 독립 회로 모델 유지
-- FUSE UI: 원본 source에서 실제형 2카트리지 디자인 반영
-- expected_nets: 미작성
-- operation_tests: 미작성
-- 결선 채점: 차단
-- 동작시험: 차단
 
-2026-08-24에 공식 PDF 010의 6~9쪽을 원본 렌더로 다시 대조했다. 6쪽은 FUSE 1개와 기구 배치를, 7쪽은 두 개의 독립 퓨즈 기호를 보여 준다. 사용자가 제공한 실제 시험 준비 현장 사진에서도 한 홀더의 좌·우에 카트리지 두 개와 독립된 네 결선점이 확인된다. 다만 PDF와 사진 모두 FUSE 단자 번호 1~4를 표시하지 않으며, `1-2`, `3-4`는 실기 준비자들이 사용하는 명명 관례라는 사용자 설명에 근거한다. 저장소에도 해당 퓨즈홀더의 제조사 단자 자료가 없다. 따라서 현재의 4단자 모델은 화면·구조 및 명명 관례 검토용으로 유지하며 Q-Net 공식 단자 번호로 승격하지 않는다.
+The private development package now contains a functional circuit definition, 32 functional expected Nets, four independent 8P contact-group alternatives, and five actual-wiring operation scenarios.
 
-8P 릴레이·타이머 및 12P 전자접촉기·EOCR의 내부도는 9쪽에 있으나, 필수 범위 전체를 동시에 충족해야 하므로 FUSE 단자 근거가 확보되기 전까지 `expected_nets`, `operation_tests`, 결선 채점, 동작시험은 계속 비공개·차단한다. TB5/TB6 번호는 공식 회로의 기능적 네트워크와 독립적으로 선택 가능해야 하며 특정 번호를 공식 정답으로 추정하지 않는다.
+Implemented internally:
 
-## 다음 개발 원칙
-다음 단계에서는 한 버전에 한 범위만 진행한다.
-1. Q-Net 010에 사용되는 실제 2회로 퓨즈홀더의 제조사 자료 또는 Q-Net 공식 단자 번호 근거 확보
-2. FUSE `1-2`, `3-4` 대응을 독립된 두 자료로 교차검증
-3. 8P 교환 접점 복수 정답과 TB 번호 독립 동등성 채점 설계 검토
-4. terminal mapping과 `expected_nets` 구현·오답 회귀시험
-5. 별도 검증 후 실제 결선 기반 operation과 우회 결선 판정 개방
+- one FUSE holder, two cartridges, four terminals;
+- implementation convention `1-2` and `3-4`, with no cross-channel intrinsic connection;
+- MCCB, EOCR, X1, X2, T1, T2, MC1, MC2, buttons, limit switches, lamps, and two motors;
+- PDF page 9 mappings for 8P relay/timer and 12P MC/EOCR;
+- TB5/TB6-number-independent Net comparison;
+- whole COM/NC/NO group swaps for X1, X2, T1, and T2;
+- missing, wrong, shorted, merged, bypassed, isolated-jumper, and capacity-error validation;
+- actual submitted-wiring operation validation for PB1/PB2, timers, motors, STOP, EOCR, indicators, and reset;
+- stable-state recomputation when a completed timer de-energizes.
+
+## Public state
+
+Q-Net 010 remains:
+
+- manifest: `draft`
+- answer verification: `unverified`
+- public wiring grading: blocked
+- public operation setup/session: blocked
+- private answer/API/bundle/log exposure: blocked
+
+The field photo confirms one holder with two physically separate cartridges and four connection points. The PDF confirms two independent fuse paths. The labels `1-2` and `3-4` are a user-provided practical convention, not a Q-Net or manufacturer terminal-number claim.
+
+## Readiness
+
+- Functional readiness: 19 PASS
+- Evidence gate: 1 BLOCKED
+- Remaining BLOCKED: no Q-Net/manufacturer document or numbered field photo establishes the official physical numbering of the four FUSE terminals.
+
+Q-Net 001-009 and 011-018 were not implemented or changed.

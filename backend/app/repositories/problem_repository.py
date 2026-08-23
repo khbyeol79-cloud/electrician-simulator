@@ -111,6 +111,7 @@ class ProblemRepository:
             return None
         manifest = package.manifest
         problem = package.problem
+        expose_operation = package.answer.verification.status != "unverified"
         return PublicProblemDetail(
             problem_id=manifest.problem_id,
             title=manifest.title,
@@ -132,7 +133,10 @@ class ProblemRepository:
             circuit=problem.circuit.model_dump(mode="json"),
             socket_questions=[question.model_dump(mode="json") for question in problem.socket_questions],
             device_layout=problem.device_layout.model_dump(mode="json") if problem.device_layout else None,
-            operation=problem.operation.model_dump(by_alias=True, mode="json") if problem.operation else None,
+            operation=(
+                problem.operation.model_dump(by_alias=True, mode="json")
+                if problem.operation and expose_operation else None
+            ),
             wiring_semantics=problem.wiring_semantics.model_dump(mode="json") if problem.wiring_semantics else None,
             warning_count=len(package.warnings),
         )

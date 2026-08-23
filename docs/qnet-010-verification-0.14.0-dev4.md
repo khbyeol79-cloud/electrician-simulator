@@ -1,51 +1,51 @@
-# Q-Net 010 verification - 0.14.0-dev4 evidence gate
+# Q-Net 010 verification - private functional validation
 
-## 감사 범위
+## Evidence
 
-- 원본: `전기기능사-010-A4, 2025-08-04.pdf`
+- Official PDF: `전기기능사-010-A4, 2025-08-04.pdf`
 - SHA-256: `e026b49d4e4e99595b0689ff2c890297dfc1f62d26a39db7b6e94263990f92ec`
-- 검수 페이지: PDF 6~9쪽
-- 보조 근거: 사용자가 제공한 실제 시험 준비 현장 퓨즈홀더 사진 및 실기 준비자들의 `1-2`, `3-4` 명명 관례 설명
-- 방법: Poppler 180 DPI 원본 렌더 시각 검수, 사용자 사진 확대 확인, 저장소 JSON·카탈로그·채점기·시뮬레이터 교차검사
+- Reviewed pages: 6-9, rendered and visually inspected
+- Supplement: user-provided field photo of the exam-practice FUSE holder
 
-## 검증표
+Evidence levels:
 
-| 필수 항목 | 공식 근거 | 판정 | 조치 |
-| --- | --- | --- | --- |
-| 6~9쪽 재검수 | PDF 6~9쪽 | PASS | 원본 렌더로 재확인 |
-| FUSE 1개 | 6쪽 배치도 | PASS | `F` 한 기구 유지 |
-| FUSE 4개 결선점 | 7쪽 두 퓨즈 회로 + 사용자 현장 사진 | PASS (구조) | 한 홀더, 좌·우 카트리지, 네 결선점 확인 |
-| FUSE 좌·우 독립회로 | 7쪽 두 퓨즈 기호 + 사용자 현장 사진 | PASS (구조) | 좌·우 회로를 서로 연결하지 않음 |
-| FUSE `1-2`, `3-4` 명명 | 실기 준비자 관례라는 사용자 설명 | REVIEWED CONVENTION | 구현 명명으로 유지, Q-Net 공식 번호로 주장하지 않음 |
-| 전체 기구 구조 | 6~9쪽 | PASS (도면 구조) | 기구 목록과 내부도 확인 |
-| 8P 교환 접점 복수 정답 | 9쪽 두 동등 전환접점 | DESIGN BLOCKED | 채점기의 대안 네트워크 지원 검증 필요 |
-| 12P MC 단자 | 9쪽 전자접촉기 내부도 | PASS (PDF 대조) | 1~12 표기 확인 |
-| 12P EOCR 단자 | 9쪽 EOCR 내부도 | PASS (PDF 대조) | L1/L2/L3, 95~98, A1/A2 확인 |
-| 비공개 `expected_nets` | FUSE 번호 근거 부족 | BLOCKED | 비워 둠 |
-| TB 번호 독립 동등성 | PDF에 고정 TB 번호 없음 | REQUIREMENT CONFIRMED | 기능 네트워크 기준이어야 함 |
-| 정상·오결선 계열 테스트 | 정답 네트워크 미확정 | BLOCKED | 정답 확정 후 작성 |
-| 실제 결선 operation | 정답 네트워크 미확정 | BLOCKED | 채점 통과 결선만 대상으로 작성 |
-| STOP/FUSE/EOCR/타이머/인터록 우회 | 정답·operation 미확정 | BLOCKED | 추측 판정 금지 |
-| 정답 비노출 | 기존 API 회귀시험 | PASS | draft 답안·operation 비노출 유지 |
+```text
+structure_evidence:
+- Q-Net PDF
+- user-provided field photo
 
-## 페이지별 확인
+terminal_naming_evidence:
+- user-provided practical convention
 
-### 6쪽
+verification:
+- unverified
+```
 
-제어판 배치는 TB5, MCCB, EOCR, X2, X1, F, T1, T2, MC1, MC2, TB6 순서를 제공한다. 범례는 F를 “퓨즈 및 퓨즈홀더” 한 항목으로 기재한다.
+The photo confirms one holder, left/right cartridges, and four physical connection points. PDF page 7 confirms two separate fuse paths. Neither source shows the digits 1-4. This implementation names the paths `1-2` and `3-4` as the user's practical convention only.
 
-### 7쪽
+## Verification matrix
 
-동력회로와 제어 시퀀스를 제공한다. FUSE 아래에 독립된 퓨즈 기호 두 개가 있으므로 두 회로가 서로 연결돼서는 안 된다는 구조는 확인된다. 사용자 현장 사진도 한 홀더 안의 좌·우 카트리지와 독립된 네 결선점을 뒷받침한다. 그러나 PDF와 사진의 네 끝점에는 번호가 없다. 또한 도면은 시험을 위해 임의 구성되어 상용도면과 다를 수 있다는 주의문이 있다.
+| Scope | Result | Notes |
+| --- | --- | --- |
+| PDF pages 6-9 | PASS | layout, sequence, required behavior, internal diagrams |
+| FUSE one holder/two cartridges/four endpoints | PASS | PDF plus field photo |
+| FUSE independent `1-2`, `3-4` implementation | PASS | convention implemented; no cross-channel intrinsic edge |
+| Official FUSE physical terminal numbering | BLOCKED | no numbered photo or manufacturer/Q-Net diagram |
+| X1/X2 8P | PASS | coil 2-7; groups 1/4/3 and 8/5/6 |
+| T1/T2 8P | PASS | coil 2-7; two on-delay changeover groups |
+| MC1/MC2 12P | PASS | main 1-7, 2-8, 3-9; NO 4-10; NC 5-11; coil 6-12 |
+| EOCR 12P | PASS | L/U, L/V, L/W; NC 95-96; NO 97-98; A1-A2 |
+| Complete private circuit | PASS | functional circuit, contacts, coils, terminals |
+| Private expected Nets | PASS | 32 Nets, no TB number in expected signatures |
+| 8P multiple answers | PASS | four whole-group alternatives, combinable |
+| TB number independence | PASS | alternate TB numbers and wire trees accepted |
+| Wrong/bypass validation | PASS | missing, short, merge, STOP/FUSE/EOCR/timer/MC/forced-coil |
+| Actual-wiring operation | PASS | five deterministic private scenarios |
+| Answer secrecy | PASS | public API/setup/session/source/bundle checks |
+| Public availability | BLOCKED intentionally | draft/unverified evidence gate |
 
-### 8쪽
+PDF 010 does not define a mutual MC1-MC2 interlock. No imaginary interlock was added. The MC auxiliary NC contacts are modeled as WL indication gates, and bypassing those contacts is rejected.
 
-PB1/X1/LS1/T1/MC1/M1/RL/WL, PB2/X2/LS2/T2/MC2/M2/GL/WL, PB0 정지, EOCR 트립·리셋 동작을 설명한다.
+## Final decision
 
-### 9쪽
-
-전자접촉기 12P, EOCR 12P, 타이머 8P, 릴레이 8P 및 소켓 하측 기준 번호를 제공한다. 8P 릴레이의 두 전환접점은 기능상 교환 가능하지만, 이를 복수 정답으로 안전하게 표현하는 채점 규칙은 별도 검증이 필요하다.
-
-## 결론
-
-사용자 사진으로 FUSE의 실제 2카트리지·4결선점 구조는 보강됐다. `F-1~F-4`와 `1-2`, `3-4`는 실기 준비 관례를 반영한 일관된 구현 명명으로 유지할 수 있다. 다만 이것이 Q-Net 공식 단자 번호라는 문서 근거는 아니며, 필수 범위 전체의 공식 검증이 끝나지 않았으므로 Q-Net 010은 계속 `draft/unverified`다.
+Functional implementation is present for private automated validation. Public grading and operation remain blocked until independent official/manufacturer evidence establishes the FUSE terminal numbering.

@@ -171,6 +171,25 @@ class CircuitReferenceValidator:
         for terminal_id, count in net_terminal_counts.items():
             if count > 1:
                 issues.append(self._issue("duplicate_expected_net_terminal", f"기능 단자가 여러 정답 네트워크에 중복됩니다: {terminal_id}", "answer.expected_nets", problem_id))
+        alternative_ids = [item.alternative_id for item in answer.allowed_alternatives]
+        for duplicate in self._duplicates(alternative_ids):
+            issues.append(self._issue("duplicate_allowed_alternative", f"대체 정답 ID가 중복됩니다: {duplicate}", "answer.allowed_alternatives", problem_id))
+        expected_terminal_ids = set(net_terminal_counts)
+        for alternative_index, alternative in enumerate(answer.allowed_alternatives):
+            for swap_index, swap in enumerate(alternative.terminal_swaps):
+                for terminal_id in [*swap.left, *swap.right]:
+                    check_terminal(
+                        terminal_id,
+                        "unknown_alternative_terminal",
+                        f"allowed_alternatives.{alternative_index}.terminal_swaps.{swap_index}",
+                    )
+                if not (set(swap.left) & expected_terminal_ids):
+                    issues.append(self._issue(
+                        "inactive_alternative_terminal_group",
+                        "대체 정답의 기준 접점군이 expected_nets에 사용되지 않습니다.",
+                        f"answer.allowed_alternatives.{alternative_index}.terminal_swaps.{swap_index}",
+                        problem_id,
+                    ))
         if problem.wiring_semantics:
             external_ids = [
                 terminal.terminal_id

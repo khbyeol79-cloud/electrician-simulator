@@ -251,14 +251,17 @@ class OperationEngine:
                 f"{interlock.label}: {requested.label}이(가) {kind} 인터록에 의해 차단되었습니다."
             )
 
-    def _update_timer_energization(self) -> None:
+    def _update_timer_energization(self) -> bool:
+        timed_contact_changed = False
         for definition in self.definition.timers:
             timer = self.timers[definition.timer_id]
             energized = self.coils.get(definition.coil_id, False) and self.powered and not self.tripped
             if not energized and timer.energized and not definition.retentive:
+                timed_contact_changed = timed_contact_changed or timer.completed
                 timer.elapsed_ms = 0
                 timer.completed = False
             timer.energized = energized
+        return timed_contact_changed
 
     def resolve(self) -> None:
         initial = dict(self.coils)
@@ -302,7 +305,11 @@ class OperationEngine:
             self.powered = False
             self.tripped = True
             self.coils = {key: False for key in self.coils}
-        self._update_timer_energization()
+        if self._update_timer_energization():
+            # 완료 접점이 복귀하면 해당 접점으로 여자된 코일까지 같은 사용자
+            # 동작 사이클 안에서 다시 계산하여 실제 안정상태를 반환한다.
+            self.resolve()
+            return
         graph = self._conductive_graph()
         self._update_outputs(graph)
         self._update_contact_states()

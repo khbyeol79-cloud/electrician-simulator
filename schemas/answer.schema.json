@@ -51,7 +51,8 @@
     },
     "allowed_alternatives": {
       "type": "array",
-      "items": { "type": "object", "additionalProperties": true }
+      "maxItems": 20,
+      "items": { "$ref": "#/$defs/allowedAlternative" }
     },
     "forbidden_connections": {
       "type": "array",
@@ -77,6 +78,35 @@
     }
   },
   "$defs": {
+    "allowedAlternative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alternative_id", "label", "terminal_swaps"],
+      "properties": {
+        "alternative_id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "terminal_swaps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["left", "right"],
+            "properties": {
+              "left": {
+                "type": "array", "minItems": 1, "maxItems": 20,
+                "items": { "$ref": "#/$defs/terminalId" }
+              },
+              "right": {
+                "type": "array", "minItems": 1, "maxItems": 20,
+                "items": { "$ref": "#/$defs/terminalId" }
+              }
+            }
+          }
+        }
+      }
+    },
     "terminalId": {
       "type": "string",
       "pattern": "^[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*$",
