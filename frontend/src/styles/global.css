@@ -278,6 +278,12 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .socket-body-svg .octal-center { stroke-dasharray: 10 4; }
 .component-body > rect { fill: #27333f; }
 .component-body > line { stroke: #8b99a6; }
+.dual-fuse-body .dual-fuse-holder { fill: #171d24; stroke: #0b1118; stroke-width: 3; }
+.dual-fuse-body .dual-fuse-recess { fill: #252f39; stroke: #596775; stroke-width: 1.5; }
+.dual-fuse-body .dual-fuse-lead { stroke: #c0c8cf; stroke-width: 4; stroke-linecap: round; }
+.dual-fuse-body .dual-fuse-clip { fill: #aab4bc; stroke: #65727d; stroke-width: 1.2; }
+.dual-fuse-body .dual-fuse-cartridge { fill: #eee9dc; stroke: #7a7469; stroke-width: 1.8; }
+.dual-fuse-body .dual-fuse-cartridge-core { fill: #faf8ef; stroke: #beb6a5; stroke-width: 1; }
 .wire-layer { fill: none; }
 .board-wire .wire-selection-halo { fill: none; stroke: #24c7ff; stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 4px rgba(36,199,255,.9)); pointer-events: none; }
 .board-wire .wire-visible { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(1px 1.5px 1px rgba(0,0,0,.28)); }

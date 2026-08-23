@@ -8,12 +8,29 @@
       "definition_status": "reviewed",
       "source_note": "현재 보드의 TB 한 번호를 하나의 전기 노드로 취급하는 구조를 모델링했다. TB5·TB6 같은 특정 인스턴스와 번호는 회로 구성에서 정한다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["terminal_block"],
-      "terminals": [
-        { "terminal_key": "node", "terminal_suffix": "1", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "unassigned", "max_connections": 2, "enabled": true }
+      "capabilities": [
+        "terminal_block"
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "terminals": [
+        {
+          "terminal_key": "node",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "mccb_3p_training",
@@ -22,23 +39,88 @@
       "definition_status": "reviewed",
       "source_note": "현재 세 자유회로의 단자와 항상 투입된 교육용 internal_connections를 대조했다. 차단기 트립 곡선은 아직 모델링하지 않는다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["switching", "overcurrent_isolation"],
-      "terminals": [
-        { "terminal_key": "line_1", "terminal_suffix": "L1", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_2", "terminal_suffix": "L2", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_3", "terminal_suffix": "L3", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_1", "terminal_suffix": "T1", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_2", "terminal_suffix": "T2", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_3", "terminal_suffix": "T3", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "load", "max_connections": 2, "enabled": true }
+      "capabilities": [
+        "switching",
+        "overcurrent_isolation"
       ],
-      "coils": [], "contacts": [],
+      "terminals": [
+        {
+          "terminal_key": "line_1",
+          "terminal_suffix": "L1",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_2",
+          "terminal_suffix": "L2",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_3",
+          "terminal_suffix": "L3",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_1",
+          "terminal_suffix": "T1",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_2",
+          "terminal_suffix": "T2",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_3",
+          "terminal_suffix": "T3",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
       "intrinsic_connections": [
-        { "from_terminal_key": "line_1", "to_terminal_key": "load_1" },
-        { "from_terminal_key": "line_2", "to_terminal_key": "load_2" },
-        { "from_terminal_key": "line_3", "to_terminal_key": "load_3" }
+        {
+          "from_terminal_key": "line_1",
+          "to_terminal_key": "load_1"
+        },
+        {
+          "from_terminal_key": "line_2",
+          "to_terminal_key": "load_2"
+        },
+        {
+          "from_terminal_key": "line_3",
+          "to_terminal_key": "load_3"
+        }
       ],
       "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "fuse_single_pole_training",
@@ -47,15 +129,110 @@
       "definition_status": "reviewed",
       "source_note": "현재 세 자유회로의 F-1·F-2와 정상 상태 internal_connection을 반영한다. 실제 용단 전류 계산은 포함하지 않는다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["overcurrent_isolation"],
-      "terminals": [
-        { "terminal_key": "input", "terminal_suffix": "1", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "control", "max_connections": 2, "enabled": true },
-        { "terminal_key": "output", "terminal_suffix": "2", "pin_number": null, "terminal_type": "screw_terminal", "electrical_role": "control", "max_connections": 2, "enabled": true }
+      "capabilities": [
+        "overcurrent_isolation"
       ],
-      "coils": [], "contacts": [],
-      "intrinsic_connections": [{ "from_terminal_key": "input", "to_terminal_key": "output" }],
+      "terminals": [
+        {
+          "terminal_key": "input",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "output",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [
+        {
+          "from_terminal_key": "input",
+          "to_terminal_key": "output"
+        }
+      ],
       "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
+    },
+    {
+      "model_id": "fuse_dual_4terminal_training",
+      "device_type_id": "fuse",
+      "name": "2회로 4단자 제어퓨즈 교육용 모델",
+      "definition_status": "reviewed",
+      "source_note": "Q-Net 010 배치도에서 F 기구 1개, 사용자 제공 실제 배선 사진의 외부 결선 4점, 참고 풀이의 단자 1-2 및 3-4 독립 퓨즈 경로를 교차 확인했다. 기존 2단자 fuse_single_pole_training은 저장 데이터 호환을 위해 유지한다. Hotfix: F는 소켓 삽입형 기구가 아닌 직접 나사단자 기구이므로 catalog pin_number는 사용하지 않고 terminal_suffix 1~4로 단자번호를 표현한다.",
+      "compatible_socket_type_ids": [],
+      "capabilities": [
+        "overcurrent_isolation"
+      ],
+      "terminals": [
+        {
+          "terminal_key": "channel_1_input",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "channel_1_output",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "channel_2_input",
+          "terminal_suffix": "3",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "channel_2_output",
+          "terminal_suffix": "4",
+          "pin_number": null,
+          "terminal_type": "screw_terminal",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [
+        {
+          "from_terminal_key": "channel_1_input",
+          "to_terminal_key": "channel_1_output"
+        },
+        {
+          "from_terminal_key": "channel_2_input",
+          "to_terminal_key": "channel_2_output"
+        }
+      ],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "power_3p_control_training",
@@ -64,16 +241,65 @@
       "definition_status": "reviewed",
       "source_note": "기존 외부 전원의 L, N, L1, L2, L3 단자만 정의한다. 실제 작업공간의 line·return·phase source 지정은 회로 구성에 남긴다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["power_source"],
-      "terminals": [
-        { "terminal_key": "control_line", "terminal_suffix": "L", "pin_number": null, "terminal_type": "power_terminal", "electrical_role": "control", "max_connections": 1, "enabled": true },
-        { "terminal_key": "neutral", "terminal_suffix": "N", "pin_number": null, "terminal_type": "power_terminal", "electrical_role": "neutral", "max_connections": 1, "enabled": true },
-        { "terminal_key": "phase_1", "terminal_suffix": "L1", "pin_number": null, "terminal_type": "power_terminal", "electrical_role": "line", "max_connections": 1, "enabled": true },
-        { "terminal_key": "phase_2", "terminal_suffix": "L2", "pin_number": null, "terminal_type": "power_terminal", "electrical_role": "line", "max_connections": 1, "enabled": true },
-        { "terminal_key": "phase_3", "terminal_suffix": "L3", "pin_number": null, "terminal_type": "power_terminal", "electrical_role": "line", "max_connections": 1, "enabled": true }
+      "capabilities": [
+        "power_source"
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "terminals": [
+        {
+          "terminal_key": "control_line",
+          "terminal_suffix": "L",
+          "pin_number": null,
+          "terminal_type": "power_terminal",
+          "electrical_role": "control",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "neutral",
+          "terminal_suffix": "N",
+          "pin_number": null,
+          "terminal_type": "power_terminal",
+          "electrical_role": "neutral",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "phase_1",
+          "terminal_suffix": "L1",
+          "pin_number": null,
+          "terminal_type": "power_terminal",
+          "electrical_role": "line",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "phase_2",
+          "terminal_suffix": "L2",
+          "pin_number": null,
+          "terminal_type": "power_terminal",
+          "electrical_role": "line",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "phase_3",
+          "terminal_suffix": "L3",
+          "pin_number": null,
+          "terminal_type": "power_terminal",
+          "electrical_role": "line",
+          "max_connections": 1,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "push_button_no",
@@ -82,18 +308,56 @@
       "definition_status": "reviewed",
       "source_note": "기존 PB1·PB2 외부 단자와 OperationControl의 순간동작 NO 정의를 공통화했다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["manual_control"],
+      "capabilities": [
+        "manual_control"
+      ],
       "terminals": [
-        { "terminal_key": "common", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_common", "max_connections": 1, "enabled": true },
-        { "terminal_key": "no", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_no", "max_connections": 1, "enabled": true }
+        {
+          "terminal_key": "common",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_common",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "no",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_no",
+          "max_connections": 1,
+          "enabled": true
+        }
       ],
       "coils": [],
       "contacts": [
-        { "contact_key": "main_contact", "id_suffix": "CONTACT", "contact_type": "NO", "common_terminal_key": "common", "switched_terminal_key": "no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "operator", "normal_state": "open" }
+        {
+          "contact_key": "main_contact",
+          "id_suffix": "CONTACT",
+          "contact_type": "NO",
+          "common_terminal_key": "common",
+          "switched_terminal_key": "no",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "manual",
+          "controlled_by_key": "operator",
+          "normal_state": "open"
+        }
       ],
-      "intrinsic_connections": [], "configurable_properties": [],
-      "control": { "control_type": "pushbutton", "mode": "momentary", "contact_key": "main_contact", "initial_active": false },
-      "timer": null, "indicator": null, "motor": null, "protection": null
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": {
+        "control_type": "pushbutton",
+        "mode": "momentary",
+        "contact_key": "main_contact",
+        "initial_active": false
+      },
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "push_button_nc",
@@ -102,18 +366,56 @@
       "definition_status": "reviewed",
       "source_note": "기존 PB0 외부 단자와 OperationControl의 순간동작 NC 정의를 공통화했다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["manual_control"],
+      "capabilities": [
+        "manual_control"
+      ],
       "terminals": [
-        { "terminal_key": "common", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_common", "max_connections": 1, "enabled": true },
-        { "terminal_key": "nc", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_nc", "max_connections": 1, "enabled": true }
+        {
+          "terminal_key": "common",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_common",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "nc",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_nc",
+          "max_connections": 1,
+          "enabled": true
+        }
       ],
       "coils": [],
       "contacts": [
-        { "contact_key": "main_contact", "id_suffix": "CONTACT", "contact_type": "NC", "common_terminal_key": "common", "switched_terminal_key": "nc", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "operator", "normal_state": "closed" }
+        {
+          "contact_key": "main_contact",
+          "id_suffix": "CONTACT",
+          "contact_type": "NC",
+          "common_terminal_key": "common",
+          "switched_terminal_key": "nc",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "manual",
+          "controlled_by_key": "operator",
+          "normal_state": "closed"
+        }
       ],
-      "intrinsic_connections": [], "configurable_properties": [],
-      "control": { "control_type": "pushbutton", "mode": "momentary", "contact_key": "main_contact", "initial_active": false },
-      "timer": null, "indicator": null, "motor": null, "protection": null
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": {
+        "control_type": "pushbutton",
+        "mode": "momentary",
+        "contact_key": "main_contact",
+        "initial_active": false
+      },
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "limit_switch_no",
@@ -122,18 +424,56 @@
       "definition_status": "reviewed",
       "source_note": "기존 LS1의 유지형 NO 입력 정의를 공통화했다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["limit_control"],
+      "capabilities": [
+        "limit_control"
+      ],
       "terminals": [
-        { "terminal_key": "common", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_common", "max_connections": 1, "enabled": true },
-        { "terminal_key": "no", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_no", "max_connections": 1, "enabled": true }
+        {
+          "terminal_key": "common",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_common",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "no",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_no",
+          "max_connections": 1,
+          "enabled": true
+        }
       ],
       "coils": [],
       "contacts": [
-        { "contact_key": "main_contact", "id_suffix": "CONTACT", "contact_type": "NO", "common_terminal_key": "common", "switched_terminal_key": "no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "operator", "normal_state": "open" }
+        {
+          "contact_key": "main_contact",
+          "id_suffix": "CONTACT",
+          "contact_type": "NO",
+          "common_terminal_key": "common",
+          "switched_terminal_key": "no",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "manual",
+          "controlled_by_key": "operator",
+          "normal_state": "open"
+        }
       ],
-      "intrinsic_connections": [], "configurable_properties": [],
-      "control": { "control_type": "limit_switch", "mode": "maintained", "contact_key": "main_contact", "initial_active": false },
-      "timer": null, "indicator": null, "motor": null, "protection": null
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": {
+        "control_type": "limit_switch",
+        "mode": "maintained",
+        "contact_key": "main_contact",
+        "initial_active": false
+      },
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "limit_switch_nc",
@@ -142,18 +482,56 @@
       "definition_status": "unverified",
       "source_note": "후속 자유회로용 NC 리밋 스위치 구조다. 현재 문제에는 사용 사례가 없어 실제 문제 대조 검증이 필요하다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["limit_control"],
+      "capabilities": [
+        "limit_control"
+      ],
       "terminals": [
-        { "terminal_key": "common", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_common", "max_connections": 1, "enabled": true },
-        { "terminal_key": "nc", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "contact_nc", "max_connections": 1, "enabled": true }
+        {
+          "terminal_key": "common",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_common",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "nc",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "contact_nc",
+          "max_connections": 1,
+          "enabled": true
+        }
       ],
       "coils": [],
       "contacts": [
-        { "contact_key": "main_contact", "id_suffix": "CONTACT", "contact_type": "NC", "common_terminal_key": "common", "switched_terminal_key": "nc", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "operator", "normal_state": "closed" }
+        {
+          "contact_key": "main_contact",
+          "id_suffix": "CONTACT",
+          "contact_type": "NC",
+          "common_terminal_key": "common",
+          "switched_terminal_key": "nc",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "manual",
+          "controlled_by_key": "operator",
+          "normal_state": "closed"
+        }
       ],
-      "intrinsic_connections": [], "configurable_properties": [],
-      "control": { "control_type": "limit_switch", "mode": "maintained", "contact_key": "main_contact", "initial_active": false },
-      "timer": null, "indicator": null, "motor": null, "protection": null
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": {
+        "control_type": "limit_switch",
+        "mode": "maintained",
+        "contact_key": "main_contact",
+        "initial_active": false
+      },
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "auxiliary_relay_8p_training_partial",
@@ -161,32 +539,162 @@
       "name": "8P 보조릴레이 2전환접점 모델",
       "definition_status": "verified",
       "source_note": "Q-Net 전기기능사 공개문제 001~018 공통 내부결선도 9쪽을 배선면 기준 8P 소켓 배열과 대조했다. 코일 2-7, 제1접점 COM 1/NC 4/NO 3, 제2접점 COM 8/NC 5/NO 6이다. 기존 model_id는 저장된 자유회로 작업공간 호환을 위해 유지한다.",
-      "compatible_socket_type_ids": ["socket_8p_base"],
-      "capabilities": ["coil", "relay_contacts"],
+      "compatible_socket_type_ids": [
+        "socket_8p_base"
+      ],
+      "capabilities": [
+        "coil",
+        "relay_contacts"
+      ],
       "terminals": [
-        { "terminal_key": "coil_a", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "coil_b", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_1_common", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_1_nc", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_1_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_2_common", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_2_nc", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "contact_2_no", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
+        {
+          "terminal_key": "coil_a",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_b",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_1_common",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_1_nc",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_1_no",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_2_common",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_2_nc",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "contact_2_no",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        }
       ],
       "coils": [
-        { "coil_key": "main_coil", "id_suffix": "COIL", "terminal_a_key": "coil_a", "terminal_b_key": "coil_b", "rated_voltage_property_key": "coil_voltage", "voltage_type_property_key": "coil_voltage_type", "frequency_property_key": "coil_frequency" }
+        {
+          "coil_key": "main_coil",
+          "id_suffix": "COIL",
+          "terminal_a_key": "coil_a",
+          "terminal_b_key": "coil_b",
+          "rated_voltage_property_key": "coil_voltage",
+          "voltage_type_property_key": "coil_voltage_type",
+          "frequency_property_key": "coil_frequency"
+        }
       ],
       "contacts": [
-        { "contact_key": "contact_1", "id_suffix": "C1", "contact_type": "CHANGEOVER", "common_terminal_key": "contact_1_common", "switched_terminal_key": "contact_1_no", "nc_terminal_key": "contact_1_nc", "no_terminal_key": "contact_1_no", "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "closed" },
-        { "contact_key": "contact_2", "id_suffix": "C2", "contact_type": "CHANGEOVER", "common_terminal_key": "contact_2_common", "switched_terminal_key": "contact_2_no", "nc_terminal_key": "contact_2_nc", "no_terminal_key": "contact_2_no", "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "closed" }
+        {
+          "contact_key": "contact_1",
+          "id_suffix": "C1",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "contact_1_common",
+          "switched_terminal_key": "contact_1_no",
+          "nc_terminal_key": "contact_1_nc",
+          "no_terminal_key": "contact_1_no",
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "closed"
+        },
+        {
+          "contact_key": "contact_2",
+          "id_suffix": "C2",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "contact_2_common",
+          "switched_terminal_key": "contact_2_no",
+          "nc_terminal_key": "contact_2_nc",
+          "no_terminal_key": "contact_2_no",
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "closed"
+        }
       ],
       "intrinsic_connections": [],
       "configurable_properties": [
-        { "property_key": "coil_voltage", "value_type": "number", "required": false, "default": 220, "minimum": 1, "maximum": 1000, "choices": [] },
-        { "property_key": "coil_voltage_type", "value_type": "voltage_type", "required": false, "default": "AC", "minimum": null, "maximum": null, "choices": ["AC", "DC"] },
-        { "property_key": "coil_frequency", "value_type": "number", "required": false, "default": 60, "minimum": 1, "maximum": 1000, "choices": [] }
+        {
+          "property_key": "coil_voltage",
+          "value_type": "number",
+          "required": false,
+          "default": 220,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "coil_voltage_type",
+          "value_type": "voltage_type",
+          "required": false,
+          "default": "AC",
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "AC",
+            "DC"
+          ]
+        },
+        {
+          "property_key": "coil_frequency",
+          "value_type": "number",
+          "required": false,
+          "default": 60,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        }
       ],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "timer_8p_on_delay_training_partial",
@@ -194,111 +702,603 @@
       "name": "8P 온딜레이 타이머 2전환접점 모델",
       "definition_status": "verified",
       "source_note": "Q-Net 전기기능사 공개문제 001~018 공통 내부결선도 9쪽을 배선면 기준 8P 소켓 배열과 대조했다. 코일 2-7, 제1 계시접점 COM 1/NC 4/NO 3, 제2 계시접점 COM 8/NC 5/NO 6이다. 기존 model_id는 저장된 자유회로 작업공간 호환을 위해 유지한다.",
-      "compatible_socket_type_ids": ["socket_8p_base"],
-      "capabilities": ["coil", "timed_contacts"],
+      "compatible_socket_type_ids": [
+        "socket_8p_base"
+      ],
+      "capabilities": [
+        "coil",
+        "timed_contacts"
+      ],
       "terminals": [
-        { "terminal_key": "coil_a", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "coil_b", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_1_common", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_1_nc", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_1_no", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_2_common", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_2_nc", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "timed_2_no", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true }
+        {
+          "terminal_key": "coil_a",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_b",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_1_common",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_1_nc",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_1_no",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_2_common",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_2_nc",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "timed_2_no",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        }
       ],
       "coils": [
-        { "coil_key": "main_coil", "id_suffix": "COIL", "terminal_a_key": "coil_a", "terminal_b_key": "coil_b", "rated_voltage_property_key": "coil_voltage", "voltage_type_property_key": "coil_voltage_type", "frequency_property_key": "coil_frequency" }
+        {
+          "coil_key": "main_coil",
+          "id_suffix": "COIL",
+          "terminal_a_key": "coil_a",
+          "terminal_b_key": "coil_b",
+          "rated_voltage_property_key": "coil_voltage",
+          "voltage_type_property_key": "coil_voltage_type",
+          "frequency_property_key": "coil_frequency"
+        }
       ],
       "contacts": [
-        { "contact_key": "timed_contact_1", "id_suffix": "C1", "contact_type": "CHANGEOVER", "common_terminal_key": "timed_1_common", "switched_terminal_key": "timed_1_no", "nc_terminal_key": "timed_1_nc", "no_terminal_key": "timed_1_no", "actuation": "timer", "controlled_by_key": "main_timer", "normal_state": "closed" },
-        { "contact_key": "timed_contact_2", "id_suffix": "C2", "contact_type": "CHANGEOVER", "common_terminal_key": "timed_2_common", "switched_terminal_key": "timed_2_no", "nc_terminal_key": "timed_2_nc", "no_terminal_key": "timed_2_no", "actuation": "timer", "controlled_by_key": "main_timer", "normal_state": "closed" }
+        {
+          "contact_key": "timed_contact_1",
+          "id_suffix": "C1",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "timed_1_common",
+          "switched_terminal_key": "timed_1_no",
+          "nc_terminal_key": "timed_1_nc",
+          "no_terminal_key": "timed_1_no",
+          "actuation": "timer",
+          "controlled_by_key": "main_timer",
+          "normal_state": "closed"
+        },
+        {
+          "contact_key": "timed_contact_2",
+          "id_suffix": "C2",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "timed_2_common",
+          "switched_terminal_key": "timed_2_no",
+          "nc_terminal_key": "timed_2_nc",
+          "no_terminal_key": "timed_2_no",
+          "actuation": "timer",
+          "controlled_by_key": "main_timer",
+          "normal_state": "closed"
+        }
       ],
       "intrinsic_connections": [],
       "configurable_properties": [
-        { "property_key": "coil_voltage", "value_type": "number", "required": false, "default": 220, "minimum": 1, "maximum": 1000, "choices": [] },
-        { "property_key": "coil_voltage_type", "value_type": "voltage_type", "required": false, "default": "AC", "minimum": null, "maximum": null, "choices": ["AC", "DC"] },
-        { "property_key": "coil_frequency", "value_type": "number", "required": false, "default": 60, "minimum": 1, "maximum": 1000, "choices": [] },
-        { "property_key": "delay_ms", "value_type": "integer", "required": false, "default": 1000, "minimum": 1, "maximum": 3600000, "choices": [] }
+        {
+          "property_key": "coil_voltage",
+          "value_type": "number",
+          "required": false,
+          "default": 220,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "coil_voltage_type",
+          "value_type": "voltage_type",
+          "required": false,
+          "default": "AC",
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "AC",
+            "DC"
+          ]
+        },
+        {
+          "property_key": "coil_frequency",
+          "value_type": "number",
+          "required": false,
+          "default": 60,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "delay_ms",
+          "value_type": "integer",
+          "required": false,
+          "default": 1000,
+          "minimum": 1,
+          "maximum": 3600000,
+          "choices": []
+        }
       ],
       "control": null,
-      "timer": { "timer_key": "main_timer", "id_suffix": "TIMER", "coil_key": "main_coil", "mode": "on_delay", "delay_property_key": "delay_ms", "timed_contact_keys": ["timed_contact_1", "timed_contact_2"], "retentive": false },
-      "indicator": null, "motor": null, "protection": null
+      "timer": {
+        "timer_key": "main_timer",
+        "id_suffix": "TIMER",
+        "coil_key": "main_coil",
+        "mode": "on_delay",
+        "delay_property_key": "delay_ms",
+        "timed_contact_keys": [
+          "timed_contact_1",
+          "timed_contact_2"
+        ],
+        "retentive": false
+      },
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "magnetic_contactor_12p_training",
       "device_type_id": "auxiliary_relay_12p",
       "name": "12P 전자접촉기 교육용 모델",
-      "definition_status": "unverified",
-      "source_note": "코일 6-12, 보조 NO 4-10, 보조 NC 5-11은 현재 문제와 일치한다. 주접점 1-7·2-8·3-9 관계는 단자 역할을 이용한 후속 엔진 후보이며 제조사·공개문제 근거 확인이 더 필요하다.",
-      "compatible_socket_type_ids": ["socket_12p_base"],
-      "capabilities": ["coil", "relay_contacts", "contactor"],
+      "definition_status": "verified",
+      "source_note": "Q-Net 전기기능사 공개문제 010(2025-08-04) 9쪽 내부결선도 및 12P 소켓 구성도를 대조했다. 배선면 기준 주접점 1-7·2-8·3-9, 보조 NO a1-a2=4-10, 보조 NC b1-b2=5-11, 코일 A1-A2=6-12로 확인했다.",
+      "compatible_socket_type_ids": [
+        "socket_12p_base"
+      ],
+      "capabilities": [
+        "coil",
+        "relay_contacts",
+        "contactor"
+      ],
       "terminals": [
-        { "terminal_key": "line_1", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_2", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_3", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "aux_no_common", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "aux_nc_common", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "coil_a", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_1", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_2", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_3", "terminal_suffix": "9", "pin_number": 9, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "aux_no", "terminal_suffix": "10", "pin_number": 10, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
-        { "terminal_key": "aux_nc", "terminal_suffix": "11", "pin_number": 11, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "coil_b", "terminal_suffix": "12", "pin_number": 12, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true }
+        {
+          "terminal_key": "line_1",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_2",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_3",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "aux_no_common",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "aux_nc_common",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_a",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_1",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_2",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_3",
+          "terminal_suffix": "9",
+          "pin_number": 9,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "aux_no",
+          "terminal_suffix": "10",
+          "pin_number": 10,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "aux_nc",
+          "terminal_suffix": "11",
+          "pin_number": 11,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_b",
+          "terminal_suffix": "12",
+          "pin_number": 12,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        }
       ],
       "coils": [
-        { "coil_key": "main_coil", "id_suffix": "COIL", "terminal_a_key": "coil_a", "terminal_b_key": "coil_b", "rated_voltage_property_key": "coil_voltage", "voltage_type_property_key": "coil_voltage_type", "frequency_property_key": "coil_frequency" }
+        {
+          "coil_key": "main_coil",
+          "id_suffix": "COIL",
+          "terminal_a_key": "coil_a",
+          "terminal_b_key": "coil_b",
+          "rated_voltage_property_key": "coil_voltage",
+          "voltage_type_property_key": "coil_voltage_type",
+          "frequency_property_key": "coil_frequency"
+        }
       ],
       "contacts": [
-        { "contact_key": "main_1", "id_suffix": "MAIN1", "contact_type": "NO", "common_terminal_key": "line_1", "switched_terminal_key": "load_1", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "open" },
-        { "contact_key": "main_2", "id_suffix": "MAIN2", "contact_type": "NO", "common_terminal_key": "line_2", "switched_terminal_key": "load_2", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "open" },
-        { "contact_key": "main_3", "id_suffix": "MAIN3", "contact_type": "NO", "common_terminal_key": "line_3", "switched_terminal_key": "load_3", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "open" },
-        { "contact_key": "aux_hold", "id_suffix": "HOLD", "contact_type": "NO", "common_terminal_key": "aux_no_common", "switched_terminal_key": "aux_no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "open" },
-        { "contact_key": "aux_interlock", "id_suffix": "INTERLOCK", "contact_type": "NC", "common_terminal_key": "aux_nc_common", "switched_terminal_key": "aux_nc", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "coil", "controlled_by_key": "main_coil", "normal_state": "closed" }
+        {
+          "contact_key": "main_1",
+          "id_suffix": "MAIN1",
+          "contact_type": "NO",
+          "common_terminal_key": "line_1",
+          "switched_terminal_key": "load_1",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "open"
+        },
+        {
+          "contact_key": "main_2",
+          "id_suffix": "MAIN2",
+          "contact_type": "NO",
+          "common_terminal_key": "line_2",
+          "switched_terminal_key": "load_2",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "open"
+        },
+        {
+          "contact_key": "main_3",
+          "id_suffix": "MAIN3",
+          "contact_type": "NO",
+          "common_terminal_key": "line_3",
+          "switched_terminal_key": "load_3",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "open"
+        },
+        {
+          "contact_key": "aux_hold",
+          "id_suffix": "HOLD",
+          "contact_type": "NO",
+          "common_terminal_key": "aux_no_common",
+          "switched_terminal_key": "aux_no",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "open"
+        },
+        {
+          "contact_key": "aux_interlock",
+          "id_suffix": "INTERLOCK",
+          "contact_type": "NC",
+          "common_terminal_key": "aux_nc_common",
+          "switched_terminal_key": "aux_nc",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "closed"
+        }
       ],
       "intrinsic_connections": [],
       "configurable_properties": [
-        { "property_key": "coil_voltage", "value_type": "number", "required": false, "default": 220, "minimum": 1, "maximum": 1000, "choices": [] },
-        { "property_key": "coil_voltage_type", "value_type": "voltage_type", "required": false, "default": "AC", "minimum": null, "maximum": null, "choices": ["AC", "DC"] },
-        { "property_key": "coil_frequency", "value_type": "number", "required": false, "default": 60, "minimum": 1, "maximum": 1000, "choices": [] }
+        {
+          "property_key": "coil_voltage",
+          "value_type": "number",
+          "required": false,
+          "default": 220,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "coil_voltage_type",
+          "value_type": "voltage_type",
+          "required": false,
+          "default": "AC",
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "AC",
+            "DC"
+          ]
+        },
+        {
+          "property_key": "coil_frequency",
+          "value_type": "number",
+          "required": false,
+          "default": 60,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        }
       ],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "eocr_12p_training",
       "device_type_id": "eocr",
       "name": "12P EOCR 교육용 모델",
-      "definition_status": "unverified",
-      "source_note": "현재 12P 핀 역할과 L1-U·L2-V·L3-W 정상 경로를 반영했다. 95-96 NC와 97-98 NO의 트립 연동은 후속 엔진 연결 전에 실제 자료 검증이 필요하다.",
-      "compatible_socket_type_ids": ["socket_12p_base"],
-      "capabilities": ["overload_protection"],
+      "definition_status": "verified",
+      "source_note": "Q-Net 전기기능사 공개문제 010(2025-08-04) 8~9쪽을 대조했다. 12P 배선면 기준 L1/U=1/7, L2/V=2/8, L3/W=3/9, 96/95=4/10(NC), 98/97=5/11(NO), A1/A2=6/12이며 과부하 동작 시 NC 차단·NO 경보 전환과 RESET 복귀를 확인했다.",
+      "compatible_socket_type_ids": [
+        "socket_12p_base"
+      ],
+      "capabilities": [
+        "overload_protection"
+      ],
       "terminals": [
-        { "terminal_key": "line_1", "terminal_suffix": "L1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_2", "terminal_suffix": "L2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "line_3", "terminal_suffix": "L3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "line", "max_connections": 2, "enabled": true },
-        { "terminal_key": "trip_nc", "terminal_suffix": "96", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "contact_nc", "max_connections": 2, "enabled": true },
-        { "terminal_key": "trip_no", "terminal_suffix": "98", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "contact_no", "max_connections": 2, "enabled": true },
-        { "terminal_key": "supply_a", "terminal_suffix": "A1", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_u", "terminal_suffix": "U", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_v", "terminal_suffix": "V", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "load_w", "terminal_suffix": "W", "pin_number": 9, "terminal_type": "socket_pin", "electrical_role": "load", "max_connections": 2, "enabled": true },
-        { "terminal_key": "trip_common_nc", "terminal_suffix": "95", "pin_number": 10, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "trip_common_no", "terminal_suffix": "97", "pin_number": 11, "terminal_type": "socket_pin", "electrical_role": "contact_common", "max_connections": 2, "enabled": true },
-        { "terminal_key": "supply_b", "terminal_suffix": "A2", "pin_number": 12, "terminal_type": "socket_pin", "electrical_role": "coil", "max_connections": 2, "enabled": true }
+        {
+          "terminal_key": "line_1",
+          "terminal_suffix": "L1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_2",
+          "terminal_suffix": "L2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "line_3",
+          "terminal_suffix": "L3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "trip_nc",
+          "terminal_suffix": "96",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "trip_no",
+          "terminal_suffix": "98",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "supply_a",
+          "terminal_suffix": "A1",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_u",
+          "terminal_suffix": "U",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_v",
+          "terminal_suffix": "V",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "load_w",
+          "terminal_suffix": "W",
+          "pin_number": 9,
+          "terminal_type": "socket_pin",
+          "electrical_role": "load",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "trip_common_nc",
+          "terminal_suffix": "95",
+          "pin_number": 10,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "trip_common_no",
+          "terminal_suffix": "97",
+          "pin_number": 11,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "supply_b",
+          "terminal_suffix": "A2",
+          "pin_number": 12,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        }
       ],
       "coils": [],
       "contacts": [
-        { "contact_key": "trip_contact_nc", "id_suffix": "TRIP-NC", "contact_type": "NC", "common_terminal_key": "trip_common_nc", "switched_terminal_key": "trip_nc", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "protection", "controlled_by_key": "trip", "normal_state": "closed" },
-        { "contact_key": "trip_contact_no", "id_suffix": "TRIP-NO", "contact_type": "NO", "common_terminal_key": "trip_common_no", "switched_terminal_key": "trip_no", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "protection", "controlled_by_key": "trip", "normal_state": "open" }
+        {
+          "contact_key": "trip_contact_nc",
+          "id_suffix": "TRIP-NC",
+          "contact_type": "NC",
+          "common_terminal_key": "trip_common_nc",
+          "switched_terminal_key": "trip_nc",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "protection",
+          "controlled_by_key": "trip",
+          "normal_state": "closed"
+        },
+        {
+          "contact_key": "trip_contact_no",
+          "id_suffix": "TRIP-NO",
+          "contact_type": "NO",
+          "common_terminal_key": "trip_common_no",
+          "switched_terminal_key": "trip_no",
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "protection",
+          "controlled_by_key": "trip",
+          "normal_state": "open"
+        }
       ],
       "intrinsic_connections": [
-        { "from_terminal_key": "line_1", "to_terminal_key": "load_u" },
-        { "from_terminal_key": "line_2", "to_terminal_key": "load_v" },
-        { "from_terminal_key": "line_3", "to_terminal_key": "load_w" }
+        {
+          "from_terminal_key": "line_1",
+          "to_terminal_key": "load_u"
+        },
+        {
+          "from_terminal_key": "line_2",
+          "to_terminal_key": "load_v"
+        },
+        {
+          "from_terminal_key": "line_3",
+          "to_terminal_key": "load_w"
+        }
       ],
       "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null,
-      "protection": { "protection_type": "eocr", "reset_modes": ["manual", "automatic", "restart_required"], "default_reset_mode": "manual", "allowed_fault_types": ["overload"], "contact_keys": ["trip_contact_nc", "trip_contact_no"] }
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": {
+        "protection_type": "eocr",
+        "reset_modes": [
+          "manual",
+          "automatic",
+          "restart_required"
+        ],
+        "default_reset_mode": "manual",
+        "allowed_fault_types": [
+          "overload"
+        ],
+        "contact_keys": [
+          "trip_contact_nc",
+          "trip_contact_no"
+        ]
+      }
     },
     {
       "model_id": "indicator_lamp_two_terminal",
@@ -307,18 +1307,57 @@
       "definition_status": "reviewed",
       "source_note": "기존 외부 표시등의 1·2 단자를 반영한다. 표시색은 회로 인스턴스 설정이다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["indicator"],
+      "capabilities": [
+        "indicator"
+      ],
       "terminals": [
-        { "terminal_key": "terminal_a", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true },
-        { "terminal_key": "terminal_b", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true }
+        {
+          "terminal_key": "terminal_a",
+          "terminal_suffix": "1",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "load",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "terminal_b",
+          "terminal_suffix": "2",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "load",
+          "max_connections": 1,
+          "enabled": true
+        }
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
       "configurable_properties": [
-        { "property_key": "display_color", "value_type": "color", "required": false, "default": "green", "minimum": null, "maximum": null, "choices": ["red", "green", "yellow", "white"] }
+        {
+          "property_key": "display_color",
+          "value_type": "color",
+          "required": false,
+          "default": "green",
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "red",
+            "green",
+            "yellow",
+            "white"
+          ]
+        }
       ],
-      "control": null, "timer": null,
-      "indicator": { "terminal_a_key": "terminal_a", "terminal_b_key": "terminal_b", "display_color_property_key": "display_color" },
-      "motor": null, "protection": null
+      "control": null,
+      "timer": null,
+      "indicator": {
+        "terminal_a_key": "terminal_a",
+        "terminal_b_key": "terminal_b",
+        "display_color_property_key": "display_color"
+      },
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "motor_three_phase",
@@ -327,15 +1366,52 @@
       "definition_status": "reviewed",
       "source_note": "기존 외부 모터의 U·V·W 단자만 공통화했다. 정·역회전은 실제 상 순서와 접촉기 회로 구성으로 결정한다.",
       "compatible_socket_type_ids": [],
-      "capabilities": ["three_phase_load"],
-      "terminals": [
-        { "terminal_key": "phase_u", "terminal_suffix": "U", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true },
-        { "terminal_key": "phase_v", "terminal_suffix": "V", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true },
-        { "terminal_key": "phase_w", "terminal_suffix": "W", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true }
+      "capabilities": [
+        "three_phase_load"
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null,
-      "motor": { "phase_terminal_keys": ["phase_u", "phase_v", "phase_w"] },
+      "terminals": [
+        {
+          "terminal_key": "phase_u",
+          "terminal_suffix": "U",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "load",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "phase_v",
+          "terminal_suffix": "V",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "load",
+          "max_connections": 1,
+          "enabled": true
+        },
+        {
+          "terminal_key": "phase_w",
+          "terminal_suffix": "W",
+          "pin_number": null,
+          "terminal_type": "external_terminal",
+          "electrical_role": "load",
+          "max_connections": 1,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": {
+        "phase_terminal_keys": [
+          "phase_u",
+          "phase_v",
+          "phase_w"
+        ]
+      },
       "protection": null
     },
     {
@@ -344,20 +1420,95 @@
       "name": "8P 소켓 베이스",
       "definition_status": "verified",
       "source_note": "socket_types.json의 wiring_base_front 핀 배열과 기존 소켓 검증 테스트를 사용한다.",
-      "compatible_socket_type_ids": ["socket_8p_base"],
-      "capabilities": ["socket"],
-      "terminals": [
-        { "terminal_key": "pin_1", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_2", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_3", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_4", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_5", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_6", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_7", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_8", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true }
+      "compatible_socket_type_ids": [
+        "socket_8p_base"
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "capabilities": [
+        "socket"
+      ],
+      "terminals": [
+        {
+          "terminal_key": "pin_1",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_2",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_3",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_4",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_5",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_6",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_7",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_8",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     },
     {
       "model_id": "socket_base_12p",
@@ -365,24 +1516,131 @@
       "name": "12P 소켓 베이스",
       "definition_status": "verified",
       "source_note": "socket_types.json의 wiring_base_front 핀 배열과 기존 소켓 검증 테스트를 사용한다.",
-      "compatible_socket_type_ids": ["socket_12p_base"],
-      "capabilities": ["socket"],
-      "terminals": [
-        { "terminal_key": "pin_1", "terminal_suffix": "1", "pin_number": 1, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_2", "terminal_suffix": "2", "pin_number": 2, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_3", "terminal_suffix": "3", "pin_number": 3, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_4", "terminal_suffix": "4", "pin_number": 4, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_5", "terminal_suffix": "5", "pin_number": 5, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_6", "terminal_suffix": "6", "pin_number": 6, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_7", "terminal_suffix": "7", "pin_number": 7, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_8", "terminal_suffix": "8", "pin_number": 8, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_9", "terminal_suffix": "9", "pin_number": 9, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_10", "terminal_suffix": "10", "pin_number": 10, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_11", "terminal_suffix": "11", "pin_number": 11, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true },
-        { "terminal_key": "pin_12", "terminal_suffix": "12", "pin_number": 12, "terminal_type": "socket_pin", "electrical_role": "unassigned", "max_connections": 2, "enabled": true }
+      "compatible_socket_type_ids": [
+        "socket_12p_base"
       ],
-      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [],
-      "control": null, "timer": null, "indicator": null, "motor": null, "protection": null
+      "capabilities": [
+        "socket"
+      ],
+      "terminals": [
+        {
+          "terminal_key": "pin_1",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_2",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_3",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_4",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_5",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_6",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_7",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_8",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_9",
+          "terminal_suffix": "9",
+          "pin_number": 9,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_10",
+          "terminal_suffix": "10",
+          "pin_number": 10,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_11",
+          "terminal_suffix": "11",
+          "pin_number": 11,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "pin_12",
+          "terminal_suffix": "12",
+          "pin_number": 12,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "indicator": null,
+      "motor": null,
+      "protection": null
     }
   ]
 }

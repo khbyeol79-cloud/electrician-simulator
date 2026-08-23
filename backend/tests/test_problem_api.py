@@ -63,7 +63,7 @@ def test_problem_api_never_exposes_answers_or_paths(tmp_path):
 
         behaviors = client.get("/api/catalog/device-behaviors")
         assert behaviors.status_code == 200
-        assert len(behaviors.json()) == 16
+        assert len(behaviors.json()) == 17
         assert "expected_nets" not in behaviors.text
         assert "wiring_connections" not in behaviors.text
         assert "TB5-" not in behaviors.text

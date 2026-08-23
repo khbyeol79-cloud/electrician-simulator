@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import trainingBoardData from '../../../problems/training_socket_demo_001/board.json'
 import type { BoardDefinition } from '../api/client'
-import { boardItemLabelArea, buildExternalWireLayouts, buildTerminalSummary, deviceSummaryColor, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
+import { BoardItemBody, boardItemLabelArea, buildExternalWireLayouts, buildTerminalSummary, deviceSummaryColor, isDualFuseBoardItem, summaryLabelY, terminalSlotLabel } from '../features/wiring/components/WiringBoard'
 import { calculatePanDelta } from '../components/circuit/useSvgViewport'
 import { buildConnectionEndpointOffsets, pathHasSelfOverlap, routeConnection, routeConnections } from '../features/wiring/engine/orthogonalRouter'
 import { terminalBlockBank, terminalBlockUsage } from '../features/wiring/engine/terminalCapacity'
@@ -16,6 +16,25 @@ afterEach(() => {
 })
 
 describe('제어함 결선', () => {
+  it('renders the four-terminal dual fuse from source with two visible cartridges', () => {
+    const fuse = {
+      item_id: 'F', label: 'F', item_type: 'component' as const, socket_type_id: null, row: 1,
+      x: 100, y: 100, width: 120, height: 150,
+      label_area: { x: 145, y: 160, width: 30, height: 22 },
+      pins: [
+        { terminal_id: 'F-1', label: '1', number: 1, side: 'top' as const, x: 135, y: 100, max_connections: 2, enabled: true, terminal_role: 'functional' as const },
+        { terminal_id: 'F-3', label: '3', number: 3, side: 'top' as const, x: 185, y: 100, max_connections: 2, enabled: true, terminal_role: 'functional' as const },
+        { terminal_id: 'F-2', label: '2', number: 2, side: 'bottom' as const, x: 135, y: 250, max_connections: 2, enabled: true, terminal_role: 'functional' as const },
+        { terminal_id: 'F-4', label: '4', number: 4, side: 'bottom' as const, x: 185, y: 250, max_connections: 2, enabled: true, terminal_role: 'functional' as const },
+      ],
+    }
+    expect(isDualFuseBoardItem(fuse)).toBe(true)
+    const { container } = render(<svg><BoardItemBody item={fuse} /></svg>)
+    expect(container.querySelector('.dual-fuse-holder')).toBeInTheDocument()
+    expect(container.querySelectorAll('.dual-fuse-cartridge')).toHaveLength(2)
+    expect(container.querySelectorAll('.dual-fuse-channel')).toHaveLength(2)
+  })
+
   it('shows the stage-one socket-number draft in a read-only reference without toolbar buttons', async () => {
     installApiMock()
     window.localStorage.setItem('electrician.circuitDraft.training_socket_demo_001.v1', JSON.stringify({

@@ -829,7 +829,7 @@
     },
     {
       "item_id": "F",
-      "label": "FUSE",
+      "label": "F",
       "item_type": "component",
       "socket_type_id": null,
       "row": 1,
@@ -841,9 +841,20 @@
         {
           "terminal_id": "F-1",
           "label": "1",
-          "number": null,
+          "number": 1,
           "side": "top",
-          "x": 1050,
+          "x": 1025,
+          "y": 210,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "F-3",
+          "label": "3",
+          "number": 3,
+          "side": "top",
+          "x": 1075,
           "y": 210,
           "max_connections": 2,
           "enabled": true,
@@ -852,9 +863,20 @@
         {
           "terminal_id": "F-2",
           "label": "2",
-          "number": null,
+          "number": 2,
           "side": "bottom",
-          "x": 1050,
+          "x": 1025,
+          "y": 360,
+          "max_connections": 2,
+          "enabled": true,
+          "terminal_role": "functional"
+        },
+        {
+          "terminal_id": "F-4",
+          "label": "4",
+          "number": 4,
+          "side": "bottom",
+          "x": 1075,
           "y": 360,
           "max_connections": 2,
           "enabled": true,
@@ -862,10 +884,10 @@
         }
       ],
       "label_area": {
-        "x": 1012,
-        "y": 264,
-        "width": 76,
-        "height": 42
+        "x": 1038,
+        "y": 274,
+        "width": 24,
+        "height": 22
       }
     },
     {

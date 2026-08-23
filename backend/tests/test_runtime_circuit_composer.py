@@ -35,8 +35,9 @@ def test_composer_adds_mc_main_contacts_eocr_contacts_and_intrinsic_paths():
     assert tuple(sorted(("EOCR-L1", "EOCR-U"))) in pairs
     protection = result.operation.protection_devices[0]
     assert set(protection.protection_contact_ids) == {"EOCR-TRIP-NC", "EOCR-TRIP-NO"}
-    assert any("magnetic_contactor_12p_training" in item for item in result.warnings)
-    assert any("eocr_12p_training" in item for item in result.warnings)
+    # Q-Net 010 PDF 대조가 끝난 MC/EOCR 공통 모델은 verified이므로 경고가 없어야 한다.
+    assert not any("magnetic_contactor_12p_training" in item for item in result.warnings)
+    assert not any("eocr_12p_training" in item for item in result.warnings)
 
 
 def test_unknown_and_mismatched_explicit_model_bindings_are_rejected():

@@ -55,7 +55,44 @@ export function summaryLabelY(pin: BoardPin) {
   return pin.side === 'top' ? pin.y - 18 : pin.y + 31
 }
 
+export function isDualFuseBoardItem(item: BoardItem) {
+  if (item.item_type !== 'component') return false
+  const suffixes = new Set(item.pins.map((pin) => terminalSlotLabel(pin.terminal_id)))
+  return item.pins.length === 4 && ['1', '2', '3', '4'].every((suffix) => suffixes.has(suffix))
+    && (item.item_id === 'F' || /^F\d*$/.test(item.item_id) || /FUSE/i.test(item.label))
+}
+
+function DualFuseBody({ item }: { item: BoardItem }) {
+  const bySuffix = new Map(item.pins.map((pin) => [terminalSlotLabel(pin.terminal_id), pin]))
+  const leftTop = bySuffix.get('1')
+  const leftBottom = bySuffix.get('2')
+  const rightTop = bySuffix.get('3')
+  const rightBottom = bySuffix.get('4')
+  if (!leftTop || !leftBottom || !rightTop || !rightBottom) return null
+
+  const cartridgeTop = item.y + item.height * .28
+  const cartridgeBottom = item.y + item.height * .72
+  const cartridgeHeight = cartridgeBottom - cartridgeTop
+  const cartridgeWidth = Math.min(26, item.width * .22)
+  const channel = (key: string, x: number, topPinY: number, bottomPinY: number) => <g key={key} className="dual-fuse-channel">
+    <line className="dual-fuse-lead" x1={x} y1={topPinY} x2={x} y2={cartridgeTop} />
+    <rect className="dual-fuse-clip" x={x - cartridgeWidth * .42} y={cartridgeTop - 5} width={cartridgeWidth * .84} height="9" rx="2" />
+    <rect className="dual-fuse-cartridge" x={x - cartridgeWidth / 2} y={cartridgeTop} width={cartridgeWidth} height={cartridgeHeight} rx={cartridgeWidth / 2} />
+    <rect className="dual-fuse-cartridge-core" x={x - cartridgeWidth * .28} y={cartridgeTop + 7} width={cartridgeWidth * .56} height={Math.max(10, cartridgeHeight - 14)} rx={cartridgeWidth * .28} />
+    <rect className="dual-fuse-clip" x={x - cartridgeWidth * .42} y={cartridgeBottom - 4} width={cartridgeWidth * .84} height="9" rx="2" />
+    <line className="dual-fuse-lead" x1={x} y1={cartridgeBottom} x2={x} y2={bottomPinY} />
+  </g>
+
+  return <g className="board-item-body dual-fuse-body">
+    <rect className="dual-fuse-holder" x={item.x} y={item.y} width={item.width} height={item.height} rx="7" />
+    <rect className="dual-fuse-recess" x={item.x + 10} y={item.y + 14} width={item.width - 20} height={item.height - 28} rx="6" />
+    {channel('left', leftTop.x, leftTop.y, leftBottom.y)}
+    {channel('right', rightTop.x, rightTop.y, rightBottom.y)}
+  </g>
+}
+
 export function BoardItemBody({ item }: { item: BoardItem }) {
+  if (isDualFuseBoardItem(item)) return <DualFuseBody item={item} />
   if (item.item_type === 'terminal_block') {
     return <g className="board-item-body terminal-block-body"><rect x={item.x} y={item.y} width={item.width} height={item.height} rx="5" />{item.pins.map((pin) => <rect key={pin.terminal_id} x={pin.x - 16} y={item.y + 8} width="32" height={item.height - 16} rx="2" />)}</g>
   }
