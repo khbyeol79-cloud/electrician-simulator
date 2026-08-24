@@ -1,6 +1,6 @@
 # Current Recommended Build
 
-**Build:** 0.13.0 stable-fuse base with private Q-Net 010 functional validation
+**Build:** 0.13.0 stable-fuse base with Q-Net 010 contact labels and private wiring audit
 
 This feature branch keeps the existing 0.13.0 version policy. It is not a verified public Q-Net 010 release.
 
@@ -15,10 +15,14 @@ This feature branch keeps the existing 0.13.0 version policy. It is not a verifi
 - actual submitted-wiring operation validation;
 - wrong, shorted, merged, bypassed, and capacity-error tests;
 - public answer and operation suppression for unverified official packages.
+- metadata-driven `NO`/`NC` text badges on wiring and operation screens;
+- private 62-line candidate audit with production grading unchanged.
 
 ## Public behavior unchanged
 
 Q-Net 010 remains `draft/unverified`. Public wiring grading and operation stay blocked. Q-Net 001-009 and 011-018 are unchanged.
+
+The user candidate passes the five operation scenarios but remains unsuitable as a complete practical submission because PE is missing and direct device fan-out exceeds seven terminal capacities. It is retained only in private audit/test artifacts and is absent from public API data and the frontend bundle.
 
 ## Evidence gate
 

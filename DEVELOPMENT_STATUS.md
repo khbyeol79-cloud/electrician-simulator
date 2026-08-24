@@ -1,4 +1,4 @@
-# Development Status - Q-Net 010 private functional validation
+# Development Status - Q-Net 010 contact labels and private wiring audit
 
 ## Current baseline
 
@@ -22,6 +22,18 @@ Implemented internally:
 - missing, wrong, shorted, merged, bypassed, isolated-jumper, and capacity-error validation;
 - actual submitted-wiring operation validation for PB1/PB2, timers, motors, STOP, EOCR, indicators, and reset;
 - stable-state recomputation when a completed timer de-energizes.
+
+Implemented in the public UI without exposing answer data:
+
+- metadata-driven `NO`/`NC` text badges beside push-button and limit-switch names;
+- Q-Net 010 metadata: PB0 `NC`, PB1/PB2 `NO`, LS1/LS2 `NO`;
+- the same badge component on wiring and operation screens;
+- terminal numbers remain separately visible and selectable;
+- missing contact metadata falls back safely without guessing.
+
+## User candidate audit
+
+The supplied 62-line wiring answer is preserved and reviewed only in private test/document paths. It matches 21 of 32 production Nets directly and 31 of 32 under an audit-only dry-contact endpoint projection. Its direct wiring passes all five private operation scenarios, so the sequence intent is substantially correct. It is nevertheless classified as `기능 Net 후보이나 완성 실기결선으로는 오답` because PE is absent and omitted TB distribution produces seven terminal-capacity overflows. Production grading was not relaxed and no answer alternative was added.
 
 ## Public state
 

@@ -1944,6 +1944,7 @@
         "device_id": "PB0",
         "label": "PB0 정지(NC)",
         "placement": "top",
+        "contact_type": "NC",
         "terminals": [
           {
             "terminal_id": "PB0-1",
@@ -1967,6 +1968,7 @@
         "device_id": "PB1",
         "label": "PB1 기동(NO)",
         "placement": "top",
+        "contact_type": "NO",
         "terminals": [
           {
             "terminal_id": "PB1-1",
@@ -1990,6 +1992,7 @@
         "device_id": "PB2",
         "label": "PB2 기동(NO)",
         "placement": "top",
+        "contact_type": "NO",
         "terminals": [
           {
             "terminal_id": "PB2-1",
@@ -2013,6 +2016,7 @@
         "device_id": "LS1",
         "label": "리밋 스위치 LS1",
         "placement": "top",
+        "contact_type": "NO",
         "terminals": [
           {
             "terminal_id": "LS1-1",
@@ -2036,6 +2040,7 @@
         "device_id": "LS2",
         "label": "리밋 스위치 LS2",
         "placement": "top",
+        "contact_type": "NO",
         "terminals": [
           {
             "terminal_id": "LS2-1",

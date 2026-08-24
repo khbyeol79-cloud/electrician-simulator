@@ -319,6 +319,9 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .external-device-list { display: flex; gap: 7px; overflow-x: auto; padding: 2px; }
 .external-device-card { flex: 0 0 auto; min-width: 160px; padding: 6px; border: 1px solid #c7d4e2; border-radius: 5px; background: #fff; }
 .external-device-card > strong { display: block; margin-bottom: 5px; color: #263e5c; font-size: 9px; }
+.contact-type-badge { display: inline-flex; min-width: 25px; height: 17px; margin-left: 6px; align-items: center; justify-content: center; border: 1px solid #475569; border-radius: 9px; background: #fff; color: #1e293b; font-size: 9px; font-weight: 950; line-height: 1; vertical-align: middle; }
+.contact-type-badge.no { border-color: #16734a; background: #e8f8ef; color: #0b5d3a; }
+.contact-type-badge.nc { border-color: #a63b3b; background: #fff0f0; color: #8f2525; }
 .external-device-card > div { display: flex; gap: 4px; }
 .external-device-card button { min-width: 72px; display: grid; grid-template-columns: 8px 1fr; gap: 0 4px; align-items: center; padding: 4px 5px; color: #253c57; border: 1px solid #c6d3e1; border-radius: 4px; background: #f8fafc; font-size: 8px; text-align: left; }
 .external-device-card button.selected { border-color: #1265e8; box-shadow: 0 0 0 2px rgba(18,101,232,.15); }
@@ -432,6 +435,8 @@ button:disabled { cursor: not-allowed; opacity: .48; }
 .device-on-badge { fill: #1265e8; font-size: 11px; font-weight: 900; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
 .operation-section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; }
 .operation-section-title span { color: #61738a; font-size: 10px; font-weight: 800; }
+.control-button b { display: flex; align-items: center; justify-content: center; gap: 3px; }
+.control-button .contact-type-badge { margin-left: 2px; }
 .power-switch { width: 100%; height: 40px; margin-bottom: 8px; color: #fff; border: 1px solid #a62d2d; border-radius: 5px; background: #c93b3b; font-weight: 900; }
 .power-switch.on { border-color: #08713f; background: #148a50; }
 .control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }

@@ -81,6 +81,8 @@ describe('동작시험', () => {
     render(<MemoryRouter><OperationTestPage problem={trainingDetail} /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '전원 ON' }))
     expect(await screen.findByRole('button', { name: '전원 OFF' })).toBeInTheDocument()
+    expect(screen.getByLabelText('평상시 닫힘(NC)')).toHaveTextContent('NC')
+    expect(screen.getAllByLabelText('평상시 열림(NO)').length).toBeGreaterThanOrEqual(2)
 
     const pb1 = screen.getByRole('button', { name: /PB1/ })
     fireEvent.pointerDown(pb1)

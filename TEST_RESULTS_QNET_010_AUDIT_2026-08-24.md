@@ -6,20 +6,20 @@ Date: 2026-08-24 (Asia/Seoul)
 
 - Base: `ca87754f320be5c73d05bfb1dfaf6cc7cf5e3e7a`, tag `v0.13.0-stable-fuse`
 - Preserved documentation commit: `7a65a59c2c76051b6e41157f2800671892b91546`
-- Python: 3.14.6, rebuilt project `.venv`
+- Python: 3.12.13, rebuilt project `.venv`
 - `pip check`: PASS
 
 ## Final automated results
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Full Python suite | `.venv\Scripts\python.exe -m pytest` | 185 passed, 1 deprecation warning |
-| Q-Net 010 private suite | `.venv\Scripts\python.exe -m pytest backend/tests/test_qnet_010_private_validation.py -q` | 34 passed |
+| Full Python suite | `scripts\test_all.ps1` | 193 passed, 1 deprecation warning |
+| Q-Net 010 private and candidate suites | `.venv\Scripts\python.exe -m pytest backend/tests/test_qnet_010_private_validation.py backend/tests/test_qnet_010_user_candidate_audit.py -q` | 42 passed (34 private + 8 candidate audit) |
 | Package validation | `.venv\Scripts\python.exe scripts\validate_problems.py` | 23 loaded, 0 errors, 19 intended unverified warnings |
-| Frontend | `npm test` | 7 files, 67 passed |
+| Frontend | `npm test` | 7 files, 68 passed |
 | TypeScript | `npm run typecheck` | PASS |
-| Production build | `npm run build` | PASS, 63 modules |
-| Privacy regression | focused pytest command | 49 passed |
+| Production build | `npm run build` | PASS, 64 modules |
+| Privacy regression | focused pytest command | 48 passed |
 | Basic board demo | `scripts/run_basic_board_demo.py` | PASS |
 | Empty board demo | `scripts/run_empty_board_demo.py` | PASS |
 | Q-Net inventory smoke | `scripts/run_qnet_18_smoke_test.py` | PASS, 18/18 |
@@ -47,6 +47,10 @@ The 34 dedicated tests cover:
 - power/reset state isolation;
 - public grading and operation blocking;
 - API, source, and production-bundle answer secrecy.
+
+The eight additional candidate-audit tests cover exact raw-answer preservation, typo/alias normalization, unordered wire direction, production rejection, audit-only endpoint projection, all five actual-wiring operation scenarios, frontend secrecy, and safe public contact metadata. Audit result: 62 raw/62 unique wires, 21/32 direct production Net matches, 31/32 audit-projected matches, missing PE, no phase short, no FUSE-channel merge, and seven physical terminal-capacity overflows.
+
+Manual browser validation confirmed visible PB0 `NC`, PB1 `NO`, and LS1 `NO` badges on both wiring and operation screens; PB0 terminal selection still worked; control operation worked; and the browser console reported zero errors.
 
 ## Status decision
 

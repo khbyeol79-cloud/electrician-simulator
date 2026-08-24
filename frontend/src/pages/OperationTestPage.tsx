@@ -14,6 +14,7 @@ import {
 } from '../api/client'
 import { OperationBoard } from '../features/operation/components/OperationBoard'
 import { PlaceholderPage } from './PlaceholderPage'
+import { ContactTypeBadge } from '../components/ContactTypeBadge'
 
 const MOTOR_LABELS: Record<string, string> = {
   stopped: '정지', forward: '정회전', reverse: '역회전', phase_loss: '결상',
@@ -174,7 +175,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
             <div className="operation-section-title"><strong>조작부</strong><span>{session.power_state === 'tripped' ? '오류 차단' : session.powered ? '전원 투입' : '전원 차단'}</span></div>
             <button className={`power-switch ${session.powered ? 'on' : ''}`} disabled={busy} onClick={() => void perform({ action: 'set_power', value: !session.powered })}>전원 {session.powered ? 'OFF' : 'ON'}</button>
             <div className="control-grid">{Object.entries(session.controls).map(([controlId, state]) => state.mode === 'maintained' ?
-              <button key={controlId} disabled={busy} className={`control-button maintained ${state.active ? 'active' : ''}`} onClick={() => void perform({ action: 'toggle_control', control_id: controlId })} aria-pressed={state.active}><b>{controlId}</b><span>{state.active ? '작동' : '복귀'}</span></button>
+              <button key={controlId} disabled={busy} className={`control-button maintained ${state.active ? 'active' : ''}`} onClick={() => void perform({ action: 'toggle_control', control_id: controlId })} aria-pressed={state.active}><b>{controlId}<ContactTypeBadge contactType={state.contact_type} /></b><span>{state.active ? '작동' : '복귀'}</span></button>
               : <button key={controlId} className={`control-button momentary ${state.active ? 'active' : ''}`}
                 disabled={busy}
                 onPointerDown={(event) => { event.currentTarget.setPointerCapture?.(event.pointerId); pressMomentary(controlId) }}
@@ -183,7 +184,7 @@ export function OperationTestPage({ problem }: { problem?: PublicProblemDetail }
                 onPointerLeave={() => releaseMomentaryId(controlId)}
                 onKeyDown={(event) => { if (!event.repeat && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); pressMomentary(controlId) } }}
                 onKeyUp={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); releaseMomentaryId(controlId) } }}
-                onBlur={() => releaseMomentaryId(controlId)} aria-pressed={state.active}><b>{controlId}</b><span>{state.contact_type} · {state.active ? '누름' : '복귀'}</span></button>
+                onBlur={() => releaseMomentaryId(controlId)} aria-pressed={state.active}><b>{controlId}<ContactTypeBadge contactType={state.contact_type} /></b><span>{state.active ? '누름' : '복귀'}</span></button>
             )}</div>
             {Object.entries(session.protections).length > 0 && <div className="protection-controls">
               <p>아래 기능은 실제 전류 측정이 아닌 교육용 과부하 시뮬레이션입니다.</p>

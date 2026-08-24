@@ -126,7 +126,7 @@ export type BoardDefinition = {
 }
 export type WiringConnection = { from: string; to: string; wire_color: 'brown' | 'black' | 'gray' | 'yellow'; pair_display_color: string }
 export type ExternalWiringTerminal = { terminal_id: string; label: string; terminal_role: 'external'; operation_terminal_id: string | null; max_connections: 1 | 2; wire_color: WiringConnection['wire_color'] }
-export type ExternalWiringDevice = { device_id: string; label: string; placement: 'top' | 'bottom'; terminals: ExternalWiringTerminal[] }
+export type ExternalWiringDevice = { device_id: string; label: string; placement: 'top' | 'bottom'; contact_type?: 'NO' | 'NC' | null; terminals: ExternalWiringTerminal[] }
 export type WiringSemantics = { schema_version: '1.0'; extra_jumper_policy: 'ignore' | 'warning' | 'reject'; external_devices: ExternalWiringDevice[] }
 export type WiringDraft = { problem_id: string; problem_version: number; mode: 'graphic' | 'summary'; connections: WiringConnection[]; updated_at: string | null }
 export type WiringAttemptResult = {
@@ -195,7 +195,7 @@ export type OperationDefinition = {
   direction_change_policy: 'current_direction_first' | 'first_input_first' | 'block_both' | 'stop_before_reverse'
   internal_connections: { from: string; to: string }[]
 }
-export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: string; active: boolean }
+export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: 'NO' | 'NC'; active: boolean }
 export type OperationTimerState = { status: 'stopped' | 'timing' | 'completed' | 'reset'; elapsed_ms: number; delay_ms: number }
 export type OperationFault = { code: string; message: string; severity: 'warning' | 'error' | 'danger'; trip_required: boolean }
 export type OperationProtectionState = { label: string; protection_type: string; status: 'normal' | 'tripped' | 'reset_required'; reset_mode: string }

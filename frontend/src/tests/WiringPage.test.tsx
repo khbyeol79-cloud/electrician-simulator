@@ -93,6 +93,33 @@ describe('제어함 결선', () => {
     expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
   })
 
+  it('shows metadata-driven NO/NC badges without hiding terminal numbers or blocking clicks', async () => {
+    const externalDevice = (device_id: string, label: string, contact_type?: 'NO' | 'NC') => ({
+      device_id, label, placement: 'top' as const, contact_type,
+      terminals: [1, 2].map((number) => ({ terminal_id: `${device_id}-${number}`, label: String(number), terminal_role: 'external' as const, operation_terminal_id: null, max_connections: 1 as const, wire_color: 'yellow' as const })),
+    })
+    const detail = {
+      ...trainingDetail,
+      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [
+        externalDevice('PB0', 'PB0 정지', 'NC'), externalDevice('PB1', 'PB1 기동', 'NO'), externalDevice('PB2', 'PB2 기동', 'NO'), externalDevice('UNMARKED', '메타데이터 없음'),
+      ] },
+    }
+    installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+
+    expect(screen.getByRole('article', { name: 'PB0 정지, 평상시 닫힘(NC)' })).toHaveTextContent('NC')
+    expect(screen.getByRole('article', { name: 'PB1 기동, 평상시 열림(NO)' })).toHaveTextContent('NO')
+    expect(screen.getByRole('article', { name: 'PB2 기동, 평상시 열림(NO)' })).toHaveTextContent('NO')
+    expect(screen.getByRole('article', { name: '메타데이터 없음' }).querySelector('.contact-type-badge')).toBeNull()
+    const pb0Terminal = screen.getByRole('button', { name: /PB0-1 외부 기구선/ })
+    expect(pb0Terminal).toHaveTextContent('PB0-1')
+    expect(screen.getByRole('button', { name: /PB0-2 외부 기구선/ })).toHaveTextContent('PB0-2')
+    await user.click(pb0Terminal)
+    expect(pb0Terminal).toHaveClass('selected')
+  })
+
   it('separates two external TB leads and recenters the remaining lead after deletion', async () => {
     const tbPin = { terminal_id: 'TB5-01', label: '1', number: 1, side: 'bottom' as const, x: 80, y: 100, max_connections: 2, enabled: true, terminal_role: 'free_junction' as const }
     const board: BoardDefinition = {

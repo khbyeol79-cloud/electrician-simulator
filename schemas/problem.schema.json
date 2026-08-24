@@ -95,6 +95,7 @@
       "properties": {
         "device_id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1, "maxLength": 120 },
         "placement": { "enum": ["top", "bottom"] },
+        "contact_type": { "type": ["string", "null"], "enum": ["NO", "NC", null] },
         "terminals": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/externalWiringTerminal" } }
       }
     },

@@ -112,6 +112,16 @@ class ProblemRepository:
         manifest = package.manifest
         problem = package.problem
         expose_operation = package.answer.verification.status != "unverified"
+        wiring_semantics = problem.wiring_semantics.model_dump(mode="json") if problem.wiring_semantics else None
+        if wiring_semantics is not None and problem.operation:
+            public_contact_types = {
+                control.control_id: control.contact_type
+                for control in problem.operation.controls
+                if control.control_type in {"pushbutton", "limit_switch"}
+            }
+            for device in wiring_semantics["external_devices"]:
+                if device.get("contact_type") is None and device["device_id"] in public_contact_types:
+                    device["contact_type"] = public_contact_types[device["device_id"]]
         return PublicProblemDetail(
             problem_id=manifest.problem_id,
             title=manifest.title,
@@ -137,7 +147,7 @@ class ProblemRepository:
                 problem.operation.model_dump(by_alias=True, mode="json")
                 if problem.operation and expose_operation else None
             ),
-            wiring_semantics=problem.wiring_semantics.model_dump(mode="json") if problem.wiring_semantics else None,
+            wiring_semantics=wiring_semantics,
             warning_count=len(package.warnings),
         )
 

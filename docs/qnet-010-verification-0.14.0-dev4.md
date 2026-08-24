@@ -28,6 +28,7 @@ The photo confirms one holder, left/right cartridges, and four physical connecti
 | Scope | Result | Notes |
 | --- | --- | --- |
 | PDF pages 6-9 | PASS | layout, sequence, required behavior, internal diagrams |
+| Push-button/limit-switch contact types | PASS | page 7 symbols and page 8 behavior: PB0 NC; PB1/PB2 and LS1/LS2 NO |
 | FUSE one holder/two cartridges/four endpoints | PASS | PDF plus field photo |
 | FUSE independent `1-2`, `3-4` implementation | PASS | convention implemented; no cross-channel intrinsic edge |
 | Official FUSE physical terminal numbering | BLOCKED | no numbered photo or manufacturer/Q-Net diagram |
@@ -43,6 +44,21 @@ The photo confirms one holder, left/right cartridges, and four physical connecti
 | Actual-wiring operation | PASS | five deterministic private scenarios |
 | Answer secrecy | PASS | public API/setup/session/source/bundle checks |
 | Public availability | BLOCKED intentionally | draft/unverified evidence gate |
+
+## Supplied 62-line answer audit
+
+| Check | Result | Meaning |
+| --- | --- | --- |
+| Raw/unique lines | 62/62 | original answer retained verbatim in the private audit script |
+| Exact production Nets | 21/32 | direction-independent normalization only |
+| Audit-only projected Nets | 31/32 | permits only dry-contact endpoint orientation analysis; not grading |
+| Actual-wiring operation scenarios | 5/5 PASS | functional sequence intent is substantially correct |
+| Protective earth | MISSING | P04_PE is absent |
+| Terminal capacity | FAIL | seven overflows caused by bypassing TB distribution |
+| Phase short/FUSE merge | none | neither defect was detected |
+| Production alternatives | unchanged | no grading relaxation or new allowed answer |
+
+The candidate is therefore a functional Net candidate, not a complete acceptable practical wiring submission. Reversing the two external ends of an isolated dry contact can be electrically equivalent, but that observation does not override the verified COM/NO/NC terminal semantics or physical terminal-capacity rules.
 
 PDF 010 does not define a mutual MC1-MC2 interlock. No imaginary interlock was added. The MC auxiliary NC contacts are modeled as WL indication gates, and bypassing those contacts is rejected.
 

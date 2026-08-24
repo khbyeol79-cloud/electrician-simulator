@@ -178,6 +178,7 @@ class ExternalWiringDevice(BaseModel):
     device_id: str = Field(min_length=1, max_length=80)
     label: str = Field(min_length=1, max_length=120)
     placement: Literal["top", "bottom"] = "top"
+    contact_type: Literal["NO", "NC"] | None = None
     terminals: list[ExternalWiringTerminal] = Field(min_length=1, max_length=20)
 
 

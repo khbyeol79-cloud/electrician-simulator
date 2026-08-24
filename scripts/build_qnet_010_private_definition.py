@@ -164,6 +164,10 @@ def build_problem():
     problem["circuit"] = circuit.model_dump(mode="json", by_alias=True)
     problem["operation"] = operation.model_dump(mode="json", by_alias=True)
     problem["wiring_semantics"]["extra_jumper_policy"] = "reject"
+    public_contact_types = {"PB0": "NC", "PB1": "NO", "PB2": "NO", "LS1": "NO", "LS2": "NO"}
+    for device in problem["wiring_semantics"]["external_devices"]:
+        if device["device_id"] in public_contact_types:
+            device["contact_type"] = public_contact_types[device["device_id"]]
     return problem
 
 
