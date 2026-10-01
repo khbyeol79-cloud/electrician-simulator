@@ -95,6 +95,7 @@
       "properties": {
         "device_id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1, "maxLength": 120 },
         "placement": { "enum": ["top", "bottom"] },
+        "contact_type": { "type": ["string", "null"], "enum": ["NO", "NC", null] },
         "terminals": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/externalWiringTerminal" } }
       }
     },
@@ -128,7 +129,7 @@
     "contact": {
       "type": "object", "additionalProperties": false,
       "required": ["contact_id", "owner_device_id", "contact_type", "common_terminal_id", "switched_terminal_id", "normal_state"],
-      "properties": { "contact_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] }, "common_terminal_id": { "$ref": "#/$defs/id" }, "switched_terminal_id": { "$ref": "#/$defs/id" }, "nc_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "no_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "controller_type": { "enum": ["coil", "timer", "protection"] }, "controller_id": { "type": ["string", "null"], "maxLength": 80 }, "controlled_by_coil_id": { "type": ["string", "null"], "maxLength": 80 }, "normal_state": { "enum": ["open", "closed"] } }
+      "properties": { "contact_id": { "$ref": "#/$defs/id" }, "owner_device_id": { "$ref": "#/$defs/id" }, "contact_type": { "enum": ["NO", "NC", "CHANGEOVER"] }, "common_terminal_id": { "$ref": "#/$defs/id" }, "switched_terminal_id": { "$ref": "#/$defs/id" }, "nc_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "no_terminal_id": { "type": ["string", "null"], "maxLength": 80 }, "controller_type": { "enum": ["coil", "timer", "protection", "flasher", "level"] }, "controller_id": { "type": ["string", "null"], "maxLength": 80 }, "controlled_by_coil_id": { "type": ["string", "null"], "maxLength": 80 }, "normal_state": { "enum": ["open", "closed"] } }
     },
     "coil": {
       "type": "object", "additionalProperties": false,
@@ -212,11 +213,16 @@
         },
         "controls": { "type": "array", "maxItems": 50, "items": { "$ref": "#/$defs/operationControl" } },
         "timers": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationTimer" } },
+        "flashers": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationFlasher" } },
+        "level_relays": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationLevelRelay" } },
         "indicators": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationIndicator" } },
+        "audible_outputs": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationAudibleOutput" } },
         "motors": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/operationMotor" } },
         "contactors": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationContactor" } },
         "interlocks": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationInterlock" } },
         "protection_devices": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationProtectionDevice" } },
+        "fuse_channels": { "type": "array", "maxItems": 40, "items": { "$ref": "#/$defs/operationFuseChannel" } },
+        "requirements": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/operationRequirement" } },
         "direction_change_policy": { "enum": ["current_direction_first", "first_input_first", "block_both", "stop_before_reverse"] },
         "internal_connections": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/terminalPair" } }
       }
@@ -224,6 +230,48 @@
     "terminalPair": {
       "type": "object", "additionalProperties": false, "required": ["from", "to"],
       "properties": { "from": { "$ref": "#/$defs/id" }, "to": { "$ref": "#/$defs/id" } }
+    },
+    "operationFuseChannel": {
+      "type": "object", "additionalProperties": false,
+      "required": ["channel_id", "label", "terminal_a_id", "terminal_b_id"],
+      "properties": {
+        "channel_id": { "$ref": "#/$defs/id" }, "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "terminal_a_id": { "$ref": "#/$defs/id" }, "terminal_b_id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "operationAction": {
+      "type": "object", "additionalProperties": false,
+      "required": ["action", "value", "control_id", "milliseconds", "target_id", "fault_type"],
+      "properties": {
+        "action": { "enum": ["set_power", "press_control", "release_control", "toggle_control", "advance_time", "trigger_fault", "reset_fault", "set_fuse_state", "set_level", "reset_operation"] },
+        "value": { "type": ["boolean", "null"] },
+        "control_id": { "type": ["string", "null"], "maxLength": 80 },
+        "milliseconds": { "type": ["integer", "null"], "minimum": 0, "maximum": 60000 },
+        "target_id": { "type": ["string", "null"], "maxLength": 80 },
+        "fault_type": { "type": ["string", "null"], "enum": ["overload", null] }
+      }
+    },
+    "operationExpectation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "expected"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*$", "maxLength": 160 },
+        "expected": { "type": ["boolean", "integer", "string"] }
+      }
+    },
+    "operationRequirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requirement_id", "label", "actions", "observations", "expectations"],
+      "properties": {
+        "requirement_id": { "type": "string", "pattern": "^[A-Z0-9_]+$", "maxLength": 80 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "scenario_id": { "type": ["string", "null"], "pattern": "^[A-Z0-9_]+$", "maxLength": 80 },
+        "scenario_label": { "type": ["string", "null"], "minLength": 1, "maxLength": 120 },
+        "next_action": { "type": ["string", "null"], "minLength": 1, "maxLength": 240 },
+        "actions": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/operationAction" } },
+        "observations": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/operationExpectation" } },
+        "expectations": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/operationExpectation" } }
+      }
     },
     "operationControl": {
       "type": "object", "additionalProperties": false,
@@ -233,6 +281,8 @@
         "control_type": { "enum": ["pushbutton", "limit_switch", "selector"] },
         "mode": { "enum": ["momentary", "maintained"] }, "contact_type": { "enum": ["NO", "NC"] },
         "terminal_a_id": { "$ref": "#/$defs/id" }, "terminal_b_id": { "$ref": "#/$defs/id" },
+        "alternate_terminal_a_id": { "type": ["string", "null"], "maxLength": 80 },
+        "alternate_terminal_b_id": { "type": ["string", "null"], "maxLength": 80 },
         "initial_active": { "type": "boolean" }
       }
     },
@@ -244,6 +294,34 @@
         "mode": { "const": "on_delay" }, "delay_ms": { "type": "integer", "exclusiveMinimum": 0, "maximum": 3600000 },
         "timed_contact_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
         "retentive": { "type": "boolean" }
+      }
+    },
+    "operationFlasher": {
+      "type": "object", "additionalProperties": false,
+      "required": ["flasher_id", "label", "coil_id", "interval_ms", "contact_ids"],
+      "properties": {
+        "flasher_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" }, "coil_id": { "$ref": "#/$defs/id" },
+        "interval_ms": { "type": "integer", "exclusiveMinimum": 0, "maximum": 3600000 },
+        "contact_ids": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "operationLevelRelay": {
+      "type": "object", "additionalProperties": false,
+      "required": ["level_relay_id", "label", "supply_terminal_a_id", "supply_terminal_b_id", "electrode_terminal_ids", "external_electrode_terminal_ids", "contact_ids"],
+      "properties": {
+        "level_relay_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" },
+        "supply_terminal_a_id": { "$ref": "#/$defs/id" }, "supply_terminal_b_id": { "$ref": "#/$defs/id" },
+        "electrode_terminal_ids": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
+        "external_electrode_terminal_ids": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/id" } },
+        "contact_ids": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "operationAudibleOutput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["output_id", "label", "terminal_a_id", "terminal_b_id"],
+      "properties": {
+        "output_id": { "$ref": "#/$defs/id" }, "label": { "$ref": "#/$defs/id" },
+        "terminal_a_id": { "$ref": "#/$defs/id" }, "terminal_b_id": { "$ref": "#/$defs/id" }
       }
     },
     "operationIndicator": {
@@ -297,6 +375,8 @@
         "protected_coil_ids": { "type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
         "protected_motor_ids": { "type": "array", "maxItems": 10, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
         "protection_contact_ids": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "supply_terminal_a_id": { "type": ["string", "null"], "maxLength": 80 },
+        "supply_terminal_b_id": { "type": ["string", "null"], "maxLength": 80 },
         "reset_mode": { "enum": ["manual", "automatic", "restart_required"] },
         "allowed_fault_types": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "const": "overload" } }
       }

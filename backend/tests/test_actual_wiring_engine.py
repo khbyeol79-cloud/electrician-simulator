@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from app.domain import OperationAction
 from app.simulation import OperationEngine
 from actual_wiring_test_utils import actual_connections, compose_actual
@@ -91,3 +93,22 @@ def test_eocr_reset_does_not_restart_a_dropped_self_hold_circuit():
     assert reset.coils["MC1-COIL"] is False
     restarted = item.apply(OperationAction(action="press_control", control_id="PB1"))
     assert restarted.coils["MC1-COIL"] is True
+
+
+def test_eocr_fault_injection_requires_actual_a1_a2_supply():
+    runtime = compose_actual()
+    without_supply_a = [
+        connection for connection in actual_connections()
+        if set(connection.key) != {"PWR-L", "EOCR-A1"}
+    ]
+    item = OperationEngine(
+        session_id="actual-unpowered-eocr", problem_id="free:actual", wiring_attempt_id=0,
+        circuit=runtime.circuit, definition=runtime.operation,
+        connections=without_supply_a,
+        catalog_composed=runtime.catalog_composed,
+        composition_warnings=runtime.warnings,
+    )
+    item.apply(OperationAction(action="set_power", value=True))
+    assert item.state().protections["EOCR"].operating_state == "unpowered"
+    with pytest.raises(ValueError, match="A1-A2"):
+        item.apply(OperationAction(action="trigger_fault", target_id="EOCR", fault_type="overload"))

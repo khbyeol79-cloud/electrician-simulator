@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
   "problem_id": "qnet_electrician_practical_010",
-  "answer_version": 1,
+  "answer_version": 3,
   "verification": {
     "status": "unverified",
     "verified_by": null,
     "verified_at": null,
-    "notes": "PDF 회로의 접점별 소켓 핀 선택과 expected_nets 교차검증 전"
+    "notes": "Public source copy: private candidate grading nets are omitted. Operation scenarios are retained. Not an official grading answer."
   },
   "socket_pin_answers": {},
   "required_connections": [],
@@ -22,5 +22,334 @@
     "L3": "gray",
     "control": "yellow"
   },
-  "operation_tests": []
+  "operation_tests": [
+    {
+      "test_id": "PB1_TIMER_MC1",
+      "label": "PB1·X1·LS1·T1·MC1·M1",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true,
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "X1-COIL": true
+            },
+            "indicators": {
+              "WL": "on"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1",
+          "expect": {
+            "coils": {
+              "X1-COIL": true
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS1",
+          "expect": {
+            "coils": {
+              "T1-COIL": true
+            },
+            "timers": {
+              "T1-TIMER": {
+                "status": "timing"
+              }
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 999,
+          "expect": {
+            "coils": {
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1,
+          "expect": {
+            "coils": {
+              "MC1-COIL": true
+            },
+            "motors": {
+              "M1": "forward"
+            },
+            "indicators": {
+              "RL": "on",
+              "WL": "off"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "LS1",
+          "expect": {
+            "coils": {
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "motors": {
+              "M1": "stopped"
+            },
+            "indicators": {
+              "RL": "off",
+              "WL": "on"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "PB2_TIMER_MC2",
+      "label": "PB2·X2·LS2·T2·MC2·M2",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB2",
+          "expect": {
+            "coils": {
+              "X2-COIL": true
+            },
+            "indicators": {
+              "WL": "on"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB2",
+          "expect": {
+            "coils": {
+              "X2-COIL": true
+            }
+          }
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS2",
+          "expect": {
+            "coils": {
+              "T2-COIL": true
+            }
+          }
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000,
+          "expect": {
+            "coils": {
+              "MC2-COIL": true
+            },
+            "motors": {
+              "M2": "forward"
+            },
+            "indicators": {
+              "GL": "on",
+              "WL": "off"
+            }
+          }
+        },
+        {
+          "action": "release_control",
+          "control_id": "LS2",
+          "expect": {
+            "coils": {
+              "MC2-COIL": false
+            },
+            "motors": {
+              "M2": "stopped"
+            },
+            "indicators": {
+              "GL": "off",
+              "WL": "on"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "STOP_BOTH",
+      "label": "PB0 전체 정지",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB0",
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "timers": {
+              "T1-TIMER": {
+                "status": "stopped",
+                "elapsed_ms": 0
+              }
+            },
+            "motors": {
+              "M1": "stopped",
+              "M2": "stopped"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "EOCR_TRIP_RESET",
+      "label": "EOCR 트립·수동 리셋",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS1"
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000
+        },
+        {
+          "action": "trigger_fault",
+          "target_id": "EOCR",
+          "fault_type": "overload",
+          "expect": {
+            "coils": {
+              "X1-COIL": false,
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "timers": {
+              "T1-TIMER": {
+                "status": "stopped",
+                "elapsed_ms": 0
+              }
+            },
+            "protections": {
+              "EOCR": {
+                "status": "reset_required"
+              }
+            },
+            "indicators": {
+              "YL": "on"
+            }
+          }
+        },
+        {
+          "action": "reset_fault",
+          "target_id": "EOCR",
+          "expect": {
+            "protections": {
+              "EOCR": {
+                "status": "normal"
+              }
+            },
+            "indicators": {
+              "YL": "off"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "test_id": "POWER_RESET",
+      "label": "전원 차단 초기화",
+      "steps": [
+        {
+          "action": "set_power",
+          "value": true
+        },
+        {
+          "action": "press_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "release_control",
+          "control_id": "PB1"
+        },
+        {
+          "action": "press_control",
+          "control_id": "LS1"
+        },
+        {
+          "action": "advance_time",
+          "milliseconds": 1000
+        },
+        {
+          "action": "set_power",
+          "value": false,
+          "expect": {
+            "powered": false,
+            "coils": {
+              "X1-COIL": false,
+              "T1-COIL": false,
+              "MC1-COIL": false
+            },
+            "timers": {
+              "T1-TIMER": {
+                "status": "stopped",
+                "elapsed_ms": 0
+              }
+            },
+            "motors": {
+              "M1": "power_off"
+            },
+            "indicators": {
+              "RL": "off",
+              "WL": "off",
+              "YL": "off"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Response
 
-from app.domain import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, SchematicDiagram
-from app.repositories import CircuitAttemptRepository, ProblemRepository
+from app.domain import CircuitAnalysisDraftResponse, CircuitAnalysisDraftUpdate, CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, SchematicDiagram
+from app.repositories import CircuitAnalysisDraftRepository, CircuitAttemptRepository, ProblemRepository
 from app.services.circuit_attempt_service import CircuitAttemptService, CircuitAttemptValidationError
 from app.core.user_context import request_database
 
@@ -20,6 +20,17 @@ def _problems(request: Request) -> ProblemRepository:
 
 def _attempts(request: Request) -> CircuitAttemptRepository:
     return CircuitAttemptRepository(request_database(request))
+
+
+def _drafts(request: Request) -> CircuitAnalysisDraftRepository:
+    return CircuitAnalysisDraftRepository(request_database(request))
+
+
+def _problem(problem_id: str, request: Request):
+    package = _problems(request)._get_package_internal(problem_id)
+    if package is None:
+        raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
+    return package
 
 
 @router.get("/{problem_id}/diagram", response_model=SchematicDiagram)
@@ -43,3 +54,24 @@ def get_progress(problem_id: str, request: Request) -> CircuitProgress:
     if _problems(request)._get_package_internal(problem_id) is None:
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
     return _attempts(request).progress(problem_id)
+
+
+@router.get("/{problem_id}/analysis-draft", response_model=CircuitAnalysisDraftResponse | None)
+def get_analysis_draft(problem_id: str, request: Request):
+    _problem(problem_id, request)
+    return _drafts(request).get(problem_id)
+
+
+@router.put("/{problem_id}/analysis-draft", response_model=CircuitAnalysisDraftResponse)
+def save_analysis_draft(problem_id: str, draft: CircuitAnalysisDraftUpdate, request: Request):
+    package = _problem(problem_id, request)
+    if package.manifest.version != draft.problem_version:
+        raise HTTPException(status_code=409, detail="문제 버전이 변경되었습니다. 분석 메모를 다시 확인해 주세요.")
+    return _drafts(request).save(problem_id, draft)
+
+
+@router.delete("/{problem_id}/analysis-draft", status_code=204)
+def delete_analysis_draft(problem_id: str, request: Request):
+    _problem(problem_id, request)
+    _drafts(request).delete(problem_id)
+    return Response(status_code=204)

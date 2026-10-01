@@ -9,6 +9,12 @@ frontend/coverage/
 frontend/vite.config.js
 frontend/vite.config.d.ts
 data/dev/
+data/ui-simulation/
+user-data/
+service-config/
+user-data-backups/
+restored-data/
+releases/
 logs/*.log*
 *.db
 .env
@@ -16,3 +22,15 @@ dist/
 build/
 *.spec
 setup.log
+
+# Never publish local answer material or operating credentials.
+docs/private/
+data/user-answer*
+*.sqlite
+*.sqlite3
+*.pem
+*.key
+*.pfx
+*.p12
+.env.*
+!.env.example

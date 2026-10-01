@@ -7,7 +7,7 @@
   "simulation_mode": "actual_wiring",
   "device_models": {
     "MCCB": "mccb_3p_training",
-    "F": "fuse_single_pole_training",
+    "F": "fuse_dual_4terminal_training",
     "X1": "auxiliary_relay_8p_training_partial",
     "X2": "auxiliary_relay_8p_training_partial",
     "T1": "timer_8p_on_delay_training_partial",

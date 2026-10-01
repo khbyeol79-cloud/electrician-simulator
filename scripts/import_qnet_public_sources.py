@@ -45,8 +45,8 @@ TITLES = {
 
 LAYOUTS = {
     "001": (["F", "EOCR", "MCCB", "X", "FR"], ["T", "FLS", "MC1", "MC2"]),
-    "002": (["EOCR", "MCCB", "X", "FR"], ["MC1", "MC2", "T", "FLS"]),
-    "003": (["MCCB", "EOCR", "F", "FR"], ["T", "FLS", "MC1", "MC2"]),
+    "002": (["EOCR", "MCCB", "F", "X", "FR"], ["MC1", "MC2", "T", "FLS"]),
+    "003": (["MCCB", "EOCR", "F", "X", "FR"], ["T", "FLS", "MC1", "MC2"]),
     "004": (["MCCB", "EOCR", "FR", "X", "F"], ["FLS", "MC1", "MC2", "T"]),
     "005": (["EOCR", "F", "MCCB", "FR", "X"], ["MC1", "MC2", "FLS", "T"]),
     "006": (["EOCR", "MCCB", "F", "X", "FR"], ["FLS", "T", "MC1", "MC2"]),
@@ -93,12 +93,13 @@ def replace_prefix(value: str, old: str, new: str) -> str:
     return new + value[len(old):] if value == old or value.startswith(old + "-") else value
 
 
-def move_item(source: dict, item_id: str, x: float, y: float) -> dict:
+def move_item(source: dict, item_id: str, x: float, y: float, row: int) -> dict:
     item = copy.deepcopy(source)
     old_id = item["item_id"]
     dx, dy = x - item["x"], y - item["y"]
     item["item_id"] = item_id
-    item["label"] = "FUSE" if item_id == "F" else item_id
+    item["label"] = item_id
+    item["row"] = row
     item["x"], item["y"] = x, y
     for pin in item["pins"]:
         pin["terminal_id"] = replace_prefix(pin["terminal_id"], old_id, item_id)
@@ -115,6 +116,7 @@ def board_for(number: str) -> dict:
     templates = {item["item_id"]: item for item in base["items"]}
     board = {key: copy.deepcopy(value) for key, value in base.items() if key != "items"}
     board["board_id"] = f"qnet_public_{number}_board_v1"
+    board["layout_mode"] = "fixed"
     top, bottom = LAYOUTS[number]
     top_x = [90, 315, 540, 765, 990] if len(top) == 5 else [130, 405, 680, 955]
     bottom_x = [90, 390, 690, 990]
@@ -127,10 +129,18 @@ def board_for(number: str) -> dict:
         return "X1"
 
     items = [copy.deepcopy(templates["TB5"])]
-    items.extend(move_item(templates[template_id(device)], device, x, 210) for device, x in zip(top, top_x))
-    items.extend(move_item(templates[template_id(device)], device, x, 500) for device, x in zip(bottom, bottom_x))
+    items.extend(move_item(templates[template_id(device)], device, x, 210, 1) for device, x in zip(top, top_x))
+    items.extend(move_item(templates[template_id(device)], device, x, 500, 2) for device, x in zip(bottom, bottom_x))
     items.append(copy.deepcopy(templates["TB6"]))
     board["items"] = items
+    board["forbidden_areas"] = [
+        {
+            "area_id": f"{item['item_id']}_body",
+            "x": item["x"], "y": item["y"],
+            "width": item["width"], "height": item["height"],
+        }
+        for item in items
+    ]
     return board
 
 
@@ -257,16 +267,39 @@ def create_package(number: str, pdf: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("pdf_directory", type=Path)
+    parser.add_argument(
+        "--boards-only", action="store_true",
+        help="기존 문제 정의를 보존하고 PDF 6쪽 검수 배치만 동기화한다.",
+    )
+    parser.add_argument(
+        "--problem", action="append", choices=sorted(LAYOUTS),
+        help="처리할 공개문제 번호. 생략하면 001~018 전체를 처리한다.",
+    )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="기존 문제 패키지를 삭제하고 전체 재생성하는 작업을 명시적으로 허용한다.",
+    )
     args = parser.parse_args()
+    numbers = args.problem or sorted(LAYOUTS)
+    if args.boards_only:
+        for number in numbers:
+            target = PROBLEMS / f"qnet_electrician_practical_{number}" / "board.json"
+            if not target.exists():
+                raise SystemExit(f"{number}: 기존 board.json을 찾을 수 없습니다.")
+            write_json(target, board_for(number))
+            print(f"[배치 동기화] {number} PDF 6쪽")
+        return 0
+    if not args.force:
+        raise SystemExit("전체 문제 패키지 재생성은 기존 기능 정의를 덮어씁니다. 실행하려면 --force를 지정하세요.")
     records = []
-    for index in range(1, 19):
-        number = f"{index:03d}"
+    for number in numbers:
         matches = sorted(args.pdf_directory.glob(f"전기기능사-{number}-A4, 2025-08-04.pdf"))
         if len(matches) != 1:
             raise SystemExit(f"{number}: 원본 PDF를 정확히 1개 찾을 수 있어야 합니다.")
         records.append(create_package(number, matches[0]))
         print(f"[생성] {number} {TITLES[number]}")
-    write_json(ROOT / "catalog" / "qnet_public_sources.json", {"schema_version": "1.0", "edition": "2025-08-04", "records": records})
+    if numbers == sorted(LAYOUTS):
+        write_json(ROOT / "catalog" / "qnet_public_sources.json", {"schema_version": "1.0", "edition": "2025-08-04", "records": records})
     return 0
 
 

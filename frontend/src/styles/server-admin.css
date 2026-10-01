@@ -1,0 +1,45 @@
+.admin-shell { grid-template-columns: minmax(0, 1fr); }
+.admin-shell > * { min-width: 0; }
+.server-admin { max-width: 1500px; margin: 0 auto; padding: 20px; color: #16304b; overflow: auto; height: 100%; box-sizing: border-box; }
+.admin-title { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 20px; }
+.admin-title h2 { margin: 4px 0 8px; font-size: 26px; }
+.admin-title p { margin: 0; }
+.admin-eyebrow { color: #176459; font-size: 12px; font-weight: 700; letter-spacing: .1em; }
+.admin-title > div:last-child { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.server-admin button { border: 1px solid #bed0e3; background: white; color: #164577; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-weight: 600; }
+.server-admin button:disabled { opacity: .45; cursor: not-allowed; }
+.server-admin button:focus-visible, .server-admin input:focus-visible { outline: 3px solid #7eabec; outline-offset: 2px; }
+.admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.admin-stats article { padding: 20px; background: #102c48; color: white; border-radius: 10px; display: grid; gap: 8px; }
+.admin-stats article strong { font-size: 25px; }
+.admin-stats article span, .admin-stats article small { color: #c6d7e9; }
+.admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.admin-panel { background: #fff; padding: 22px; border: 1px solid #d4e1ee; border-radius: 10px; margin-bottom: 18px; min-width: 0; }
+.admin-panel h3 { margin: 0 0 16px; font-size: 18px; }
+.admin-panel p, .admin-panel li { font-size: 14px; line-height: 1.65; }
+.admin-panel code { overflow-wrap: anywhere; }
+.admin-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: #f1f5fa; border-radius: 6px; font-size: 12px; }
+.admin-panel hr { border: 0; border-top: 1px solid #e0e8f2; margin: 22px 0; }
+.admin-panel fieldset { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; border: 0; padding: 0; margin: 20px 0; }
+.admin-panel label { display: grid; gap: 6px; font-weight: 600; font-size: 13px; flex: 1; min-width: 110px; }
+.admin-panel input { width: 100%; box-sizing: border-box; min-height: 38px; border: 1px solid #b9ccdf; border-radius: 5px; padding: 8px; }
+.admin-panel button[type=submit], .admin-switch button { background: #165cca; color: white; border-color: #165cca; }
+.admin-panel summary { cursor: pointer; font-weight: 600; color: #285680; line-height: 1.6; }
+.admin-help { color: #617589; }
+.admin-notice, .admin-error, .admin-success { padding: 12px 16px; border-radius: 6px; background: #fff5dd; color: #774b0b; font-size: 14px; line-height: 1.6; }
+.admin-error { background: #fff0f0; color: #ae2525; }
+.admin-success { background: #e9f6ef; color: #206144; }
+.admin-switch { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.admin-switch p { margin: 6px 0; }
+.admin-path { display: block; background: #edf4fa; padding: 12px; border-radius: 5px; }
+.admin-table-scroll { overflow-x: auto; }
+.server-admin table { border-collapse: collapse; width: 100%; text-align: left; font-size: 13px; }
+.server-admin th { background: #f0f5fa; white-space: nowrap; }
+.server-admin td, .server-admin th { padding: 12px 14px; border-bottom: 1px solid #e1e9f2; line-height: 1.6; }
+.admin-audit { padding-left: 18px; overflow-wrap: anywhere; }
+.admin-account-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.admin-password-dialog { max-height: 90vh; overflow: auto; }
+.admin-password-dialog label { display: grid; gap: 5px; margin: 0; }
+.admin-password-dialog input { min-height: 38px; width: 100%; border: 1px solid #bed0e3; border-radius: 5px; padding: 8px; }
+@media (max-width: 900px) { .admin-grid { grid-template-columns: 1fr; gap: 0; } .admin-stats { grid-template-columns: repeat(2, 1fr); } .admin-title { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 480px) { .server-admin { padding: 12px; } .admin-panel { padding: 16px; } .admin-stats { gap: 8px; } .admin-stats article { padding: 14px; } }

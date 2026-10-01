@@ -226,6 +226,10 @@ class CatalogService:
         ]
         if model.timer:
             generated_suffixes.append(model.timer.id_suffix)
+        if model.flasher:
+            generated_suffixes.append(model.flasher.id_suffix)
+        if model.level_relay:
+            generated_suffixes.append(model.level_relay.id_suffix)
         duplicate_suffixes = self._duplicates(generated_suffixes)
         if duplicate_suffixes:
             raise fail(
@@ -254,6 +258,10 @@ class CatalogService:
                 raise fail(f"contacts[{contact_index}].actuation", "수동 접점에 control 정의가 없습니다.")
             if contact.actuation == "protection" and model.protection is None:
                 raise fail(f"contacts[{contact_index}].actuation", "보호 접점에 protection 정의가 없습니다.")
+            if contact.actuation == "flasher" and model.flasher is None:
+                raise fail(f"contacts[{contact_index}].actuation", "플리커 접점에 flasher 정의가 없습니다.")
+            if contact.actuation == "level" and model.level_relay is None:
+                raise fail(f"contacts[{contact_index}].actuation", "수위 접점에 level_relay 정의가 없습니다.")
 
         connection_pairs: set[tuple[str, str]] = set()
         for connection_index, connection in enumerate(model.intrinsic_connections):
@@ -272,6 +280,12 @@ class CatalogService:
             contact = contact_map.get(model.control.contact_key)
             if contact is None or contact.actuation != "manual":
                 raise fail("control.contact_key", "수동 조작 접점을 참조해야 합니다.")
+            if model.control.alternate_contact_key:
+                alternate = contact_map.get(model.control.alternate_contact_key)
+                if model.control.control_type != "selector":
+                    raise fail("control.alternate_contact_key", "대체 접점은 셀렉터에만 지정할 수 있습니다.")
+                if alternate is None or alternate.actuation != "manual":
+                    raise fail("control.alternate_contact_key", "수동 조작 대체 접점을 참조해야 합니다.")
         if model.timer:
             if model.timer.coil_key not in coil_map:
                 raise fail("timer.coil_key", "존재하지 않는 타이머 코일을 참조합니다.")
@@ -282,6 +296,27 @@ class CatalogService:
                 contact = contact_map.get(key)
                 if contact is None or contact.actuation != "timer" or contact.controlled_by_key != model.timer.timer_key:
                     raise fail(f"timer.timed_contact_keys[{timed_index}]", "올바른 계시 접점을 참조하지 않습니다.")
+        if model.flasher:
+            if model.flasher.coil_key not in coil_map:
+                raise fail("flasher.coil_key", "존재하지 않는 플리커 코일을 참조합니다.")
+            interval = property_map.get(model.flasher.interval_property_key)
+            if interval is None or interval.value_type != "integer":
+                raise fail("flasher.interval_property_key", "정수형 점멸주기 설정을 참조해야 합니다.")
+            for contact_index, key in enumerate(model.flasher.contact_keys):
+                contact = contact_map.get(key)
+                if contact is None or contact.actuation != "flasher" or contact.controlled_by_key != model.flasher.flasher_key:
+                    raise fail(f"flasher.contact_keys[{contact_index}]", "올바른 플리커 접점을 참조하지 않습니다.")
+        if model.level_relay:
+            for field_name in ("supply_terminal_a_key", "supply_terminal_b_key"):
+                if getattr(model.level_relay, field_name) not in terminals:
+                    raise fail(f"level_relay.{field_name}", "존재하지 않는 전원 단자를 참조합니다.")
+            for key in model.level_relay.electrode_terminal_keys:
+                if key not in terminals:
+                    raise fail("level_relay.electrode_terminal_keys", f"존재하지 않는 전극 단자 키 {key}를 참조합니다.")
+            for contact_index, key in enumerate(model.level_relay.contact_keys):
+                contact = contact_map.get(key)
+                if contact is None or contact.actuation != "level" or contact.controlled_by_key != model.level_relay.level_relay_key:
+                    raise fail(f"level_relay.contact_keys[{contact_index}]", "올바른 수위 접점을 참조하지 않습니다.")
         if model.indicator:
             for field_name in ("terminal_a_key", "terminal_b_key"):
                 if getattr(model.indicator, field_name) not in terminals:
@@ -289,6 +324,10 @@ class CatalogService:
             color = property_map.get(model.indicator.display_color_property_key)
             if color is None or color.value_type != "color":
                 raise fail("indicator.display_color_property_key", "색상 설정을 참조해야 합니다.")
+        if model.audible_output:
+            for field_name in ("terminal_a_key", "terminal_b_key"):
+                if getattr(model.audible_output, field_name) not in terminals:
+                    raise fail(f"audible_output.{field_name}", "존재하지 않는 가청출력 단자를 참조합니다.")
         if model.motor:
             for key in model.motor.phase_terminal_keys:
                 if key not in terminals:
@@ -305,6 +344,8 @@ class CatalogService:
             "coil": bool(model.coils),
             "relay_contacts": any(item.actuation == "coil" for item in model.contacts),
             "timed_contacts": model.timer is not None,
+            "flashing_contacts": model.flasher is not None,
+            "level_control": model.level_relay is not None,
             "manual_control": bool(
                 model.control and model.control.control_type in {"pushbutton", "selector"}
             ),
@@ -312,6 +353,7 @@ class CatalogService:
                 model.control and model.control.control_type == "limit_switch"
             ),
             "indicator": model.indicator is not None,
+            "audible_output": model.audible_output is not None,
             "three_phase_load": model.motor is not None,
             "overload_protection": model.protection is not None,
         }

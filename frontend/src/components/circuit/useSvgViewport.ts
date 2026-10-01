@@ -1,81 +1,97 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-type SvgViewportOptions = {
-  minZoom?: number
-  maxZoom?: number
-  wheelStep?: number
-  panSpeed?: number
-  fitZoom?: number
-  mapClientToViewBox?: boolean
-}
+type Point = { x: number; y: number }
 
-export function calculatePanDelta({ dx, dy, zoom, panSpeed, clientWidth, clientHeight, viewBoxWidth, viewBoxHeight, mapClientToViewBox }: {
-  dx: number
-  dy: number
-  zoom: number
-  panSpeed: number
-  clientWidth: number
-  clientHeight: number
-  viewBoxWidth: number
-  viewBoxHeight: number
-  mapClientToViewBox: boolean
+// translate(pan) precedes scale(zoom): pan is in root SVG units, not zoomed units.
+// preserveAspectRatio="meet" uses one scale for both axes, including letterboxing.
+export function calculatePanDelta({ dx, dy, clientWidth, clientHeight, viewBoxWidth, viewBoxHeight }: {
+  dx: number; dy: number; clientWidth: number; clientHeight: number; viewBoxWidth: number; viewBoxHeight: number
 }) {
-  const scaleX = mapClientToViewBox && clientWidth > 0 && viewBoxWidth > 0 ? viewBoxWidth / clientWidth : 1
-  const scaleY = mapClientToViewBox && clientHeight > 0 && viewBoxHeight > 0 ? viewBoxHeight / clientHeight : 1
-  return { x: (dx * scaleX / zoom) * panSpeed, y: (dy * scaleY / zoom) * panSpeed }
+  const scale = clientWidth > 0 && clientHeight > 0 ? Math.max(viewBoxWidth / clientWidth, viewBoxHeight / clientHeight) : 1
+  return { x: dx * scale, y: dy * scale }
 }
 
-export function useSvgViewport({ minZoom = 0.65, maxZoom = 2.5, wheelStep = 0.1, panSpeed = 1, fitZoom = 0.82, mapClientToViewBox = false }: SvgViewportOptions = {}) {
-  const [zoom, setZoom] = useState(1)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
-  const drag = useRef<{ pointerId: number; x: number; y: number; moved: boolean } | undefined>(undefined)
+function viewBox(svg: SVGSVGElement) {
+  const [x = 0, y = 0, width = 1, height = 1] = (svg.getAttribute('viewBox') ?? '').trim().split(/\s+/).map(Number)
+  return { x, y, width, height }
+}
+
+function svgPoint(svg: SVGSVGElement, clientX: number, clientY: number): Point {
+  const box = viewBox(svg)
+  const rect = svg.getBoundingClientRect()
+  const scale = rect.width > 0 && rect.height > 0 ? Math.max(box.width / rect.width, box.height / rect.height) : 1
+  return {
+    x: box.x + box.width / 2 + (clientX - rect.left - rect.width / 2) * scale,
+    y: box.y + box.height / 2 + (clientY - rect.top - rect.height / 2) * scale,
+  }
+}
+
+export function useSvgViewport({ minZoom = .65, maxZoom = 4, wheelStep = .15 } = {}) {
+  const svgRef = useRef<SVGSVGElement>(null)
+  const [{ zoom, pan }, setView] = useState({ zoom: 1, pan: { x: 0, y: 0 } })
+  const [isDragging, setIsDragging] = useState(false)
+  const drag = useRef<{ pointerId: number; x: number; y: number; pan: Point; moved: boolean } | null>(null)
   const lastDragMoved = useRef(false)
 
-  const zoomBy = useCallback((delta: number) => setZoom((value) => Math.min(maxZoom, Math.max(minZoom, value + delta))), [maxZoom, minZoom])
-  const reset = useCallback(() => { setZoom(1); setPan({ x: 0, y: 0 }) }, [])
-  const fit = useCallback(() => { setZoom(fitZoom); setPan({ x: 140, y: 70 }) }, [fitZoom])
-
-  const pointerDown = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
-    const target = event.target as EventTarget & { closest?: (selector: string) => Element | null }
-    if (target.closest?.('.element-hitbox')) return
-    drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false }
-    event.currentTarget.setPointerCapture?.(event.pointerId)
-  }, [])
-  const pointerMove = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
-    if (!drag.current || drag.current.pointerId !== event.pointerId) return
-    const dx = event.clientX - drag.current.x
-    const dy = event.clientY - drag.current.y
-    if (Math.abs(dx) + Math.abs(dy) > 3) drag.current.moved = true
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const viewBox = event.currentTarget.viewBox.baseVal
-    const delta = calculatePanDelta({
-      dx, dy, zoom, panSpeed,
-      clientWidth: bounds.width, clientHeight: bounds.height,
-      viewBoxWidth: viewBox.width, viewBoxHeight: viewBox.height,
-      mapClientToViewBox,
+  const zoomBy = useCallback((delta: number, anchor?: Point) => {
+    const box = svgRef.current ? viewBox(svgRef.current) : { x: 0, y: 0, width: 0, height: 0 }
+    const pivot = anchor ?? { x: box.x + box.width / 2, y: box.y + box.height / 2 }
+    setView(current => {
+      const next = Math.min(maxZoom, Math.max(minZoom, current.zoom + delta))
+      const ratio = next / current.zoom
+      return { zoom: next, pan: { x: pivot.x - (pivot.x - current.pan.x) * ratio, y: pivot.y - (pivot.y - current.pan.y) * ratio } }
     })
-    setPan((value) => ({ x: value.x + delta.x, y: value.y + delta.y }))
-    drag.current.x = event.clientX
-    drag.current.y = event.clientY
-  }, [mapClientToViewBox, panSpeed, zoom])
-  const pointerUp = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
-    const currentDrag = drag.current
-    if (currentDrag && currentDrag.pointerId === event.pointerId) {
-      lastDragMoved.current = currentDrag.moved
-      drag.current = undefined
-      event.currentTarget.releasePointerCapture?.(event.pointerId)
+  }, [maxZoom, minZoom])
+  const reset = useCallback(() => setView({ zoom: 1, pan: { x: 0, y: 0 } }), [])
+
+  // React's delegated wheel listener may be passive: use a local non-passive one
+  // so zooming a diagram does not simultaneously scroll its surrounding panel.
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!svg) return
+    const wheel = (event: WheelEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+      zoomBy(event.deltaY < 0 ? wheelStep : -wheelStep, svgPoint(svg, event.clientX, event.clientY))
     }
-  }, [])
-  const wheel = useCallback((event: React.WheelEvent<SVGSVGElement>) => {
-    event.preventDefault()
-    zoomBy(event.deltaY < 0 ? wheelStep : -wheelStep)
+    svg.addEventListener('wheel', wheel, { passive: false })
+    return () => svg.removeEventListener('wheel', wheel)
   }, [wheelStep, zoomBy])
 
+  const pointerDown = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
+    if (event.button !== 0) return
+    event.preventDefault() // Prevent text selection and the browser's image drag UI.
+    lastDragMoved.current = false
+    drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, pan, moved: false }
+    // Do not capture a simple click: it must still reach the contact/annotation.
+  }, [pan])
+  const pointerMove = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
+    const current = drag.current
+    if (!current || current.pointerId !== event.pointerId) return
+    const dx = event.clientX - current.x, dy = event.clientY - current.y
+    if (!current.moved && Math.hypot(dx, dy) < 5) return
+    event.preventDefault()
+    if (!current.moved) {
+      current.moved = true
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+      setIsDragging(true)
+    }
+    const rect = event.currentTarget.getBoundingClientRect(), box = viewBox(event.currentTarget)
+    const delta = calculatePanDelta({ dx, dy, clientWidth: rect.width, clientHeight: rect.height, viewBoxWidth: box.width, viewBoxHeight: box.height })
+    setView(value => ({ ...value, pan: { x: current.pan.x + delta.x, y: current.pan.y + delta.y } }))
+  }, [])
+  const pointerUp = useCallback((event: React.PointerEvent<SVGSVGElement>) => {
+    const current = drag.current
+    if (!current || current.pointerId !== event.pointerId) return
+    lastDragMoved.current = current.moved || event.type === 'pointercancel'
+    drag.current = null
+    setIsDragging(false)
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+  }, [])
   const consumeDragClick = useCallback(() => {
     const moved = lastDragMoved.current
     lastDragMoved.current = false
     return moved
   }, [])
-
-  return { zoom, pan, zoomBy, reset, fit, pointerDown, pointerMove, pointerUp, wheel, consumeDragClick }
+  return { svgRef, zoom, pan, isDragging, zoomBy, reset, fit: reset, pointerDown, pointerMove, pointerUp, consumeDragClick }
 }

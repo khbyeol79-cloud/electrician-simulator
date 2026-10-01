@@ -227,9 +227,27 @@ def create_from_template(template_id: str, request: Request, payload: CreateFrom
 
 @router.get("/{workspace_id}", response_model=FreeCircuitWorkspaceResponse)
 def get_workspace(workspace_id: WorkspaceId, request: Request):
-    workspace = _repository(request).get(workspace_id)
+    repository = _repository(request)
+    workspace = repository.get(workspace_id)
     if workspace is None:
         raise HTTPException(status_code=404, detail="자유회로 작업공간을 찾을 수 없습니다.")
+    has_removed_single_fuse = (
+        workspace.assembly is not None
+        and workspace.assembly.mode == "editable"
+        and any(
+            item.palette_id == "fuse" or item.model_id == "fuse_single_pole_training"
+            for item in workspace.assembly.installed_devices
+        )
+    )
+    if has_removed_single_fuse:
+        problem_repository = getattr(request.app.state, "problem_repository", None)
+        if problem_repository is None:
+            raise HTTPException(status_code=503, detail="기구 구성을 준비할 수 없습니다.")
+        try:
+            workspace = FreeCircuitAssemblyService(problem_repository).compose(workspace)
+        except FreeCircuitAssemblyError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        workspace = repository.save(workspace_id, workspace)
     return workspace
 
 
@@ -333,6 +351,8 @@ def create_free_circuit_session(workspace_id: WorkspaceId, request: Request):
             terminal_aliases=terminal_aliases,
             catalog_composed=runtime.catalog_composed,
             composition_warnings=runtime.warnings,
+            session_type="free_circuit_session",
+            gradable=False,
         )
     except SimulationDefinitionError as exc:
         raise HTTPException(status_code=422, detail=f"자유회로 정의를 확인해 주세요. {exc}") from exc
@@ -362,6 +382,8 @@ def get_diagnostics(workspace_id: WorkspaceId, request: Request):
             circuit=runtime.circuit, definition=runtime.operation, connections=workspace.connections,
             catalog_composed=runtime.catalog_composed,
             composition_warnings=runtime.warnings,
+            session_type="free_circuit_session",
+            gradable=False,
         )
         diagnostics.extend(FreeCircuitDiagnostic(
             severity=fault.severity, code=fault.code,

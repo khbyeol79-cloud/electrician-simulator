@@ -482,6 +482,24 @@
         "enabled": true
       },
       {
+        "terminal_id": "F-3",
+        "device_id": "F",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "control",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
+        "terminal_id": "F-4",
+        "device_id": "F",
+        "pin_number": null,
+        "terminal_type": "screw_terminal",
+        "electrical_role": "control",
+        "max_connections": 2,
+        "enabled": true
+      },
+      {
         "terminal_id": "EOCR-L1",
         "device_id": "EOCR",
         "pin_number": 1,
@@ -1105,6 +1123,10 @@
       {
         "from": "F-1",
         "to": "F-2"
+      },
+      {
+        "from": "F-3",
+        "to": "F-4"
       },
       {
         "from": "EOCR-L1",

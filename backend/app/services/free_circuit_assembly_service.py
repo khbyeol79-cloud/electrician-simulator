@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from app.domain.board_definition import BoardDefinition, ForbiddenArea
+from app.domain.board_definition import (
+    BoardDefinition,
+    BoardItem,
+    BoardPin,
+    BoardRect,
+    ForbiddenArea,
+)
 from app.domain.device_behavior import DeviceInstanceCreate, DeviceInstanceDefinition
 from app.domain.free_circuit import (
     FreeCircuitAssembly,
@@ -50,9 +56,14 @@ class _PaletteDefinition:
 
 _PALETTE = (
     _PaletteDefinition("mccb", "mccb_3p_training", "MCCB", "보호·전원", "internal", "internal_upper", "MCCB", "MCCB", 1),
-    _PaletteDefinition("fuse", "fuse_single_pole_training", "FUSE", "보호·전원", "internal", "internal_upper", "F", "F", 1),
+    _PaletteDefinition(
+        "dual_fuse", "fuse_dual_4terminal_training", "2회로 4단자 FUSE",
+        "보호·전원", "internal", "internal_upper", None, "F", 1,
+    ),
     _PaletteDefinition("relay_8p", "auxiliary_relay_8p_training_partial", "8P 보조릴레이", "제어", "internal", "internal_upper", "X1", "X"),
     _PaletteDefinition("timer_8p", "timer_8p_on_delay_training_partial", "8P 온딜레이 타이머", "제어", "internal", "internal_lower", "T1", "T", default_properties={"delay_ms": 1000}),
+    _PaletteDefinition("flasher_8p", "flasher_relay_8p_training", "8P 플리커 릴레이", "제어", "internal", "internal_lower", "T1", "FR", default_properties={"flash_interval_ms": 1000}),
+    _PaletteDefinition("level_relay_8p", "floatless_level_switch_8p_training", "8P 무수위 계전기", "제어", "internal", "internal_upper", "X1", "FLS"),
     _PaletteDefinition("contactor_12p", "magnetic_contactor_12p_training", "12P 전자접촉기", "동력", "internal", "internal_lower", "MC1", "MC"),
     _PaletteDefinition("eocr", "eocr_12p_training", "EOCR", "보호·전원", "internal", "internal_upper", "EOCR", "EOCR", 1),
     _PaletteDefinition("power", "power_3p_control_training", "3상·제어 전원", "외부", "external", "external_top", None, "PWR", 1),
@@ -60,6 +71,8 @@ _PALETTE = (
     _PaletteDefinition("pb_nc", "push_button_nc", "NC Push Button", "외부", "external", "external_top", None, "PB"),
     _PaletteDefinition("ls_no", "limit_switch_no", "NO Limit Switch", "외부", "external", "external_top", None, "LS"),
     _PaletteDefinition("ls_nc", "limit_switch_nc", "NC Limit Switch", "외부", "external", "external_top", None, "LS"),
+    _PaletteDefinition("selector_auto_manual", "selector_switch_auto_manual", "자동·수동 선택스위치", "외부", "external", "external_top", None, "SS"),
+    _PaletteDefinition("buzzer", "buzzer_two_terminal", "부저", "외부", "external", "external_bottom", None, "BZ"),
     _PaletteDefinition("lamp_green", "indicator_lamp_two_terminal", "녹색 표시등", "외부", "external", "external_bottom", None, "GL", default_properties={"display_color": "green"}),
     _PaletteDefinition("lamp_red", "indicator_lamp_two_terminal", "적색 표시등", "외부", "external", "external_bottom", None, "RL", default_properties={"display_color": "red"}),
     _PaletteDefinition("motor", "motor_three_phase", "3상 Motor", "외부", "external", "external_bottom", None, "M", 1),
@@ -217,6 +230,12 @@ class FreeCircuitAssemblyService:
     def compose(self, workspace: FreeCircuitWorkspaceUpdate) -> FreeCircuitWorkspaceUpdate:
         if workspace.assembly is None:
             return workspace
+        # 제거된 1회로 FUSE가 과거 작업공간에 남아 있으면 기구 ID와 기존
+        # 1-2 결선을 유지한 채 현재의 2회로 4단자 모델로 승격한다.
+        for installed in workspace.assembly.installed_devices:
+            if installed.palette_id == "fuse" or installed.model_id == "fuse_single_pole_training":
+                installed.palette_id = "dual_fuse"
+                installed.model_id = "fuse_dual_4terminal_training"
         board = self.empty_board()
         fragments: list[tuple[FreeCircuitInstalledDevice, DeviceInstanceDefinition]] = []
         for installed in workspace.assembly.installed_devices:
@@ -243,7 +262,10 @@ class FreeCircuitAssemblyService:
         )
         controls = [value for _, fragment in fragments for value in fragment.controls]
         timers = [value for _, fragment in fragments for value in fragment.timers]
+        flashers = [value for _, fragment in fragments for value in fragment.flashers]
+        level_relays = [value for _, fragment in fragments for value in fragment.level_relays]
         indicators = [value for _, fragment in fragments for value in fragment.indicators]
+        audible_outputs = [value for _, fragment in fragments for value in fragment.audible_outputs]
         contactors = [value for _, fragment in fragments for value in fragment.contactors]
         intrinsic = [value for _, fragment in fragments for value in fragment.intrinsic_connections]
         power_fragment = next((fragment for installed, fragment in fragments if installed.palette_id == "power"), None)
@@ -263,12 +285,17 @@ class FreeCircuitAssemblyService:
         protections = [OperationProtectionDevice(
             protection_device_id=installed.instance_id, label=installed.label,
             protected_coil_ids=coil_ids, protected_motor_ids=[motor.motor_id for motor in motors],
+            protection_contact_ids=[item.contact_id for item in fragment.contacts],
+            supply_terminal_a_id=fragment.terminal_ids.get("supply_a"),
+            supply_terminal_b_id=fragment.terminal_ids.get("supply_b"),
             reset_mode="manual",
-        ) for installed, _ in fragments if installed.palette_id == "eocr"]
+        ) for installed, fragment in fragments if installed.palette_id == "eocr"]
         workspace.operation = OperationDefinition(
             schema_version="1.0", simulation_status="functional", simulation_mode="actual_wiring",
-            power=power, controls=controls, timers=timers, indicators=indicators,
+            power=power, controls=controls, timers=timers, flashers=flashers,
+            level_relays=level_relays, indicators=indicators, audible_outputs=audible_outputs,
             motors=motors, contactors=contactors, protection_devices=protections,
+            fuse_channels=[value for _, fragment in fragments for value in fragment.fuse_channels],
             internal_connections=intrinsic,
         )
         workspace.board = board
@@ -276,17 +303,39 @@ class FreeCircuitAssemblyService:
             FixedDevicePlacement(
                 mount_device_id=installed.instance_id, label=installed.label,
                 device_type_id=fragment.device.device_type_id,
-                graphic_type=("timer" if installed.palette_id == "timer_8p" else "contactor" if installed.palette_id == "contactor_12p" else "relay"),
+                graphic_type=("timer" if installed.palette_id in {"timer_8p", "flasher_8p"} else "contactor" if installed.palette_id == "contactor_12p" else "relay"),
                 socket_id=installed.instance_id,
                 socket_type_id=fragment.device.socket_type_id,
             )
             for installed, fragment in fragments if fragment.device.socket_type_id
         ])
-        workspace.wiring_semantics = WiringSemantics(external_devices=[
+        external_devices = [
             self._external_device(installed, fragment)
             for installed, fragment in fragments
             if self._definition(installed.palette_id).mounting_kind == "external"
-        ])
+        ]
+        external_devices.extend(
+            ExternalWiringDevice(
+                device_id=f"{installed.instance_id}_ELECTRODES",
+                label=f"{installed.label} 수위전극",
+                placement="top",
+                terminals=[
+                    ExternalWiringTerminal(
+                        terminal_id=terminal_id,
+                        label=f"E{index}",
+                        terminal_role="external",
+                        max_connections=1,
+                        wire_color="yellow",
+                    )
+                    for index, terminal_id in enumerate(
+                        fragment.level_relays[0].external_electrode_terminal_ids, start=1
+                    )
+                ],
+            )
+            for installed, fragment in fragments
+            if fragment.level_relays
+        )
+        workspace.wiring_semantics = WiringSemantics(external_devices=external_devices)
         return workspace
 
     def _fragment(self, installed: FreeCircuitInstalledDevice) -> DeviceInstanceDefinition:
@@ -305,6 +354,8 @@ class FreeCircuitAssemblyService:
             raise FreeCircuitAssemblyError(str(exc)) from exc
 
     def _board_item(self, installed, fragment, definition):
+        if definition.model_id == "fuse_dual_4terminal_training":
+            return self._dual_fuse_board_item(installed, fragment)
         prototype = next((item for item in self.source_board.items if item.item_id == definition.prototype_id), None)
         if prototype is None:
             raise FreeCircuitAssemblyError(f"{definition.name}의 보드 그래픽을 찾을 수 없습니다.")
@@ -331,6 +382,41 @@ class FreeCircuitAssemblyService:
                 pin.terminal_id = f"{installed.instance_id}-{pin.number or pin.label}"
                 pin.enabled = False
         return item
+
+    def _dual_fuse_board_item(self, installed, fragment) -> BoardItem:
+        """특정 문제 보드에 의존하지 않는 공통 2회로 FUSE 그래픽."""
+        x = self.INTERNAL_X[installed.placement.column] + 40
+        y = self.INTERNAL_Y[installed.placement.zone]
+        width, height = 120.0, 150.0
+        suffixes = {
+            terminal.terminal_id.rsplit("-", 1)[-1]: terminal.terminal_id
+            for terminal in fragment.terminals
+        }
+        required = {"1", "2", "3", "4"}
+        if not required.issubset(suffixes):
+            raise FreeCircuitAssemblyError("4단자 FUSE 모델에 1·2·3·4 단자가 모두 필요합니다.")
+        pin_x = {"1": x + 35, "2": x + 35, "3": x + 85, "4": x + 85}
+        pins = [
+            BoardPin(
+                terminal_id=suffixes[number], label=number, number=int(number),
+                side="top" if number in {"1", "3"} else "bottom",
+                x=pin_x[number], y=y if number in {"1", "3"} else y + height,
+                max_connections=2,
+            )
+            for number in ("1", "3", "2", "4")
+        ]
+        return BoardItem(
+            item_id=installed.instance_id,
+            label=installed.label,
+            item_type="component",
+            row=1 if installed.placement.zone == "internal_upper" else 2,
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+            pins=pins,
+            label_area=BoardRect(x=x + 44, y=y + 64, width=32, height=22),
+        )
 
     @staticmethod
     def _external_device(installed, fragment):

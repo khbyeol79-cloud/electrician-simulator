@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.domain.free_circuit import FreeCircuitTemplate
+from app.domain.board_definition import BoardItem, BoardPin, BoardRect
 from app.domain.operation_definition import (
     OperationContactor,
     OperationDefinition,
@@ -108,6 +109,7 @@ class FreeCircuitTemplateService:
 
         board = package.board.model_copy(deep=True)
         board.board_id = "free_basic_board_v1"
+        self._upgrade_basic_board_fuse(board)
         devices = self._devices(config, board)
         circuit = CircuitDefinition(
             schema_version="1.0",
@@ -182,6 +184,30 @@ class FreeCircuitTemplateService:
             device_layout=package.problem.device_layout,
             wiring_semantics=self._wiring_semantics(),
         )
+
+    @staticmethod
+    def _upgrade_basic_board_fuse(board) -> None:
+        """New workspaces always expose the physical two-channel 4-terminal FUSE."""
+        old = next((item for item in board.items if item.item_id == "F"), None)
+        if old is None:
+            raise FreeCircuitTemplateError("기본보드 FUSE 배치를 찾을 수 없습니다.")
+        x, y, width, height = old.x, old.y, 120.0, 150.0
+        pin_x = {"1": x + 35, "2": x + 35, "3": x + 85, "4": x + 85}
+        upgraded = BoardItem(
+            item_id="F", label="F", item_type="component", row=old.row,
+            x=x, y=y, width=width, height=height,
+            pins=[
+                BoardPin(
+                    terminal_id=f"F-{number}", label=number, number=int(number),
+                    side="top" if number in {"1", "3"} else "bottom",
+                    x=pin_x[number], y=y if number in {"1", "3"} else y + height,
+                    max_connections=2,
+                )
+                for number in ("1", "3", "2", "4")
+            ],
+            label_area=BoardRect(x=x + 44, y=y + 64, width=32, height=22),
+        )
+        board.items[board.items.index(old)] = upgraded
 
     def _legacy(self, template_id: str) -> FreeCircuitTemplate:
         package = self.repository._get_package_internal(template_id)

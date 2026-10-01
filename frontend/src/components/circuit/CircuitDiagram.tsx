@@ -1,6 +1,9 @@
+import { useRef, type ReactNode } from 'react'
 import type { CircuitAttemptResult, DiagramElement, SchematicDiagram, SocketQuestion } from '../../api/client'
 import type { CircuitDraft } from '../../features/circuit/circuitDraft'
 import { useSvgViewport } from './useSvgViewport'
+import type { ContactTarget, DiagramAnnotationMarker } from '../../features/circuit/analysisAnnotations'
+export type { DiagramAnnotationMarker } from '../../features/circuit/analysisAnnotations'
 
 function ElementShape({ element }: { element: DiagramElement }) {
   const { x, y, width: w, height: h } = element
@@ -57,12 +60,17 @@ function AnswerMarkers({ element, question, draft, result }: { element: DiagramE
   </g>
 }
 
-export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, showToolbar = !compact, ariaLabel = '시퀀스 회로도', backgroundHref }: {
+export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, result, onSelect, onClear, readOnly = false, compact = false, showToolbar = !compact, ariaLabel = '시퀀스 회로도', backgroundHref, annotationMarkers = [], contactTargets = [], onContactSelect, annotationMode = false, selectedAnnotationId, onCanvasAnnotate, onAnnotationSelect, overlay }: {
   diagram: SchematicDiagram; questions: SocketQuestion[]; selectedQuestionId: string | null
   draft: CircuitDraft; result?: CircuitAttemptResult; onSelect: (id: string) => void; onClear: () => void
   readOnly?: boolean; compact?: boolean; showToolbar?: boolean; ariaLabel?: string; backgroundHref?: string
+  annotationMarkers?: DiagramAnnotationMarker[]; annotationMode?: boolean; selectedAnnotationId?: string | null
+  onCanvasAnnotate?: (point: { x: number; y: number }) => void; onAnnotationSelect?: (id: string) => void
+  contactTargets?: ContactTarget[]; onContactSelect?: (target: ContactTarget) => void
+  overlay?: ReactNode
 }) {
-  const viewport = useSvgViewport(compact ? { maxZoom: 4, wheelStep: 0.25, panSpeed: 2.4, mapClientToViewBox: true } : undefined)
+  const viewport = useSvgViewport({ maxZoom: 5, wheelStep: compact ? .25 : .15 })
+  const contentRef = useRef<SVGGElement>(null)
   const zoomStep = compact ? 0.3 : 0.15
   const questionMap = Object.fromEntries(questions.map((question) => [question.question_id, question]))
   return <div className={`diagram-stage${compact ? ' circuit-reference-stage' : ''}${showToolbar ? '' : ' toolbarless'}`}>
@@ -75,12 +83,27 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
       <span>✋ 드래그 이동</span>
     </div>}
     <svg
-      className="circuit-svg" role="img" aria-label={ariaLabel}
+      ref={viewport.svgRef} className={`circuit-svg${annotationMode ? ' annotation-mode' : ''}${viewport.isDragging ? ' is-panning' : ''}`} role="img" aria-label={ariaLabel}
+      onDragStart={(event) => event.preventDefault()}
       viewBox={`${diagram.view_box.x} ${diagram.view_box.y} ${diagram.view_box.width} ${diagram.view_box.height}`}
       onPointerDown={viewport.pointerDown} onPointerMove={viewport.pointerMove} onPointerUp={viewport.pointerUp} onPointerCancel={viewport.pointerUp}
-      onWheel={viewport.wheel} onClick={(event) => { if (event.target === event.currentTarget && !viewport.consumeDragClick()) onClear() }}
+      onLostPointerCapture={viewport.pointerUp} onClick={(event) => {
+        if (viewport.consumeDragClick()) return
+        if (annotationMode && onCanvasAnnotate && contentRef.current) {
+          const matrix = contentRef.current.getScreenCTM()
+          if (matrix) {
+            const point = event.currentTarget.createSVGPoint()
+            point.x = event.clientX
+            point.y = event.clientY
+            const mapped = point.matrixTransform(matrix.inverse())
+            onCanvasAnnotate({ x: Math.round(mapped.x), y: Math.round(mapped.y) })
+          }
+          return
+        }
+        if (event.target === event.currentTarget) onClear()
+      }}
     >
-      <g transform={`translate(${viewport.pan.x} ${viewport.pan.y}) scale(${viewport.zoom})`}>
+      <g ref={contentRef} transform={`translate(${viewport.pan.x} ${viewport.pan.y}) scale(${viewport.zoom})`}>
         {backgroundHref && <image href={backgroundHref} x={diagram.view_box.x} y={diagram.view_box.y} width={diagram.view_box.width} height={diagram.view_box.height} preserveAspectRatio="xMidYMid meet" />}
         {!backgroundHref && <g className="diagram-sections">{diagram.sections.map((section) => <g key={section.section_id}><rect x={section.bounds.x} y={section.bounds.y} width={section.bounds.width} height={section.bounds.height} /><text x={section.bounds.x + 18} y={section.bounds.y + 34}>{section.label}</text></g>)}</g>}
         <g className="conductor-layer">{diagram.conductors.map((wire) => <g key={wire.conductor_id} className={`conductor ${wire.line_style}`}><polyline points={wire.points.map((p) => `${p.x},${p.y}`).join(' ')} />{wire.junctions.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="6" />)}</g>)}</g>
@@ -94,6 +117,29 @@ export function CircuitDiagram({ diagram, questions, selectedQuestionId, draft, 
             <AnswerMarkers element={element} question={element.question_id ? questionMap[element.question_id] : undefined} draft={draft} result={result} />
           </g>
         })}</g>
+        {!readOnly && !annotationMode && <g className="contact-target-layer">{contactTargets.map((target, index) => <rect
+          key={target.id} className="element-hitbox contact-target" role="button" tabIndex={0}
+          aria-label={`${target.kind === 'body' ? '코일·표시등·부저 기호' : target.orientation === 'horizontal' ? '가로 접점' : '세로 접점'} ${index + 1} 번호 입력`}
+          data-contact-id={target.id} x={target.x - (target.orientation === 'horizontal' || target.kind === 'body' ? 35 : 16)} y={target.y - (target.orientation === 'horizontal' ? 16 : 35)}
+          width={target.orientation === 'horizontal' || target.kind === 'body' ? 70 : 32} height={target.orientation === 'horizontal' ? 32 : 70} rx="6"
+          onClick={(event) => { event.stopPropagation(); if (!viewport.consumeDragClick()) onContactSelect?.(target) }}
+          onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onContactSelect?.(target) } }}
+        />)}</g>}
+        <g className="analysis-annotation-layer">{annotationMarkers.map((marker) => <g
+          key={marker.id} data-annotation-id={marker.id}
+          className={`analysis-annotation-marker element-hitbox${marker.orientation ? ' paired-annotation' : ''}${selectedAnnotationId === marker.id ? ' selected' : ''}`}
+          transform={`translate(${marker.x} ${marker.y})`}
+          role={readOnly ? undefined : 'button'} tabIndex={readOnly ? undefined : 0} aria-label={`슬롯번호 ${marker.label || '미입력'}${marker.orientation ? ` / ${marker.second || '미입력'}` : ''} 선택`}
+          onClick={(event) => { event.stopPropagation(); if (!viewport.consumeDragClick() && !readOnly) onAnnotationSelect?.(marker.id) }}
+          onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onAnnotationSelect?.(marker.id) } }}
+        >{marker.orientation ? <>
+          {selectedAnnotationId === marker.id && <rect className="annotation-focus" x="-32" y="-32" width="64" height="64" rx="5" />}
+          <g className="annotation-labels" transform={`translate(${marker.offsetX ?? 0} ${marker.offsetY ?? 0})`}>
+            <text textAnchor={marker.kind === 'body' || marker.orientation === 'horizontal' ? 'middle' : 'end'} x={marker.orientation === 'horizontal' ? (marker.kind === 'body' ? -46 : -38) : marker.kind === 'body' ? 0 : -16} y={marker.orientation === 'horizontal' ? (marker.kind === 'body' ? 8 : 32) : marker.kind === 'body' ? -38 : -15}>{marker.label || (readOnly ? '' : '?')}</text>
+            <text textAnchor={marker.kind === 'body' || marker.orientation === 'horizontal' ? 'middle' : 'end'} x={marker.orientation === 'horizontal' ? (marker.kind === 'body' ? 46 : 38) : marker.kind === 'body' ? 0 : -16} y={marker.orientation === 'horizontal' ? (marker.kind === 'body' ? 8 : 32) : marker.kind === 'body' ? 54 : 29}>{marker.second || (readOnly ? '' : '?')}</text>
+          </g>
+        </> : <><circle r="24" /><text textAnchor="middle" y="7">{marker.label || '?'}</text></>}</g>)}</g>
+        {overlay}
       </g>
     </svg>
   </div>

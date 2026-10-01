@@ -67,7 +67,7 @@ def test_timer_fragment_resolves_delay_and_contact(factory):
     )
     assert instance.timers[0].delay_ms == 2500
     assert instance.timers[0].coil_id == "T1-COIL"
-    assert instance.timers[0].timed_contact_ids == ["T1-C1", "T1-C2"]
+    assert instance.timers[0].timed_contact_ids == ["T1-C2"]
     assert instance.contacts[0].controlled_by_coil_id == "T1-COIL"
 
 
@@ -102,6 +102,27 @@ def test_indicator_color_is_instance_setting(factory):
     assert green.indicators[0].display_color == "green"
 
 
+def test_qnet_008_special_devices_create_runtime_fragments(factory):
+    flasher = factory.create(
+        request("flasher_relay_8p_training", "FR", {"flash_interval_ms": 750})
+    )
+    level = factory.create(request("floatless_level_switch_8p_training", "FLS"))
+    selector = factory.create(request("selector_switch_auto_manual", "SS"))
+    buzzer = factory.create(request("buzzer_two_terminal", "BZ"))
+
+    assert flasher.flashers[0].coil_id == "FR-COIL"
+    assert flasher.flashers[0].interval_ms == 750
+    assert flasher.flashers[0].contact_ids == ["FR-C1"]
+    assert level.level_relays[0].supply_terminal_a_id == "FLS-5"
+    assert level.level_relays[0].electrode_terminal_ids == ["FLS-7", "FLS-8", "FLS-1"]
+    assert level.level_relays[0].external_electrode_terminal_ids == [
+        "FLS-E1", "FLS-E2", "FLS-E3"
+    ]
+    assert selector.controls[0].terminal_a_id == "SS-A1"
+    assert selector.controls[0].alternate_terminal_a_id == "SS-M1"
+    assert buzzer.audible_outputs[0].terminal_b_id == "BZ-2"
+
+
 def test_eocr_protection_contacts_are_runtime_fragments(factory):
     instance = factory.create(request("eocr_12p_training", "EOCR"))
     assert "overload_protection" in instance.deferred_operation_capabilities
@@ -111,7 +132,11 @@ def test_eocr_protection_contacts_are_runtime_fragments(factory):
     }
     assert {item.controller_type for item in instance.contacts} == {"protection"}
     assert {item.controller_id for item in instance.contacts} == {"EOCR"}
-    assert len(instance.intrinsic_connections) == 3
+    assert len(instance.intrinsic_connections) == 4
+    assert any(
+        {item.from_terminal, item.to} == {"EOCR-95", "EOCR-97"}
+        for item in instance.intrinsic_connections
+    )
 
 
 def test_motor_direction_relationship_is_deferred(factory):

@@ -78,3 +78,27 @@ def test_attempt_validation_errors(tmp_path):
             assert response.status_code == status
         assert client.get("/api/problems/missing/diagram").status_code == 404
         assert client.get("/api/problems/missing/circuit-progress").status_code == 404
+
+
+def test_analysis_draft_autosaves_per_user_without_answer_data(tmp_path):
+    path = "/api/problems/training_socket_demo_001/analysis-draft"
+    payload = {
+        "problem_version": 1,
+        "memo": "X1 자기유지와 T1 계시 접점을 확인",
+        "selected_device_ids": ["X1", "T1"],
+        "selected_socket_ids": ["socket_8p"],
+        "selected_terminal_ids": ["X1-1", "T1-8"],
+        "annotations": {"X1": "A접점"},
+    }
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        saved = client.put(path, headers={"X-User-Id": "student_a"}, json=payload)
+        assert saved.status_code == 200, saved.text
+        assert saved.json()["memo"] == payload["memo"]
+        assert client.get(path, headers={"X-User-Id": "student_b"}).json() is None
+        restored = client.get(path, headers={"X-User-Id": "student_a"})
+        assert restored.json()["selected_terminal_ids"] == ["X1-1", "T1-8"]
+        for forbidden in ("answer", "expected", "correct", "score"):
+            assert forbidden not in restored.text.lower()
+        assert client.put(path, json={**payload, "problem_version": 99}).status_code == 409
+        assert client.delete(path, headers={"X-User-Id": "student_a"}).status_code == 204
+        assert client.get(path, headers={"X-User-Id": "student_a"}).json() is None

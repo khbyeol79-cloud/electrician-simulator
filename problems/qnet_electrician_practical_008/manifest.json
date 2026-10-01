@@ -24,5 +24,12 @@
     "schematic": "schematic.svg",
     "diagram": "diagram.json",
     "board": "board.json"
+  },
+  "capabilities": {
+    "board_visible": true,
+    "wiring_editable": true,
+    "wiring_gradable": false,
+    "operation_previewable": true,
+    "operation_gradable": false
   }
 }

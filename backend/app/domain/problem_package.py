@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .answer_definition import AnswerDefinition
 from .problem_definition import ProblemDefinition
-from .problem_manifest import Difficulty, ProblemManifest, ProblemStatus, ProblemType
+from .problem_manifest import Difficulty, ProblemCapabilities, ProblemManifest, ProblemStatus, ProblemType
 from .schematic_diagram import SchematicDiagram
 from .board_definition import BoardDefinition
 
@@ -97,6 +97,7 @@ class PublicProblemDetail(BaseModel):
     operation: dict[str, object] | None
     wiring_semantics: dict[str, object] | None
     warning_count: int
+    capabilities: ProblemCapabilities
 
 
 class CircuitSummary(BaseModel):

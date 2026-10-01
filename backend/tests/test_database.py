@@ -17,14 +17,14 @@ def test_database_initialization_is_idempotent(tmp_path):
         version = connection.execute(
             "SELECT value FROM app_meta WHERE key='schema_version'"
         ).fetchone()["value"]
-    assert version == "9"
+        assert version == "12"
     with database.connect() as connection:
         columns = {row["name"] for row in connection.execute("PRAGMA table_info(free_circuit_workspaces)")}
     assert "assembly_json" in columns
 
     with database.connect() as connection:
         tables = {row["name"] for row in connection.execute("SELECT name FROM sqlite_master WHERE type='table'")}
-        assert {"circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(tables)
+        assert {"circuit_attempts", "circuit_attempt_responses", "circuit_analysis_drafts", "wiring_drafts", "practice_wiring_drafts", "practice_wiring_snapshots", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(tables)
 
 
 def test_database_context_releases_file_handle(tmp_path):
@@ -68,10 +68,34 @@ def test_version_5_database_is_upgraded_without_losing_user_settings(tmp_path):
         selected = connection.execute(
             "SELECT value FROM user_settings WHERE key='selected_problem_id'"
         ).fetchone()["value"]
-    assert version == "9"
+    assert version == "12"
     assert selected == "operation_demo_001"
 
     with database.connect() as connection:
         columns = {row["name"] for row in connection.execute("PRAGMA table_info(free_circuit_workspaces)")}
     assert {"board_json", "device_layout_json", "wiring_semantics_json", "editor_json", "schema_version"}.issubset(columns)
     assert database.is_ready() is True
+
+
+def test_schema_11_practice_draft_is_migrated_without_data_loss(tmp_path):
+    database_file = tmp_path / "legacy-practice.db"
+    database = SQLiteDatabase(database_file)
+    database.initialize()
+    with database.connect() as connection:
+        connection.execute(
+            """INSERT INTO practice_wiring_drafts(
+                   problem_id, workspace_id, problem_version, mode, connections_json)
+               VALUES ('qnet_electrician_practical_010', 'legacy', 1, 'graphic', '[{"from":"F-1","to":"F-2"}]')"""
+        )
+        connection.execute("UPDATE app_meta SET value='11' WHERE key='schema_version'")
+    database.initialize()
+    database.initialize()
+    with database.connect() as connection:
+        row = connection.execute(
+            "SELECT * FROM practice_wiring_drafts WHERE workspace_id='legacy'"
+        ).fetchone()
+        version = connection.execute("SELECT value FROM app_meta WHERE key='schema_version'").fetchone()[0]
+    assert version == "12"
+    assert row["connections_json"] == '[{"from":"F-1","to":"F-2"}]'
+    assert row["workspace_name"] == "기본 작업공간"
+    assert row["created_at"] is not None

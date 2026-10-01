@@ -10,8 +10,9 @@ from .device_behavior import (
     DeviceInstanceDefinition,
 )
 from .circuit_attempt import CircuitAttemptResult, CircuitAttemptSubmit, CircuitProgress, CircuitQuestionResult
+from .circuit_analysis_draft import CircuitAnalysisDraftResponse, CircuitAnalysisDraftUpdate
 from .problem_definition import ProblemDefinition
-from .problem_manifest import ProblemManifest
+from .problem_manifest import ProblemCapabilities, ProblemManifest
 from .free_circuit import (
     FreeCircuitAssembly,
     FreeCircuitDevicePlacement,
@@ -33,13 +34,19 @@ from .mounting_attempt import (
 )
 from .operation_setup import AcceptedWiringSnapshot, DeviceLayoutDefinition, FixedDevicePlacement, OperationSetupResponse
 from .operation_definition import (
+    BehaviorRequirementItem, BehaviorRequirementResult, BehaviorRequirementSummary, BehaviorScenarioItem,
     ControlState, OperationAction, OperationCheckItem, OperationCheckResult,
-    OperationDefinition, OperationFault, OperationProgress, OperationSessionCreate,
+    OperationDefinition, OperationFault, OperationProgress, OperationSessionCreate, PracticeOperationSessionCreate,
     OperationSessionState, TimerState,
 )
 from .wiring_attempt import (
-    WiringAttemptResult, WiringAttemptSubmit, WiringConnection, WiringDraftResponse,
-    WiringDraftUpdate, WiringProgress,
+    PracticeSafetyIssue, PracticeWiringDraftResponse, WiringAttemptResult, WiringAttemptSubmit,
+    WiringConnection, WiringDraftResponse, WiringDraftUpdate, WiringProgress,
+)
+from .wiring_capture import (
+    CaptureConnection, StructuralWarning, WiringCaptureDraftResponse, WiringCaptureExport,
+    WiringCaptureImport, WiringCaptureUpdate, WiringSnapshotCreate, WiringSnapshotResponse,
+    WiringWorkspaceCreate, WiringWorkspaceSummary,
 )
 from .problem_package import (
     ProblemPackage,
@@ -61,6 +68,7 @@ __all__ = [
     "DeviceInstanceDefinition",
     "ProblemDefinition",
     "ProblemManifest",
+    "ProblemCapabilities",
     "FreeCircuitWorkspaceResponse",
     "FreeCircuitWorkspaceSummary",
     "FreeCircuitTemplate",
@@ -77,6 +85,8 @@ __all__ = [
     "CircuitAttemptSubmit",
     "CircuitProgress",
     "CircuitQuestionResult",
+    "CircuitAnalysisDraftResponse",
+    "CircuitAnalysisDraftUpdate",
     "ProblemSummary",
     "ProblemValidationIssue",
     "ProblemValidationResult",
@@ -104,4 +114,27 @@ __all__ = [
     "WiringDraftResponse",
     "WiringDraftUpdate",
     "WiringProgress",
+    "PracticeSafetyIssue",
+    "PracticeWiringDraftResponse",
+    "CaptureConnection",
+    "StructuralWarning",
+    "WiringCaptureDraftResponse",
+    "WiringCaptureExport",
+    "WiringCaptureImport",
+    "WiringCaptureUpdate",
+    "WiringSnapshotCreate",
+    "WiringSnapshotResponse",
+    "WiringWorkspaceCreate",
+    "WiringWorkspaceSummary",
+    "PracticeOperationSessionCreate",
+    "OperationSessionState",
+    "OperationSessionCreate",
+    "OperationAction",
+    "OperationCheckResult",
+    "BehaviorRequirementItem",
+    "BehaviorRequirementResult",
+    "BehaviorRequirementSummary",
+    "BehaviorScenarioItem",
+    "OperationCheckItem",
+    "OperationProgress",
 ]

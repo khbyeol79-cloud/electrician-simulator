@@ -61,9 +61,12 @@ def main() -> int:
     problem = json.loads((package / "problem.json").read_text(encoding="utf-8"))
     check(manifest.get("status") == "draft", "010 manifest는 draft 유지")
     check(answer.get("verification", {}).get("status") == "unverified", "010 answer는 unverified 유지")
-    check(answer.get("expected_nets") == [], "010 expected_nets 미작성 유지")
-    check(answer.get("operation_tests") == [], "010 operation_tests 미작성 유지")
-    check(problem.get("circuit", {}).get("definition_status") == "structure_only", "010 circuit structure_only 유지")
+    check(bool(answer.get("expected_nets")), "010 비공개 expected_nets 작성")
+    check(bool(answer.get("operation_tests")), "010 비공개 레거시 회귀시험 작성")
+    check(problem.get("circuit", {}).get("definition_status") == "functional", "010 실제 결선 회로 정의")
+    check(problem.get("operation", {}).get("simulation_status") == "functional", "010 실제 동작 정의")
+    check(len(problem.get("operation", {}).get("requirements", [])) >= 25, "010 공개 요구 동작 정의")
+    check(not {"P01_L1_IN", "C16_RETURN"} & set(js.split('"')), "운영 JS bundle에 비공개 Net ID 없음")
 
     print("\n안정화 + FUSE 디자인 검사가 모두 통과했습니다.")
     return 0

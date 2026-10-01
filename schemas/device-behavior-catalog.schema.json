@@ -55,7 +55,7 @@
         "switched_terminal_key": { "$ref": "#/$defs/key" },
         "nc_terminal_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] },
         "no_terminal_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] },
-        "actuation": { "enum": ["coil", "timer", "manual", "protection"] },
+        "actuation": { "enum": ["coil", "timer", "manual", "protection", "flasher", "level"] },
         "controlled_by_key": { "$ref": "#/$defs/key" },
         "normal_state": { "enum": ["open", "closed"] }
       }
@@ -91,6 +91,7 @@
         "control_type": { "enum": ["pushbutton", "limit_switch", "selector"] },
         "mode": { "enum": ["momentary", "maintained"] },
         "contact_key": { "$ref": "#/$defs/key" },
+        "alternate_contact_key": { "anyOf": [{ "$ref": "#/$defs/key" }, { "type": "null" }] },
         "initial_active": { "type": "boolean" }
       }
     },
@@ -106,6 +107,32 @@
         "delay_property_key": { "$ref": "#/$defs/key" },
         "timed_contact_keys": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/key" } },
         "retentive": { "type": "boolean" }
+      }
+    },
+    "flasher": {
+      "type": "object", "additionalProperties": false,
+      "required": ["flasher_key", "id_suffix", "coil_key", "interval_property_key", "contact_keys"],
+      "properties": {
+        "flasher_key": { "$ref": "#/$defs/key" }, "id_suffix": { "$ref": "#/$defs/idSuffix" },
+        "coil_key": { "$ref": "#/$defs/key" }, "interval_property_key": { "$ref": "#/$defs/key" },
+        "contact_keys": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/key" } }
+      }
+    },
+    "levelRelay": {
+      "type": "object", "additionalProperties": false,
+      "required": ["level_relay_key", "id_suffix", "supply_terminal_a_key", "supply_terminal_b_key", "electrode_terminal_keys", "contact_keys"],
+      "properties": {
+        "level_relay_key": { "$ref": "#/$defs/key" }, "id_suffix": { "$ref": "#/$defs/idSuffix" },
+        "supply_terminal_a_key": { "$ref": "#/$defs/key" }, "supply_terminal_b_key": { "$ref": "#/$defs/key" },
+        "electrode_terminal_keys": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/key" } },
+        "contact_keys": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/$defs/key" } }
+      }
+    },
+    "audibleOutput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["terminal_a_key", "terminal_b_key"],
+      "properties": {
+        "terminal_a_key": { "$ref": "#/$defs/key" }, "terminal_b_key": { "$ref": "#/$defs/key" }
       }
     },
     "indicator": {
@@ -151,7 +178,7 @@
         "compatible_socket_type_ids": { "type": "array", "maxItems": 10, "items": { "$ref": "#/$defs/modelId" } },
         "capabilities": {
           "type": "array", "minItems": 1, "maxItems": 20,
-          "items": { "enum": ["terminal_block", "switching", "overcurrent_isolation", "power_source", "manual_control", "limit_control", "coil", "relay_contacts", "timed_contacts", "contactor", "overload_protection", "indicator", "three_phase_load", "socket"] }
+          "items": { "enum": ["terminal_block", "switching", "overcurrent_isolation", "power_source", "manual_control", "limit_control", "coil", "relay_contacts", "timed_contacts", "flashing_contacts", "level_control", "contactor", "overload_protection", "indicator", "audible_output", "three_phase_load", "socket"] }
         },
         "terminals": { "type": "array", "minItems": 1, "maxItems": 100, "items": { "$ref": "#/$defs/terminal" } },
         "coils": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/coil" } },
@@ -160,7 +187,10 @@
         "configurable_properties": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/configurableProperty" } },
         "control": { "anyOf": [{ "$ref": "#/$defs/control" }, { "type": "null" }] },
         "timer": { "anyOf": [{ "$ref": "#/$defs/timer" }, { "type": "null" }] },
+        "flasher": { "anyOf": [{ "$ref": "#/$defs/flasher" }, { "type": "null" }] },
+        "level_relay": { "anyOf": [{ "$ref": "#/$defs/levelRelay" }, { "type": "null" }] },
         "indicator": { "anyOf": [{ "$ref": "#/$defs/indicator" }, { "type": "null" }] },
+        "audible_output": { "anyOf": [{ "$ref": "#/$defs/audibleOutput" }, { "type": "null" }] },
         "motor": { "anyOf": [{ "$ref": "#/$defs/motor" }, { "type": "null" }] },
         "protection": { "anyOf": [{ "$ref": "#/$defs/protection" }, { "type": "null" }] }
       }

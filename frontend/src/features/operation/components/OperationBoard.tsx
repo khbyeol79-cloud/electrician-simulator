@@ -1,3 +1,4 @@
+import { isProtectiveEarth } from '../../wiring/engine/workspaceDisplay'
 import type { PointerEventHandler } from 'react'
 import type { BoardDefinition, BoardItem, FixedDevicePlacement, WiringConnection } from '../../../api/client'
 import { MountedDeviceGraphic } from '../../mounting/components/MountingBoard'
@@ -42,8 +43,8 @@ export function OperationBoard({
         <g className="board-item-layer">{board.items.map((item) => <BoardItemBody key={item.item_id} item={item} />)}</g>
         <g className="wire-layer readonly">{routed.map((wire) => {
           const points = wire.points.map((point) => `${point.x},${point.y}`).join(' ')
-          return <g key={`${wire.from}|${wire.to}`} className="board-wire readonly"><polyline className="wire-depth" points={points} /><polyline className="wire-visible" points={points} style={{ stroke: WIRE_COLORS[wire.wire_color] }} /></g>
-        })}{externalWires.map((wire) => <g key={`external-${wire.connectionIndex}`} className="board-wire readonly external"><polyline className="wire-depth" points={wire.points} /><polyline className="wire-visible" points={wire.points} style={{ stroke: WIRE_COLORS[wire.connection.wire_color] }} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor={wire.labelAnchor}>{wire.externalTerminalId}</text></g>)}</g>
+          return <g key={`${wire.from}|${wire.to}`} className="board-wire readonly"><polyline className="wire-depth" points={points} /><polyline className="wire-visible" points={points} style={{ stroke: isProtectiveEarth(wire.from) || isProtectiveEarth(wire.to) ? '#15803d' : WIRE_COLORS[wire.wire_color] }} /></g>
+        })}{externalWires.map((wire) => <g key={`external-${wire.connectionIndex}`} className="board-wire readonly external"><polyline className="wire-depth" points={wire.points} /><polyline className="wire-visible" points={wire.points} style={{ stroke: isProtectiveEarth(wire.externalTerminalId) ? '#15803d' : WIRE_COLORS[wire.connection.wire_color] }} /><text className="external-wire-label" x={wire.labelX} y={wire.labelY} textAnchor={wire.labelAnchor}>{wire.externalTerminalId}</text></g>)}</g>
         <g className="board-pin-layer readonly">{board.items.map((item) => <StaticPins key={item.item_id} item={item} />)}</g>
         <g className="board-label-layer">{board.items.map((item) => { const labelArea = boardItemLabelArea(item); return <g key={item.item_id} className={item.item_type === 'terminal_block' ? 'terminal-block-label' : undefined}><rect x={labelArea.x} y={labelArea.y} width={labelArea.width} height={labelArea.height} rx="5" /><text x={labelArea.x + labelArea.width / 2} y={labelArea.y + labelArea.height / 2 + 5} textAnchor="middle">{item.label}</text></g> })}</g>
         <g className="fixed-device-layer">{placements.map((placement) => {

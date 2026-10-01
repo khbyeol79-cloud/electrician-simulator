@@ -35,6 +35,11 @@ class UserDatabasePool:
 
 
 def request_user_id(request: Request) -> str:
+    if request.app.state.settings.auth_required:
+        account = getattr(request.state, "account", None)
+        if account is None:
+            raise HTTPException(status_code=401, detail="로그인이 필요합니다.")
+        return account["user_id"]
     value = request.headers.get(USER_ID_HEADER, DEFAULT_USER_ID).strip() or DEFAULT_USER_ID
     if not _USER_ID_PATTERN.fullmatch(value):
         raise HTTPException(status_code=400, detail="사용자 식별자가 올바르지 않습니다.")

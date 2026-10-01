@@ -1,3 +1,6 @@
+import { authHeaders, currentAuthSession } from '../features/user/authSession'
+import { activeUserStorageSuffix } from '../features/user/userProfile'
+
 export type HealthResponse = {
   status: 'ok'
   app_name: string
@@ -48,12 +51,15 @@ export type PublicProblemDetail = Omit<ProblemSummary, 'selectable'> & {
   device_layout: DeviceLayoutDefinition | null
   operation: OperationDefinition | null
   wiring_semantics?: WiringSemantics | null
+  capabilities: { board_visible: boolean; wiring_editable: boolean; wiring_gradable: boolean; operation_previewable: boolean; operation_gradable: boolean }
 }
 
 export const schematicUrl = (problemId: string) => `/api/problems/${encodeURIComponent(problemId)}/schematic`
+export const layoutReferenceUrl = (problemId: string) => `/api/problems/${encodeURIComponent(problemId)}/layout-reference`
+export const analysisReferenceUrl = (problemId: string, referenceId: string) => `/api/problems/${encodeURIComponent(problemId)}/analysis-reference/${encodeURIComponent(referenceId)}`
 
 export type CircuitDevice = { device_id: string; device_type_id: string; label: string; socket_type_id: string | null; behavior_model_id?: string | null }
-export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed'; controller_type?: 'coil' | 'timer' | 'protection'; controller_id?: string | null }
+export type CircuitContact = { contact_id: string; owner_device_id: string; contact_type: 'NO' | 'NC' | 'CHANGEOVER'; normal_state: 'open' | 'closed'; controller_type?: 'coil' | 'timer' | 'protection' | 'flasher' | 'level'; controller_id?: string | null }
 export type CircuitCoil = { coil_id: string; owner_device_id: string }
 export type CircuitDefinition = {
   schema_version: '1.0'; definition_status: 'structure_only' | 'functional'
@@ -110,6 +116,11 @@ export type CircuitProgress = {
   problem_id: string; attempt_count: number; last_submitted_at: string | null
   last_overall_correct: boolean | null; last_correct_count: number; total_count: number
 }
+export type CircuitAnalysisDraft = {
+  problem_id: string; problem_version: number; memo: string
+  selected_device_ids: string[]; selected_socket_ids: string[]; selected_terminal_ids: string[]
+  annotations: Record<string, string>; updated_at: string | null
+}
 
 export type BoardPin = { terminal_id: string; label: string; role_label?: string | null; number: number | null; side: 'top' | 'bottom'; x: number; y: number; max_connections: number; enabled: boolean; terminal_role?: 'functional' | 'free_junction' }
 export type BoardRect = { x: number; y: number; width: number; height: number }
@@ -126,9 +137,28 @@ export type BoardDefinition = {
 }
 export type WiringConnection = { from: string; to: string; wire_color: 'brown' | 'black' | 'gray' | 'yellow'; pair_display_color: string }
 export type ExternalWiringTerminal = { terminal_id: string; label: string; terminal_role: 'external'; operation_terminal_id: string | null; max_connections: 1 | 2; wire_color: WiringConnection['wire_color'] }
-export type ExternalWiringDevice = { device_id: string; label: string; placement: 'top' | 'bottom'; terminals: ExternalWiringTerminal[] }
+export type ExternalWiringDevice = { device_id: string; label: string; placement: 'top' | 'bottom'; contact_type?: 'NO' | 'NC' | null; terminals: ExternalWiringTerminal[] }
 export type WiringSemantics = { schema_version: '1.0'; extra_jumper_policy: 'ignore' | 'warning' | 'reject'; external_devices: ExternalWiringDevice[] }
 export type WiringDraft = { problem_id: string; problem_version: number; mode: 'graphic' | 'summary'; connections: WiringConnection[]; updated_at: string | null }
+export type PracticeSafetyIssue = { code: string; severity: 'warning' | 'blocking'; message: string }
+export type StructuralWarning = PracticeSafetyIssue & { connection_indexes: number[] }
+export type PracticeWiringDraft = WiringDraft & {
+  workspace_id: string; workspace_name: string; source: 'user_practice_draft'; verified_answer: false; gradable: false
+  created_at: string | null; latest_snapshot_id: string | null; structural_warnings: StructuralWarning[]
+}
+export type PracticeWiringWorkspace = {
+  problem_id: string; problem_version: number; workspace_id: string; workspace_name: string
+  created_at: string; updated_at: string; connection_count: number; latest_snapshot_id: string | null
+}
+export type PracticeWiringSnapshot = {
+  snapshot_id: string; problem_id: string; problem_version: number; workspace_id: string; label: string | null
+  created_at: string; connections: WiringConnection[]; structural_warnings: StructuralWarning[]
+}
+export type PracticeWiringExport = {
+  schema_version: '1.0'; problem_id: string; problem_version: number; workspace_id: string; workspace_name: string
+  snapshot_id: string | null; created_at: string | null; updated_at: string | null
+  connections: WiringConnection[]; structural_warnings: StructuralWarning[]
+}
 export type WiringAttemptResult = {
   attempt_id: number | null; gradable: boolean; overall_correct: boolean | null; required_count: number; correct_count: number
   missing_connections: string[]; extra_connections: string[]; forbidden_connections: string[]; message: string
@@ -175,39 +205,56 @@ export type DeviceLayoutDefinition = {
 export type OperationSetup = {
   problem_id: string; problem_version: number; board: BoardDefinition
   device_layout: DeviceLayoutDefinition | null; wiring_draft: WiringDraft | null
-  wiring_source: 'accepted_submission' | 'draft_preview' | 'none'
+  wiring_source: 'accepted_submission' | 'draft_preview' | 'practice_draft' | 'none'
   wiring_snapshot: { attempt_id: number; problem_version: number; connections: WiringConnection[] } | null
   wiring_submission: WiringProgress; wiring_exists: boolean; operation_ready: boolean
   preview_allowed: boolean; message: string; operation: OperationDefinition | null
+  behavior_requirements?: {
+    requirement_id: string; label: string; scenario_id?: string | null
+    scenario_label?: string | null; next_action?: string | null
+  }[]
 }
 
 export type OperationDefinition = {
   schema_version: '1.0'; simulation_status: 'preview' | 'functional'
   simulation_mode?: 'legacy_assisted' | 'actual_wiring'
   power: { line_terminal_id: string; return_terminal_id: string; phase_terminal_ids: string[] }
-  controls: { control_id: string; label: string; control_type: 'pushbutton' | 'limit_switch' | 'selector'; mode: 'momentary' | 'maintained'; contact_type: 'NO' | 'NC'; terminal_a_id: string; terminal_b_id: string; initial_active: boolean }[]
+  controls: { control_id: string; label: string; control_type: 'pushbutton' | 'limit_switch' | 'selector'; mode: 'momentary' | 'maintained'; contact_type: 'NO' | 'NC'; terminal_a_id: string; terminal_b_id: string; alternate_terminal_a_id?: string | null; alternate_terminal_b_id?: string | null; initial_active: boolean }[]
   timers: { timer_id: string; label: string; coil_id: string; mode: 'on_delay'; delay_ms: number; timed_contact_ids: string[]; retentive: boolean }[]
+  flashers?: { flasher_id: string; label: string; coil_id: string; interval_ms: number; contact_ids: string[] }[]
+  level_relays?: { level_relay_id: string; label: string; supply_terminal_a_id: string; supply_terminal_b_id: string; electrode_terminal_ids: string[]; external_electrode_terminal_ids: string[]; contact_ids: string[] }[]
   indicators: { indicator_id: string; label: string; display_color: 'red' | 'green' | 'yellow' | 'white'; terminal_a_id: string; terminal_b_id: string }[]
+  audible_outputs?: { output_id: string; label: string; terminal_a_id: string; terminal_b_id: string }[]
   motors: { motor_id: string; label: string; forward_coil_id: string | null; reverse_coil_id: string | null; phase_terminal_ids: string[]; phase_source_terminal_ids: string[]; forward_phase_order: number[] }[]
   contactors: { contactor_id: string; label: string; coil_id: string; role: 'forward' | 'reverse' | 'general'; start_control_id: string | null; motor_id: string | null }[]
   interlocks: { interlock_id: string; label: string; type: 'electrical' | 'mechanical'; contactor_ids: string[]; contact_ids: string[]; policy: 'prevent_simultaneous_activation' }[]
-  protection_devices: { protection_device_id: string; label: string; protection_type: 'eocr'; protected_coil_ids: string[]; protected_motor_ids: string[]; protection_contact_ids?: string[]; reset_mode: 'manual' | 'automatic' | 'restart_required'; allowed_fault_types: 'overload'[] }[]
+  protection_devices: { protection_device_id: string; label: string; protection_type: 'eocr'; protected_coil_ids: string[]; protected_motor_ids: string[]; protection_contact_ids?: string[]; supply_terminal_a_id?: string | null; supply_terminal_b_id?: string | null; reset_mode: 'manual' | 'automatic' | 'restart_required'; allowed_fault_types: 'overload'[] }[]
+  fuse_channels?: { channel_id: string; label: string; terminal_a_id: string; terminal_b_id: string; initially_closed: boolean }[]
   direction_change_policy: 'current_direction_first' | 'first_input_first' | 'block_both' | 'stop_before_reverse'
   internal_connections: { from: string; to: string }[]
 }
-export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: string; active: boolean }
+export type OperationControlState = { label: string; control_type: string; mode: string; contact_type: 'NO' | 'NC'; active: boolean }
 export type OperationTimerState = { status: 'stopped' | 'timing' | 'completed' | 'reset'; elapsed_ms: number; delay_ms: number }
+export type OperationFlasherState = { label: string; status: 'stopped' | 'off' | 'on'; elapsed_ms: number; interval_ms: number }
+export type OperationLevelState = { label: string; requested: boolean; powered: boolean; wiring_ready: boolean; detected: boolean }
 export type OperationFault = { code: string; message: string; severity: 'warning' | 'error' | 'danger'; trip_required: boolean }
-export type OperationProtectionState = { label: string; protection_type: string; status: 'normal' | 'tripped' | 'reset_required'; reset_mode: string }
+export type OperationProtectionState = { label: string; protection_type: string; status: 'normal' | 'tripped' | 'reset_required'; reset_mode: string; powered?: boolean; operating_state?: 'unpowered' | 'powered_normal' | 'tripped' }
+export type OperationFuseState = { label: string; status: 'normal' | 'open'; terminal_a_id: string; terminal_b_id: string }
 export type OperationInterlockState = { label: string; type: 'electrical' | 'mechanical'; status: 'ready' | 'blocking' | 'fault'; blocked_contactor_id: string | null }
 export type OperationSessionState = {
   session_id: string; problem_id: string; wiring_attempt_id: number; powered: boolean; power_state: 'off' | 'on' | 'tripped'
   simulation_mode?: 'legacy_assisted' | 'actual_wiring'; catalog_composed?: boolean
   controls: Record<string, OperationControlState>; coils: Record<string, boolean>; contacts: Record<string, 'open' | 'closed'>
-  timers: Record<string, OperationTimerState>; indicators: Record<string, 'off' | 'on' | 'error'>
+  changeover_positions?: Record<string, 'nc' | 'no'>
+  timers: Record<string, OperationTimerState>; flashers?: Record<string, OperationFlasherState>; level_relays?: Record<string, OperationLevelState>
+  indicators: Record<string, 'off' | 'on' | 'error'>; audible_outputs?: Record<string, 'off' | 'on' | 'error'>
   motors: Record<string, 'stopped' | 'forward' | 'reverse' | 'phase_loss' | 'phase_sequence_error' | 'simultaneous_fault' | 'connection_error' | 'power_off' | 'protection_trip' | 'undetermined'>
   protections: Record<string, OperationProtectionState>; interlocks: Record<string, OperationInterlockState>; active_faults: string[]
+  fuses?: Record<string, OperationFuseState>
   faults: OperationFault[]; stable: boolean; elapsed_ms: number; events: string[]
+  session_type: 'verified_operation_session' | 'practice_preview_session' | 'free_circuit_session'; wiring_snapshot_id: number | null
+  workspace_id: string | null; gradable: boolean; safety_status: 'not_checked' | 'safe' | 'attention' | 'blocked'
+  power_permitted: boolean; safety_issues: PracticeSafetyIssue[]
 }
 export type OperationCheckResult = {
   gradable: boolean; overall_passed: boolean | null; passed_count: number; total_count: number
@@ -254,26 +301,19 @@ export type ReloadStatistics = {
 const USER_ID_STORAGE_KEY = 'electrician.webUserId'
 
 function requestHeaders(json = false): HeadersInit {
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = authHeaders()
   if (json) headers['Content-Type'] = 'application/json'
-  const hostname = window.location.hostname
-  const local = !hostname || hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1'
-  if (!local) {
-    let userId = window.localStorage.getItem(USER_ID_STORAGE_KEY)
-    if (!userId) {
-      userId = typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID().replaceAll('-', '')
-        : `web_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`
-      window.localStorage.setItem(USER_ID_STORAGE_KEY, userId)
-    }
+  const userId = window.localStorage.getItem(USER_ID_STORAGE_KEY)
+  if (userId && !currentAuthSession()?.required) {
     headers['X-User-Id'] = userId
   }
   return headers
 }
 
-async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(url, { signal, headers: requestHeaders() })
+async function getJson<T>(url: string, signal?: AbortSignal, headers = requestHeaders(), cache?: RequestCache): Promise<T> {
+  const response = await fetch(url, { signal, headers, cache })
   if (!response.ok) {
+    if (response.status === 401 && currentAuthSession()?.required) window.dispatchEvent(new Event('electrician:auth-expired'))
     throw new Error(`서버 응답 오류 (${response.status})`)
   }
   return response.json() as Promise<T>
@@ -281,8 +321,8 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
 
 export async function getSystemStatus(signal?: AbortSignal) {
   const [health, appInfo] = await Promise.all([
-    getJson<HealthResponse>('/api/health', signal),
-    getJson<AppInfoResponse>('/api/app-info', signal),
+    getJson<HealthResponse>('/api/health', signal, undefined, 'no-store'),
+    getJson<AppInfoResponse>('/api/app-info', signal, undefined, 'no-store'),
   ])
   return { health, appInfo }
 }
@@ -361,12 +401,50 @@ export function getCircuitProgress(problemId: string, signal?: AbortSignal) {
   return getJson<CircuitProgress>(`/api/problems/${encodeURIComponent(problemId)}/circuit-progress`, signal)
 }
 
+const analysisSaves = new Map<string, Promise<CircuitAnalysisDraft>>()
+
+export async function getCircuitAnalysisDraft(problemId: string, signal?: AbortSignal) {
+  const headers = requestHeaders()
+  const key = `${activeUserStorageSuffix()}:${problemId}`
+  await analysisSaves.get(key)
+  return getJson<CircuitAnalysisDraft | null>(`/api/problems/${encodeURIComponent(problemId)}/analysis-draft`, signal, headers)
+}
+
+export function saveCircuitAnalysisDraft(problemId: string, draft: Omit<CircuitAnalysisDraft, 'problem_id' | 'updated_at'>, userId = activeUserStorageSuffix()) {
+  const key = `${userId}:${problemId}`
+  const headers = { ...requestHeaders(true), ...(currentAuthSession()?.required ? { 'X-Session-User': userId } : { 'X-User-Id': userId }) }
+  const save = (analysisSaves.get(key) ?? Promise.resolve()).catch(() => undefined).then(() =>
+    mutationJson<CircuitAnalysisDraft>(`/api/problems/${encodeURIComponent(problemId)}/analysis-draft`, 'PUT', draft, headers))
+  analysisSaves.set(key, save)
+  void save.then(() => { if (analysisSaves.get(key) === save) analysisSaves.delete(key) }, () => { if (analysisSaves.get(key) === save) analysisSaves.delete(key) })
+  return save
+}
+
 export function getBoard(problemId: string, signal?: AbortSignal) {
   return getJson<BoardDefinition>(`/api/problems/${encodeURIComponent(problemId)}/board`, signal)
 }
 
 export function getWiringDraft(problemId: string, signal?: AbortSignal) {
   return getJson<WiringDraft | null>(`/api/problems/${encodeURIComponent(problemId)}/wiring-draft`, signal)
+}
+export type BehaviorRequirementStatus = 'not_run' | 'satisfied' | 'unsatisfied' | 'unavailable'
+export type BehaviorRequirementResult = { requirement_id: string; label: string; status: BehaviorRequirementStatus; message: string }
+export type BehaviorScenarioResult = {
+  scenario_id: string; label: string; status: BehaviorRequirementStatus
+  current_observation: string; missing_conditions: string[]; next_action: string
+}
+export type BehaviorRequirementSummary = { gradable: false; results: BehaviorRequirementResult[]; scenarios: BehaviorScenarioResult[]; message: string }
+
+export function getPracticeWiringDraft(problemId: string, workspaceId = 'main', signal?: AbortSignal) {
+  return getJson<PracticeWiringDraft | null>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}`, signal)
+}
+
+export function getPracticeWiringWorkspaces(problemId: string, signal?: AbortSignal) {
+  return getJson<PracticeWiringWorkspace[]>(`/api/problems/${encodeURIComponent(problemId)}/practice-workspaces`, signal)
+}
+
+export function getPracticeWiringSnapshots(problemId: string, workspaceId: string, signal?: AbortSignal) {
+  return getJson<PracticeWiringSnapshot[]>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}/snapshots`, signal)
 }
 
 export function getWiringProgress(problemId: string, signal?: AbortSignal) {
@@ -385,8 +463,9 @@ export function getMountingProgress(problemId: string, signal?: AbortSignal) {
   return getJson<MountingProgress>(`/api/problems/${encodeURIComponent(problemId)}/mounting-progress`, signal)
 }
 
-export function getOperationSetup(problemId: string, signal?: AbortSignal) {
-  return getJson<OperationSetup>(`/api/problems/${encodeURIComponent(problemId)}/operation-setup`, signal)
+export function getOperationSetup(problemId: string, signal?: AbortSignal, workspaceId?: string) {
+  const query = workspaceId && workspaceId !== 'main' ? `?workspace_id=${encodeURIComponent(workspaceId)}` : ''
+  return getJson<OperationSetup>(`/api/problems/${encodeURIComponent(problemId)}/operation-setup${query}`, signal)
 }
 
 export function getOperationProgress(problemId: string, signal?: AbortSignal) {
@@ -395,6 +474,10 @@ export function getOperationProgress(problemId: string, signal?: AbortSignal) {
 
 export function createOperationSession(problemId: string, problemVersion: number, wiringAttemptId?: number) {
   return mutationJson<OperationSessionState>(`/api/problems/${encodeURIComponent(problemId)}/operation-sessions`, 'POST', { problem_version: problemVersion, wiring_attempt_id: wiringAttemptId })
+}
+
+export function createPracticeOperationSession(problemId: string, problemVersion: number, workspaceId = 'main') {
+  return mutationJson<OperationSessionState>(`/api/problems/${encodeURIComponent(problemId)}/practice-sessions`, 'POST', { problem_version: problemVersion, workspace_id: workspaceId })
 }
 
 export function applyOperationAction(sessionId: string, action: Record<string, unknown>) {
@@ -409,12 +492,16 @@ export function runOperationCheck(sessionId: string) {
   return mutationJson<OperationCheckResult>(`/api/operation-sessions/${encodeURIComponent(sessionId)}/run-check`, 'POST')
 }
 
+export function runOperationRequirements(sessionId: string) {
+  return mutationJson<BehaviorRequirementSummary>(`/api/operation-sessions/${encodeURIComponent(sessionId)}/run-requirements`, 'POST')
+}
+
 export function deleteOperationSession(sessionId: string) {
   return mutationJson<void>(`/api/operation-sessions/${encodeURIComponent(sessionId)}`, 'DELETE')
 }
 
-async function mutationJson<T>(url: string, method: string, body?: unknown): Promise<T> {
-  const response = await fetch(url, { method, headers: requestHeaders(body !== undefined), body: body === undefined ? undefined : JSON.stringify(body) })
+async function mutationJson<T>(url: string, method: string, body?: unknown, headers = requestHeaders(body !== undefined)): Promise<T> {
+  const response = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) })
   if (!response.ok) {
     const payload = await response.json().catch(() => undefined) as { detail?: { message?: string } | string } | undefined
     const message = typeof payload?.detail === 'object' ? payload.detail.message : payload?.detail
@@ -425,6 +512,36 @@ async function mutationJson<T>(url: string, method: string, body?: unknown): Pro
 
 export function saveWiringDraft(problemId: string, problemVersion: number, mode: 'graphic' | 'summary', connections: WiringConnection[]) {
   return mutationJson<WiringDraft>(`/api/problems/${encodeURIComponent(problemId)}/wiring-draft`, 'PUT', { problem_version: problemVersion, mode, connections })
+}
+
+export function savePracticeWiringDraft(problemId: string, problemVersion: number, mode: 'graphic' | 'summary', connections: WiringConnection[], workspaceId = 'main', workspaceName?: string) {
+  return mutationJson<PracticeWiringDraft>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}`, 'PUT', { problem_version: problemVersion, mode, connections, workspace_name: workspaceName })
+}
+
+export function createPracticeWiringWorkspace(problemId: string, problemVersion: number, workspaceName: string) {
+  return mutationJson<PracticeWiringDraft>(`/api/problems/${encodeURIComponent(problemId)}/practice-workspaces`, 'POST', { problem_version: problemVersion, workspace_name: workspaceName })
+}
+
+export function createPracticeWiringSnapshot(problemId: string, workspaceId: string, label?: string) {
+  return mutationJson<PracticeWiringSnapshot>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}/snapshots`, 'POST', { label })
+}
+
+export function clonePracticeWiringSnapshot(problemId: string, workspaceId: string, snapshotId: string) {
+  return mutationJson<PracticeWiringDraft>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}/snapshots/${encodeURIComponent(snapshotId)}/clone`, 'POST')
+}
+
+export async function exportPracticeWiring(problemId: string, workspaceId: string): Promise<Blob> {
+  const response = await fetch(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}/export`, { headers: requestHeaders() })
+  if (!response.ok) throw new Error('검증용 JSON을 내보낼 수 없습니다.')
+  return response.blob()
+}
+
+export function importPracticeWiring(problemId: string, payload: PracticeWiringExport) {
+  return mutationJson<PracticeWiringDraft>(`/api/problems/${encodeURIComponent(problemId)}/practice-imports`, 'POST', payload)
+}
+
+export function deletePracticeWiringDraft(problemId: string, workspaceId = 'main') {
+  return mutationJson<void>(`/api/problems/${encodeURIComponent(problemId)}/practice-drafts/${encodeURIComponent(workspaceId)}`, 'DELETE')
 }
 
 export function deleteWiringDraft(problemId: string) {

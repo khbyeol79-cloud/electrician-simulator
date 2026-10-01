@@ -17,10 +17,10 @@ export function PlaceholderPage({ stage, title, description, icon }: Placeholder
       <div className="workspace-canvas">
         <div className="placeholder-card">
           <div className="placeholder-icon" aria-hidden="true">{icon}</div>
-          <span>준비 중</span>
+          <span>문제 선택 대기</span>
           <h3>{title}</h3>
           <p>{description}</p>
-          <div className="coming-soon">이 기능은 다음 개발 단계에서 구현됩니다.</div>
+          <div className="coming-soon">상단의 현재 문제 메뉴에서 공개문제를 선택하면 학습을 시작할 수 있습니다.</div>
         </div>
       </div>
     </section>

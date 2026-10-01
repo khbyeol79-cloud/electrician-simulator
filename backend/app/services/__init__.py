@@ -10,6 +10,8 @@ from .runtime_circuit_composer import (
 from .circuit_reference_validator import CircuitReferenceValidator
 from .diagram_reference_validator import DiagramReferenceValidator
 from .problem_validator import ProblemPackageValidator
+from .practice_safety_service import PracticeSafetyService
+from .wiring_capture_service import WiringCaptureService
 
 __all__ = [
     "CatalogError",
@@ -22,4 +24,6 @@ __all__ = [
     "CircuitReferenceValidator",
     "DiagramReferenceValidator",
     "ProblemPackageValidator",
+    "PracticeSafetyService",
+    "WiringCaptureService",
 ]

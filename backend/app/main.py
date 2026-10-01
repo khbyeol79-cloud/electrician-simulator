@@ -1,12 +1,20 @@
 from __future__ import annotations
 
 import logging
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+from .api.auth import router as auth_router
+from .api.admin import router as admin_router
+from .core.auth import AuthStore, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH
+from .core.auth_middleware import authentication_boundary
 
 from .api.health import router as health_router
 from .api.catalog import router as catalog_router
@@ -29,11 +37,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or load_settings()
     logger = configure_logging(app_settings.paths, app_settings.debug)
     database = SQLiteDatabase(app_settings.paths.database_file)
+    auth_store = AuthStore(app_settings.paths.writable_root / "accounts.db",
+                           idle_seconds=app_settings.auth_idle_seconds,
+                           lifetime_seconds=app_settings.auth_lifetime_seconds) if app_settings.auth_required else None
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         logger.info("애플리케이션 시작 | mode=%s", app_settings.app_mode)
         app_settings.paths.ensure_writable_directories()
+        if auth_store is not None:
+            auth_store.initialize()
         try:
             database.initialize()
             app.state.database_ready = database.is_ready()
@@ -68,6 +81,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.auth_store = auth_store
+    app.state.started_monotonic = time.monotonic()
+    app.middleware("http")(authentication_boundary)
+
+    @app.exception_handler(RequestValidationError)
+    async def safe_validation_error(request, exc):
+        if request.url.path.startswith("/api/admin/") and request.url.path.endswith("/reset-password"):
+            return JSONResponse({"detail": f"관리자 비밀번호와 새 비밀번호({MIN_PASSWORD_LENGTH}~{MAX_PASSWORD_LENGTH}자), 비밀번호 확인을 확인하세요."}, status_code=422)
+        if request.url.path.startswith("/api/auth/"):
+            # Never echo rejected passwords in validation errors.
+            return JSONResponse({"detail": f"입력 형식을 확인하세요. 아이디 4~24자(영문·숫자·_), 가입 비밀번호 {MIN_PASSWORD_LENGTH}~{MAX_PASSWORD_LENGTH}자, 닉네임 2~20자입니다."}, status_code=422)
+        return await request_validation_exception_handler(request, exc)
     app.state.database = database
     app.state.user_databases = UserDatabasePool(database)
     app.state.database_ready = False
@@ -86,6 +111,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         )
 
     app.include_router(health_router)
+    app.include_router(auth_router)
+    app.include_router(admin_router)
     app.include_router(catalog_router)
     app.include_router(circuit_analysis_router)
     app.include_router(problems_router)

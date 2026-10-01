@@ -30,6 +30,18 @@ class ProblemFiles(BaseModel):
     board: str | None = None
 
 
+class ProblemCapabilities(BaseModel):
+    """Public feature gates. They grant access to tools, never answer data."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    board_visible: bool = False
+    wiring_editable: bool = False
+    wiring_gradable: bool = False
+    operation_previewable: bool = False
+    operation_gradable: bool = False
+
+
 class ProblemManifest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -44,3 +56,4 @@ class ProblemManifest(BaseModel):
     tags: list[str] = Field(default_factory=list, max_length=20)
     source: ProblemSource
     files: ProblemFiles
+    capabilities: ProblemCapabilities | None = None

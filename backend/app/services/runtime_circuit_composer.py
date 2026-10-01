@@ -34,7 +34,7 @@ class DeviceBehaviorRuntimeComposer:
 
     _COMPATIBLE_MODELS = {
         "mccb": "mccb_3p_training",
-        "fuse": "fuse_single_pole_training",
+        "fuse": "fuse_dual_4terminal_training",
         "power_source": "power_3p_control_training",
         "auxiliary_relay_8p": "auxiliary_relay_8p_training_partial",
         "timer_8p": "timer_8p_on_delay_training_partial",
@@ -87,6 +87,8 @@ class DeviceBehaviorRuntimeComposer:
             except DeviceInstanceError as exc:
                 raise RuntimeCompositionError(str(exc)) from exc
 
+            if self._upgrade_known_legacy_fragment(runtime_circuit, runtime_operation, fragment, model_id):
+                warnings.append(f"{device.device_id}: 저장된 구형 기구 정의를 PDF 검수 모델로 실행합니다. 저장 결선은 변경하지 않습니다.")
             self._merge_models(runtime_circuit.terminals, fragment.terminals, "단자", "terminal_id")
             self._merge_models(runtime_circuit.coils, fragment.coils, "코일", "coil_id")
             self._merge_models(runtime_circuit.contacts, fragment.contacts, "접점", "contact_id")
@@ -108,6 +110,63 @@ class DeviceBehaviorRuntimeComposer:
             model_ids=tuple(model_ids),
             warnings=tuple(warnings),
         )
+
+    @staticmethod
+    def _upgrade_known_legacy_fragment(circuit, operation, fragment, model_id: str) -> bool:
+        """Recognize only the exact pre-PDF catalog shapes, on runtime copies.
+
+        Unknown/custom conflicts still fail normal composition. Terminal IDs,
+        saved wires and the persisted workspace are never migrated here.
+        """
+        owner = fragment.device.device_id
+        contact = next((c for c in fragment.contacts if c.contact_id == f"{owner}-C1"), None)
+        if contact is None:
+            return False
+        roles = {}
+        if model_id == "timer_8p_on_delay_training_partial":
+            legacy_contact = contact.model_copy(update={
+                "contact_type": "CHANGEOVER", "nc_terminal_id": f"{owner}-4",
+                "no_terminal_id": f"{owner}-3", "controller_type": "timer",
+                "controller_id": f"{owner}-TIMER", "normal_state": "closed",
+            })
+            roles = {4: "contact_nc"}
+        elif model_id == "flasher_relay_8p_training":
+            legacy_contact = contact.model_copy(update={
+                "contact_type": "NO", "common_terminal_id": f"{owner}-5",
+                "switched_terminal_id": f"{owner}-8", "nc_terminal_id": None,
+                "no_terminal_id": None, "normal_state": "open",
+            })
+            roles = {5: "contact_common", 6: "unassigned", 8: "contact_no"}
+        elif model_id == "floatless_level_switch_8p_training":
+            legacy_contact = contact.model_copy(update={
+                "contact_type": "NO", "common_terminal_id": f"{owner}-3",
+                "switched_terminal_id": f"{owner}-4", "nc_terminal_id": None,
+                "no_terminal_id": None, "normal_state": "open",
+            })
+            roles = {2: "unassigned", 3: "contact_common", 4: "contact_no"}
+        else:
+            return False
+        existing = next((c for c in circuit.contacts if c.contact_id == contact.contact_id), None)
+        if existing != legacy_contact:
+            return False
+        replacements = [(circuit.contacts, "contact_id", contact, legacy_contact)]
+        for terminal in fragment.terminals:
+            if terminal.pin_number in roles:
+                legacy = terminal.model_copy(update={"electrical_role": roles[terminal.pin_number]})
+                replacements.append((circuit.terminals, "terminal_id", terminal, legacy))
+        for timer in fragment.timers:
+            legacy = timer.model_copy(update={"timed_contact_ids": [f"{owner}-C1", f"{owner}-C2"]})
+            replacements.append((operation.timers, "timer_id", timer, legacy))
+        # Do not partially upgrade a definition with unrelated user changes.
+        for items, key, current, legacy in replacements:
+            old = next((i for i in items if getattr(i, key) == getattr(current, key)), None)
+            if old is not None and old != legacy and old != current:
+                return False
+        for items, key, current, legacy in replacements:
+            for index, old in enumerate(items):
+                if getattr(old, key) == getattr(current, key):
+                    items[index] = current.model_copy(deep=True)
+        return True
 
     def _model_id(self, device: CircuitDevice, operation: OperationDefinition) -> str | None:
         if device.behavior_model_id:
@@ -141,6 +200,16 @@ class DeviceBehaviorRuntimeComposer:
                 None,
             )
             return {"delay_ms": timer.delay_ms} if timer else {}
+        if model_id == "flasher_relay_8p_training":
+            flasher = next(
+                (
+                    item
+                    for item in operation.flashers
+                    if item.coil_id.startswith(f"{device.device_id}-")
+                ),
+                None,
+            )
+            return {"flash_interval_ms": flasher.interval_ms} if flasher else {}
         if model_id == "indicator_lamp_two_terminal":
             indicator = next(
                 (item for item in operation.indicators if item.indicator_id == device.device_id),
@@ -167,7 +236,15 @@ class DeviceBehaviorRuntimeComposer:
     def _merge_operation(self, operation: OperationDefinition, fragment) -> None:
         self._merge_operation_items(operation.controls, fragment.controls, "입력기구", "control_id")
         self._merge_operation_items(operation.timers, fragment.timers, "타이머", "timer_id")
+        self._merge_operation_items(operation.flashers, fragment.flashers, "플리커", "flasher_id")
+        self._merge_operation_items(
+            operation.level_relays, fragment.level_relays, "수위계전기", "level_relay_id"
+        )
         self._merge_operation_items(operation.indicators, fragment.indicators, "표시등", "indicator_id")
+        self._merge_operation_items(
+            operation.audible_outputs, fragment.audible_outputs, "가청출력", "output_id"
+        )
+        self._merge_operation_items(operation.fuse_channels, fragment.fuse_channels, "FUSE 채널", "channel_id")
         self._merge_contactors(operation.contactors, fragment.contactors)
         existing_pairs = {
             tuple(sorted((item.from_terminal, item.to)))
@@ -260,3 +337,13 @@ class DeviceBehaviorRuntimeComposer:
         protection.protection_contact_ids = list(
             dict.fromkeys([*protection.protection_contact_ids, *contact_ids])
         )
+        supply_a = fragment.terminal_ids.get("supply_a")
+        supply_b = fragment.terminal_ids.get("supply_b")
+        # A1-A2 power enforcement is opt-in on the operation definition so
+        # older training packages keep their established behavior. Audited
+        # packages such as Q-Net 010 explicitly declare both terminals.
+        if supply_a and supply_b and (
+            protection.supply_terminal_a_id or protection.supply_terminal_b_id
+        ):
+            protection.supply_terminal_a_id = supply_a
+            protection.supply_terminal_b_id = supply_b

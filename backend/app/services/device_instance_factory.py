@@ -10,9 +10,13 @@ from app.domain.device_behavior import (
     SettingValue,
 )
 from app.domain.operation_definition import (
+    OperationAudibleOutput,
     OperationContactor,
     OperationControl,
+    OperationFlasher,
+    OperationFuseChannel,
     OperationIndicator,
+    OperationLevelRelay,
     OperationTimer,
     TerminalPair,
 )
@@ -101,6 +105,20 @@ class DeviceInstanceFactory:
                     )
                 controlled_by_coil_id = coil_ids[model.timer.coil_key]
                 controller_id = f"{request.instance_id}-{model.timer.id_suffix}"
+            elif item.actuation == "flasher":
+                if model.flasher is None:
+                    raise DeviceInstanceError(
+                        f"{model.model_id}의 플리커 접점에 플리커 정의가 없습니다."
+                    )
+                controlled_by_coil_id = coil_ids[model.flasher.coil_key]
+                controller_id = f"{request.instance_id}-{model.flasher.id_suffix}"
+            elif item.actuation == "level":
+                if model.level_relay is None:
+                    raise DeviceInstanceError(
+                        f"{model.model_id}의 수위 접점에 수위계전기 정의가 없습니다."
+                    )
+                controlled_by_coil_id = None
+                controller_id = f"{request.instance_id}-{model.level_relay.id_suffix}"
             else:
                 controlled_by_coil_id = None
                 controller_id = request.instance_id
@@ -123,6 +141,14 @@ class DeviceInstanceFactory:
         controls: list[OperationControl] = []
         if model.control:
             contact = next(item for item in model.contacts if item.contact_key == model.control.contact_key)
+            alternate = next(
+                (
+                    item
+                    for item in model.contacts
+                    if item.contact_key == model.control.alternate_contact_key
+                ),
+                None,
+            )
             controls.append(
                 OperationControl(
                     control_id=request.instance_id,
@@ -132,6 +158,12 @@ class DeviceInstanceFactory:
                     contact_type=cast(Any, contact.contact_type),
                     terminal_a_id=terminal_ids[contact.common_terminal_key],
                     terminal_b_id=terminal_ids[contact.switched_terminal_key],
+                    alternate_terminal_a_id=(
+                        terminal_ids[alternate.common_terminal_key] if alternate else None
+                    ),
+                    alternate_terminal_b_id=(
+                        terminal_ids[alternate.switched_terminal_key] if alternate else None
+                    ),
                     initial_active=model.control.initial_active,
                 )
             )
@@ -150,6 +182,38 @@ class DeviceInstanceFactory:
                 )
             )
 
+        flashers: list[OperationFlasher] = []
+        if model.flasher:
+            flashers.append(
+                OperationFlasher(
+                    flasher_id=f"{request.instance_id}-{model.flasher.id_suffix}",
+                    label=request.label,
+                    coil_id=coil_ids[model.flasher.coil_key],
+                    interval_ms=int(settings[model.flasher.interval_property_key]),
+                    contact_ids=[contact_ids[key] for key in model.flasher.contact_keys],
+                )
+            )
+
+        level_relays: list[OperationLevelRelay] = []
+        if model.level_relay:
+            level_relays.append(
+                OperationLevelRelay(
+                    level_relay_id=f"{request.instance_id}-{model.level_relay.id_suffix}",
+                    label=request.label,
+                    supply_terminal_a_id=terminal_ids[model.level_relay.supply_terminal_a_key],
+                    supply_terminal_b_id=terminal_ids[model.level_relay.supply_terminal_b_key],
+                    electrode_terminal_ids=[
+                        terminal_ids[key] for key in model.level_relay.electrode_terminal_keys
+                    ],
+                    external_electrode_terminal_ids=[
+                        f"{request.instance_id}-E1",
+                        f"{request.instance_id}-E2",
+                        f"{request.instance_id}-E3",
+                    ],
+                    contact_ids=[contact_ids[key] for key in model.level_relay.contact_keys],
+                )
+            )
+
         indicators: list[OperationIndicator] = []
         if model.indicator:
             indicators.append(
@@ -159,6 +223,17 @@ class DeviceInstanceFactory:
                     display_color=cast(Any, settings[model.indicator.display_color_property_key]),
                     terminal_a_id=terminal_ids[model.indicator.terminal_a_key],
                     terminal_b_id=terminal_ids[model.indicator.terminal_b_key],
+                )
+            )
+
+        audible_outputs: list[OperationAudibleOutput] = []
+        if model.audible_output:
+            audible_outputs.append(
+                OperationAudibleOutput(
+                    output_id=request.instance_id,
+                    label=request.label,
+                    terminal_a_id=terminal_ids[model.audible_output.terminal_a_key],
+                    terminal_b_id=terminal_ids[model.audible_output.terminal_b_key],
                 )
             )
 
@@ -184,6 +259,17 @@ class DeviceInstanceFactory:
             )
             for item in model.intrinsic_connections
         ]
+        fuse_channels = []
+        if model.device_type_id == "fuse":
+            fuse_channels = [
+                OperationFuseChannel(
+                    channel_id=f"{request.instance_id}-CH{index}",
+                    label=f"{request.label} {pair.from_terminal.rsplit('-', 1)[-1]}-{pair.to.rsplit('-', 1)[-1]}",
+                    terminal_a_id=pair.from_terminal,
+                    terminal_b_id=pair.to,
+                )
+                for index, pair in enumerate(intrinsic_connections, start=1)
+            ]
         deferred = [
             capability
             for capability in ("power_source", "three_phase_load", "overload_protection")
@@ -198,8 +284,12 @@ class DeviceInstanceFactory:
             contacts=circuit_contacts,
             controls=controls,
             timers=timers,
+            flashers=flashers,
+            level_relays=level_relays,
             indicators=indicators,
+            audible_outputs=audible_outputs,
             contactors=contactors,
+            fuse_channels=fuse_channels,
             intrinsic_connections=intrinsic_connections,
             terminal_ids=terminal_ids,
             coil_ids=coil_ids,

@@ -31,7 +31,10 @@ def test_qnet_drafts_expose_sources_but_not_private_answers():
         public = repository.get_public(problem_id)
         assert package is not None and public is not None
         assert package.answer.verification.status == "unverified"
+        # Public source omits private candidate grading nets, not scenarios.
         assert not package.answer.expected_nets
+        if number == "010":
+            assert package.answer.operation_tests
         assert public.operation is None
         assert len(public.wiring_semantics["external_devices"]) >= 10
         serialized = public.model_dump_json()
@@ -49,3 +52,15 @@ def test_qnet_schematic_assets_are_embedded_original_page_renders():
         assert content.startswith("<svg")
         assert "data:image/png;base64," in content
         assert path.stat().st_size < 5 * 1024 * 1024
+
+
+def test_all_qnet_packages_include_pdf_page_5_layout_references():
+    repository = ProblemRepository(PROJECT_ROOT / "problems", PROJECT_ROOT / "schemas", PROJECT_ROOT / "catalog")
+    repository.reload()
+    for index in range(1, 19):
+        problem_id = f"qnet_electrician_practical_{index:03d}"
+        path = repository.get_layout_reference_path(problem_id)
+        assert path is not None, problem_id
+        content = path.read_bytes()
+        assert content.startswith(b"\x89PNG\r\n\x1a\n"), problem_id
+        assert 50_000 < len(content) < 5 * 1024 * 1024, problem_id

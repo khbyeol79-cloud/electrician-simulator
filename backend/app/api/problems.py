@@ -46,9 +46,25 @@ def get_schematic(problem_id: str, request: Request):
     return FileResponse(schematic, media_type="image/svg+xml")
 
 
+@router.get("/{problem_id}/layout-reference", response_class=FileResponse)
+def get_layout_reference(problem_id: str, request: Request):
+    reference = _repository(request).get_layout_reference_path(problem_id)
+    if reference is None:
+        raise HTTPException(status_code=404, detail="배관·배치도 원본을 찾을 수 없습니다.")
+    return FileResponse(reference, media_type="image/png")
+
+
 @router.get("/{problem_id}", response_model=PublicProblemDetail)
 def get_problem(problem_id: str, request: Request) -> PublicProblemDetail:
     problem = _repository(request).get_public(problem_id)
     if problem is None:
         raise HTTPException(status_code=404, detail="문제를 찾을 수 없습니다.")
     return problem
+
+
+@router.get("/{problem_id}/analysis-reference/{reference_id}", response_class=FileResponse)
+def get_analysis_reference(problem_id: str, reference_id: str, request: Request):
+    path = _repository(request).get_analysis_reference_path(problem_id, reference_id)
+    if path is None:
+        raise HTTPException(status_code=404, detail="해당 기구 또는 학습 자료의 원본 그림이 없습니다.")
+    return FileResponse(path, media_type="image/png")

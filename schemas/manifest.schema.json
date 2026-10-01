@@ -59,6 +59,21 @@
         "diagram": { "$ref": "#/$defs/safeRelativePath" },
         "board": { "anyOf": [{ "$ref": "#/$defs/safeRelativePath" }, { "type": "null" }] }
       }
+    },
+    "capabilities": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "board_visible", "wiring_editable", "wiring_gradable",
+        "operation_previewable", "operation_gradable"
+      ],
+      "properties": {
+        "board_visible": { "type": "boolean" },
+        "wiring_editable": { "type": "boolean" },
+        "wiring_gradable": { "type": "boolean" },
+        "operation_previewable": { "type": "boolean" },
+        "operation_gradable": { "type": "boolean" }
+      }
     }
   },
   "$defs": {

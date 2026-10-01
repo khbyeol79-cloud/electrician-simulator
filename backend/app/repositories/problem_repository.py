@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from app.domain import (
     CircuitSummary,
     ProblemPackage,
+    ProblemCapabilities,
     ProblemSummary,
     ProblemValidationIssue,
     PublicProblemDetail,
@@ -17,6 +18,10 @@ from app.services.problem_validator import ProblemPackageValidator
 
 
 STATUS_ORDER = {"verified": 0, "reviewed": 1, "draft": 2}
+QNET_COMMON_PREVIEW_IDS = {
+    *(f"qnet_electrician_practical_{number:03d}" for number in (*range(1, 8), 9)),
+    *(f"qnet_electrician_practical_{number:03d}" for number in range(11, 18)),
+}
 
 
 class ReloadStatistics(BaseModel):
@@ -111,6 +116,18 @@ class ProblemRepository:
             return None
         manifest = package.manifest
         problem = package.problem
+        capabilities = self.capabilities(package)
+        expose_operation = capabilities.operation_gradable
+        wiring_semantics = problem.wiring_semantics.model_dump(mode="json") if problem.wiring_semantics else None
+        if wiring_semantics is not None and problem.operation:
+            public_contact_types = {
+                control.control_id: control.contact_type
+                for control in problem.operation.controls
+                if control.control_type in {"pushbutton", "limit_switch"}
+            }
+            for device in wiring_semantics["external_devices"]:
+                if device.get("contact_type") is None and device["device_id"] in public_contact_types:
+                    device["contact_type"] = public_contact_types[device["device_id"]]
         return PublicProblemDetail(
             problem_id=manifest.problem_id,
             title=manifest.title,
@@ -132,10 +149,57 @@ class ProblemRepository:
             circuit=problem.circuit.model_dump(mode="json"),
             socket_questions=[question.model_dump(mode="json") for question in problem.socket_questions],
             device_layout=problem.device_layout.model_dump(mode="json") if problem.device_layout else None,
-            operation=problem.operation.model_dump(by_alias=True, mode="json") if problem.operation else None,
-            wiring_semantics=problem.wiring_semantics.model_dump(mode="json") if problem.wiring_semantics else None,
+            operation=(
+                problem.operation.model_dump(by_alias=True, mode="json")
+                if problem.operation and expose_operation else None
+            ),
+            wiring_semantics=wiring_semantics,
             warning_count=len(package.warnings),
+            capabilities=capabilities,
         )
+
+    def capabilities(self, package: ProblemPackage) -> ProblemCapabilities:
+        declared = package.manifest.capabilities
+        if declared is not None:
+            if not declared.wiring_gradable and not declared.operation_gradable:
+                return declared
+            verified_answer = package.answer.verification.status != "unverified"
+            return declared.model_copy(update={
+                "wiring_gradable": declared.wiring_gradable and verified_answer,
+                "operation_gradable": declared.operation_gradable and verified_answer,
+            })
+        is_qnet_capture = (
+            package.manifest.problem_type == "official"
+            and package.manifest.problem_id.startswith("qnet_electrician_practical_")
+            and package.board is not None
+        )
+        if is_qnet_capture:
+            return ProblemCapabilities(
+                board_visible=True,
+                wiring_editable=True,
+                wiring_gradable=False,
+                operation_previewable=package.manifest.problem_id in QNET_COMMON_PREVIEW_IDS,
+                operation_gradable=False,
+            )
+        verified_answer = package.answer.verification.status != "unverified"
+        legacy_visible = not (
+            package.manifest.problem_type == "official" and package.manifest.status == "draft"
+        )
+        functional_operation = bool(
+            package.problem.operation
+            and package.problem.operation.simulation_status == "functional"
+        )
+        return ProblemCapabilities(
+            board_visible=legacy_visible,
+            wiring_editable=legacy_visible,
+            wiring_gradable=verified_answer,
+            operation_previewable=legacy_visible and verified_answer and functional_operation,
+            operation_gradable=verified_answer and functional_operation and bool(package.answer.operation_tests),
+        )
+
+    def get_capabilities(self, problem_id: str) -> ProblemCapabilities | None:
+        package = self._packages.get(problem_id)
+        return self.capabilities(package) if package else None
 
     def _get_package_internal(self, problem_id: str) -> ProblemPackage | None:
         return self._packages.get(problem_id)
@@ -155,9 +219,34 @@ class ProblemRepository:
             return None
         return path if path.is_file() else None
 
+    def get_layout_reference_path(self, problem_id: str) -> Path | None:
+        """Return the audited PDF page-5 layout reference bundled with a problem."""
+        package = self._packages.get(problem_id)
+        if package is None:
+            return None
+        path = (package.package_dir / "layout-reference.png").resolve()
+        try:
+            path.relative_to(package.package_dir.resolve())
+        except ValueError:
+            return None
+        return path if path.is_file() else None
+
     def get_board(self, problem_id: str):
         package = self._packages.get(problem_id)
         return package.board if package else None
+
+    def get_analysis_reference_path(self, problem_id: str, reference_id: str) -> Path | None:
+        # Only bundled public PDF renders; never resolve arbitrary filenames.
+        if reference_id not in {"operation", "internal", "mc", "eocr", "timer", "relay",
+                                "fr", "fls", "ss", "socket8", "socket12"}:
+            return None
+        package = self._packages.get(problem_id)
+        if package is None:
+            return None
+        path = (package.package_dir / "study-references" / f"{reference_id}.png").resolve()
+        if not path.is_relative_to(package.package_dir.resolve()):
+            return None
+        return path if path.is_file() else None
 
     def get_circuit_summary(self, problem_id: str) -> CircuitSummary | None:
         package = self._packages.get(problem_id)

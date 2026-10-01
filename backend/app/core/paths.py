@@ -19,10 +19,20 @@ def _bundle_root() -> Path:
     return _project_root()
 
 
-def _writable_root(project_root: Path) -> Path:
+def _writable_root(project_root: Path, bundle_root: Path) -> Path:
     override = os.getenv("ELECTRICIAN_DATA_DIR")
     if override:
-        return Path(override).expanduser().resolve()
+        requested = Path(override).expanduser()
+        # Relative configuration follows the application, never the shell CWD
+        # or the drive letter used on the previous machine.
+        return (requested if requested.is_absolute() else bundle_root / requested).resolve()
+
+    account_service = any(
+        os.getenv(key, "").strip().lower() in {"1", "true", "yes", "on"}
+        for key in ("AUTH_REQUIRED", "ALLOW_LAN")
+    )
+    if account_service:
+        return bundle_root / "user-data"
 
     if os.getenv("APP_ENV", "development").lower() == "development":
         return project_root / "data" / "dev"
@@ -53,7 +63,7 @@ class AppPaths:
 def build_paths() -> AppPaths:
     project_root = _project_root()
     bundle_root = _bundle_root()
-    writable_root = _writable_root(project_root)
+    writable_root = _writable_root(project_root, bundle_root)
     return AppPaths(
         project_root=project_root,
         bundle_root=bundle_root,

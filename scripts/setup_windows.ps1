@@ -1,4 +1,4 @@
-param([switch]$RebuildFrontend)
+param([switch]$RebuildFrontend, [switch]$WebOnly)
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
@@ -80,7 +80,8 @@ try {
     }
 
     Write-Host "[4/5] Installing Python packages..."
-    & ".venv\Scripts\python.exe" -m pip install -r "backend\requirements.txt"
+    $RequirementsFile = if ($WebOnly) { "backend\requirements-web.txt" } else { "backend\requirements.txt" }
+    & ".venv\Scripts\python.exe" -m pip install -r $RequirementsFile
     if ($LASTEXITCODE -ne 0) {
         throw "Python package installation failed. Check the internet connection or setup.log."
     }
@@ -90,6 +91,9 @@ try {
         Write-Host "[5/5] Prebuilt frontend found. Node.js installation is not required."
     }
     else {
+        if ($WebOnly) {
+            throw "Prebuilt frontend missing. Create a fresh release ZIP on the development PC."
+        }
         Write-Host "[5/5] Building React frontend..."
         if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
             throw "Node.js 20+ is required only when rebuilding the frontend. Run without -RebuildFrontend or install Node.js 20+."
@@ -123,8 +127,13 @@ try {
 
     Write-Host ""
     Write-Host "Setup completed successfully." -ForegroundColor Green
-    Write-Host "Desktop: run_desktop.bat"
-    Write-Host "Web:     run_web.bat"
+    if ($WebOnly) {
+        Write-Host "LAN setup ready. Restore your backup before starting the server. See LAN_TRANSFER.md."
+    }
+    else {
+        Write-Host "Desktop: run_desktop.bat"
+        Write-Host "Web:     run_web.bat"
+    }
 }
 catch {
     $ExitCode = 1

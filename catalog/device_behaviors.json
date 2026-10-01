@@ -2,6 +2,339 @@
   "schema_version": "1.0",
   "models": [
     {
+      "model_id": "flasher_relay_8p_training",
+      "device_type_id": "flasher_relay_8p",
+      "name": "8P 플리커 릴레이",
+      "definition_status": "verified",
+      "source_note": "Q-Net 공개문제 001~009 내부결선도 9쪽: 코일 2-7, 공통 8, B접점 5, A접점 6. 두 출력은 교대로 전환한다.",
+      "compatible_socket_type_ids": [
+        "socket_8p_base"
+      ],
+      "capabilities": [
+        "coil",
+        "flashing_contacts"
+      ],
+      "terminals": [
+        {
+          "terminal_key": "electrode_3",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_a",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "unused_3",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "unused_4",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "unassigned",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "flash_nc",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "flash_no",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "coil_b",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "coil",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "flash_common",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [
+        {
+          "coil_key": "main_coil",
+          "id_suffix": "COIL",
+          "terminal_a_key": "coil_a",
+          "terminal_b_key": "coil_b",
+          "rated_voltage_property_key": "coil_voltage",
+          "voltage_type_property_key": "coil_voltage_type",
+          "frequency_property_key": "coil_frequency"
+        }
+      ],
+      "contacts": [
+        {
+          "contact_key": "flash_contact",
+          "id_suffix": "C1",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "flash_common",
+          "switched_terminal_key": "flash_no",
+          "nc_terminal_key": "flash_nc",
+          "no_terminal_key": "flash_no",
+          "actuation": "flasher",
+          "controlled_by_key": "main_flasher",
+          "normal_state": "closed"
+        }
+      ],
+      "intrinsic_connections": [],
+      "configurable_properties": [
+        {
+          "property_key": "coil_voltage",
+          "value_type": "number",
+          "required": false,
+          "default": 220,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "coil_voltage_type",
+          "value_type": "voltage_type",
+          "required": false,
+          "default": "AC",
+          "minimum": null,
+          "maximum": null,
+          "choices": [
+            "AC",
+            "DC"
+          ]
+        },
+        {
+          "property_key": "coil_frequency",
+          "value_type": "number",
+          "required": false,
+          "default": 60,
+          "minimum": 1,
+          "maximum": 1000,
+          "choices": []
+        },
+        {
+          "property_key": "flash_interval_ms",
+          "value_type": "integer",
+          "required": false,
+          "default": 1000,
+          "minimum": 100,
+          "maximum": 60000,
+          "choices": []
+        }
+      ],
+      "control": null,
+      "timer": null,
+      "flasher": {
+        "flasher_key": "main_flasher",
+        "id_suffix": "FLASH",
+        "coil_key": "main_coil",
+        "interval_property_key": "flash_interval_ms",
+        "contact_keys": [
+          "flash_contact"
+        ]
+      },
+      "level_relay": null,
+      "indicator": null,
+      "audible_output": null,
+      "motor": null,
+      "protection": null
+    },
+    {
+      "model_id": "floatless_level_switch_8p_training",
+      "device_type_id": "floatless_level_switch_8p",
+      "name": "8P 무수위 계전기",
+      "definition_status": "verified",
+      "source_note": "Q-Net 공개문제 001~009 내부결선도 9쪽: 전원 5-6, 공통 4, B접점 2, A접점 3, 전극 E1/E2/E3=7/8/1.",
+      "compatible_socket_type_ids": [
+        "socket_8p_base"
+      ],
+      "capabilities": [
+        "level_control"
+      ],
+      "terminals": [
+        {
+          "terminal_key": "electrode_e3",
+          "terminal_suffix": "1",
+          "pin_number": 1,
+          "terminal_type": "socket_pin",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "output_nc",
+          "terminal_suffix": "2",
+          "pin_number": 2,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_nc",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "output_no",
+          "terminal_suffix": "3",
+          "pin_number": 3,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_no",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "output_common",
+          "terminal_suffix": "4",
+          "pin_number": 4,
+          "terminal_type": "socket_pin",
+          "electrical_role": "contact_common",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "supply_a",
+          "terminal_suffix": "5",
+          "pin_number": 5,
+          "terminal_type": "socket_pin",
+          "electrical_role": "line",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "supply_b",
+          "terminal_suffix": "6",
+          "pin_number": 6,
+          "terminal_type": "socket_pin",
+          "electrical_role": "neutral",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "electrode_e1",
+          "terminal_suffix": "7",
+          "pin_number": 7,
+          "terminal_type": "socket_pin",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        },
+        {
+          "terminal_key": "electrode_e2",
+          "terminal_suffix": "8",
+          "pin_number": 8,
+          "terminal_type": "socket_pin",
+          "electrical_role": "control",
+          "max_connections": 2,
+          "enabled": true
+        }
+      ],
+      "coils": [],
+      "contacts": [
+        {
+          "contact_key": "level_contact",
+          "id_suffix": "C1",
+          "contact_type": "CHANGEOVER",
+          "common_terminal_key": "output_common",
+          "switched_terminal_key": "output_no",
+          "nc_terminal_key": "output_nc",
+          "no_terminal_key": "output_no",
+          "actuation": "level",
+          "controlled_by_key": "main_level",
+          "normal_state": "closed"
+        }
+      ],
+      "intrinsic_connections": [],
+      "configurable_properties": [],
+      "control": null,
+      "timer": null,
+      "flasher": null,
+      "level_relay": {
+        "level_relay_key": "main_level",
+        "id_suffix": "LEVEL",
+        "supply_terminal_a_key": "supply_a",
+        "supply_terminal_b_key": "supply_b",
+        "electrode_terminal_keys": [
+          "electrode_e1",
+          "electrode_e2",
+          "electrode_e3"
+        ],
+        "contact_keys": [
+          "level_contact"
+        ]
+      },
+      "indicator": null,
+      "audible_output": null,
+      "motor": null,
+      "protection": null
+    },
+    {
+      "model_id": "selector_switch_auto_manual",
+      "device_type_id": "selector_switch",
+      "name": "자동·수동 선택스위치",
+      "definition_status": "verified",
+      "source_note": "Q-Net 공개문제 008의 SS 자동(A)·수동(M) 전환 접점을 TB 외부기구로 모델링했다.",
+      "compatible_socket_type_ids": [], "capabilities": ["manual_control"],
+      "terminals": [
+        { "terminal_key": "auto_1", "terminal_suffix": "A1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "control", "max_connections": 1, "enabled": true },
+        { "terminal_key": "auto_2", "terminal_suffix": "A2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "control", "max_connections": 1, "enabled": true },
+        { "terminal_key": "manual_1", "terminal_suffix": "M1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "control", "max_connections": 1, "enabled": true },
+        { "terminal_key": "manual_2", "terminal_suffix": "M2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "control", "max_connections": 1, "enabled": true }
+      ],
+      "coils": [],
+      "contacts": [
+        { "contact_key": "auto_contact", "id_suffix": "AUTO", "contact_type": "NO", "common_terminal_key": "auto_1", "switched_terminal_key": "auto_2", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "selector", "normal_state": "open" },
+        { "contact_key": "manual_contact", "id_suffix": "MANUAL", "contact_type": "NO", "common_terminal_key": "manual_1", "switched_terminal_key": "manual_2", "nc_terminal_key": null, "no_terminal_key": null, "actuation": "manual", "controlled_by_key": "selector", "normal_state": "open" }
+      ],
+      "intrinsic_connections": [], "configurable_properties": [],
+      "control": { "control_type": "selector", "mode": "maintained", "contact_key": "auto_contact", "alternate_contact_key": "manual_contact", "initial_active": true },
+      "timer": null, "flasher": null, "level_relay": null, "indicator": null, "audible_output": null, "motor": null, "protection": null
+    },
+    {
+      "model_id": "buzzer_two_terminal",
+      "device_type_id": "buzzer",
+      "name": "2단자 부저",
+      "definition_status": "verified",
+      "source_note": "Q-Net 공개문제 008의 BZ 1·2 단자를 TB 외부기구로 모델링했다.",
+      "compatible_socket_type_ids": [], "capabilities": ["audible_output"],
+      "terminals": [
+        { "terminal_key": "terminal_a", "terminal_suffix": "1", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true },
+        { "terminal_key": "terminal_b", "terminal_suffix": "2", "pin_number": null, "terminal_type": "external_terminal", "electrical_role": "load", "max_connections": 1, "enabled": true }
+      ],
+      "coils": [], "contacts": [], "intrinsic_connections": [], "configurable_properties": [], "control": null, "timer": null, "flasher": null, "level_relay": null, "indicator": null,
+      "audible_output": { "terminal_a_key": "terminal_a", "terminal_b_key": "terminal_b" },
+      "motor": null, "protection": null
+    },
+    {
       "model_id": "terminal_block_position",
       "device_type_id": "terminal_block",
       "name": "단자대 한 위치",
@@ -123,56 +456,11 @@
       "protection": null
     },
     {
-      "model_id": "fuse_single_pole_training",
-      "device_type_id": "fuse",
-      "name": "단상 제어퓨즈 교육용 모델",
-      "definition_status": "reviewed",
-      "source_note": "현재 세 자유회로의 F-1·F-2와 정상 상태 internal_connection을 반영한다. 실제 용단 전류 계산은 포함하지 않는다.",
-      "compatible_socket_type_ids": [],
-      "capabilities": [
-        "overcurrent_isolation"
-      ],
-      "terminals": [
-        {
-          "terminal_key": "input",
-          "terminal_suffix": "1",
-          "pin_number": null,
-          "terminal_type": "screw_terminal",
-          "electrical_role": "control",
-          "max_connections": 2,
-          "enabled": true
-        },
-        {
-          "terminal_key": "output",
-          "terminal_suffix": "2",
-          "pin_number": null,
-          "terminal_type": "screw_terminal",
-          "electrical_role": "control",
-          "max_connections": 2,
-          "enabled": true
-        }
-      ],
-      "coils": [],
-      "contacts": [],
-      "intrinsic_connections": [
-        {
-          "from_terminal_key": "input",
-          "to_terminal_key": "output"
-        }
-      ],
-      "configurable_properties": [],
-      "control": null,
-      "timer": null,
-      "indicator": null,
-      "motor": null,
-      "protection": null
-    },
-    {
       "model_id": "fuse_dual_4terminal_training",
       "device_type_id": "fuse",
       "name": "2회로 4단자 제어퓨즈 교육용 모델",
       "definition_status": "reviewed",
-      "source_note": "Q-Net 010 배치도에서 F 기구 1개, 사용자 제공 실제 배선 사진의 외부 결선 4점, 참고 풀이의 단자 1-2 및 3-4 독립 퓨즈 경로를 교차 확인했다. 기존 2단자 fuse_single_pole_training은 저장 데이터 호환을 위해 유지한다. Hotfix: F는 소켓 삽입형 기구가 아닌 직접 나사단자 기구이므로 catalog pin_number는 사용하지 않고 terminal_suffix 1~4로 단자번호를 표현한다.",
+      "source_note": "Q-Net 배치의 F 기구 1개와 사용자 제공 실제 배선 사진의 외부 결선 4점을 반영한다. 단자 1-2 및 3-4는 서로 독립된 퓨즈 경로이며 F는 소켓 삽입형이 아닌 직접 나사단자 기구이므로 catalog pin_number를 사용하지 않는다.",
       "compatible_socket_type_ids": [],
       "capabilities": [
         "overcurrent_isolation"
@@ -699,14 +987,15 @@
     {
       "model_id": "timer_8p_on_delay_training_partial",
       "device_type_id": "timer_8p",
-      "name": "8P 온딜레이 타이머 2전환접점 모델",
+      "name": "8P 온딜레이 타이머 순시·시한 접점 모델",
       "definition_status": "verified",
-      "source_note": "Q-Net 전기기능사 공개문제 001~018 공통 내부결선도 9쪽을 배선면 기준 8P 소켓 배열과 대조했다. 코일 2-7, 제1 계시접점 COM 1/NC 4/NO 3, 제2 계시접점 COM 8/NC 5/NO 6이다. 기존 model_id는 저장된 자유회로 작업공간 호환을 위해 유지한다.",
+      "source_note": "Q-Net 공개문제 001~018 내부결선도 9쪽: 코일 2-7, 순시 A접점 1-3, 시한 전환접점 COM 8/NC 5/NO 6, 4번 내부 미접속. 저장 작업공간 호환을 위해 model_id와 단자 키를 유지한다.",
       "compatible_socket_type_ids": [
         "socket_8p_base"
       ],
       "capabilities": [
         "coil",
+        "relay_contacts",
         "timed_contacts"
       ],
       "terminals": [
@@ -742,7 +1031,7 @@
           "terminal_suffix": "4",
           "pin_number": 4,
           "terminal_type": "socket_pin",
-          "electrical_role": "contact_nc",
+          "electrical_role": "unassigned",
           "max_connections": 2,
           "enabled": true
         },
@@ -798,14 +1087,14 @@
         {
           "contact_key": "timed_contact_1",
           "id_suffix": "C1",
-          "contact_type": "CHANGEOVER",
+          "contact_type": "NO",
           "common_terminal_key": "timed_1_common",
           "switched_terminal_key": "timed_1_no",
-          "nc_terminal_key": "timed_1_nc",
-          "no_terminal_key": "timed_1_no",
-          "actuation": "timer",
-          "controlled_by_key": "main_timer",
-          "normal_state": "closed"
+          "nc_terminal_key": null,
+          "no_terminal_key": null,
+          "actuation": "coil",
+          "controlled_by_key": "main_coil",
+          "normal_state": "open"
         },
         {
           "contact_key": "timed_contact_2",
@@ -870,7 +1159,6 @@
         "mode": "on_delay",
         "delay_property_key": "delay_ms",
         "timed_contact_keys": [
-          "timed_contact_1",
           "timed_contact_2"
         ],
         "retentive": false
@@ -1120,7 +1408,7 @@
       "device_type_id": "eocr",
       "name": "12P EOCR 교육용 모델",
       "definition_status": "verified",
-      "source_note": "Q-Net 전기기능사 공개문제 010(2025-08-04) 8~9쪽을 대조했다. 12P 배선면 기준 L1/U=1/7, L2/V=2/8, L3/W=3/9, 96/95=4/10(NC), 98/97=5/11(NO), A1/A2=6/12이며 과부하 동작 시 NC 차단·NO 경보 전환과 RESET 복귀를 확인했다.",
+      "source_note": "Q-Net 전기기능사 공개문제 010(2025-08-04) 8~9쪽을 대조했다. 12P 배선면 기준 L1/U=1/7, L2/V=2/8, L3/W=3/9, 96/95=4/10(NC), 98/97=5/11(NO), A1/A2=6/12이며 10(95)-11(97)은 기구 내부 공통이다. 과부하 동작 시 NC 차단·NO 경보 전환과 RESET 복귀를 확인했다.",
       "compatible_socket_type_ids": [
         "socket_12p_base"
       ],
@@ -1276,6 +1564,10 @@
         {
           "from_terminal_key": "line_3",
           "to_terminal_key": "load_w"
+        },
+        {
+          "from_terminal_key": "trip_common_nc",
+          "to_terminal_key": "trip_common_no"
         }
       ],
       "configurable_properties": [],

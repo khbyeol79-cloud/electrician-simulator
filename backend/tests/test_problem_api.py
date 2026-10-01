@@ -63,7 +63,7 @@ def test_problem_api_never_exposes_answers_or_paths(tmp_path):
 
         behaviors = client.get("/api/catalog/device-behaviors")
         assert behaviors.status_code == 200
-        assert len(behaviors.json()) == 17
+        assert len(behaviors.json()) == 20
         assert "expected_nets" not in behaviors.text
         assert "wiring_connections" not in behaviors.text
         assert "TB5-" not in behaviors.text
@@ -86,6 +86,7 @@ def test_problem_api_never_exposes_answers_or_paths(tmp_path):
         schematic = client.get("/api/problems/practice_001/schematic")
         assert schematic.status_code == 200
         assert schematic.headers["content-type"].startswith("image/svg+xml")
+        assert client.get("/api/problems/practice_001/layout-reference").status_code == 404
 
 
 def test_problem_reload_and_missing_problem(tmp_path):
@@ -96,3 +97,15 @@ def test_problem_reload_and_missing_problem(tmp_path):
         assert reload_response.json() == {"loaded": 1, "excluded": 0, "warnings": 1}
         assert client.get("/api/problems/unknown_001").status_code == 404
         assert client.get("/api/problems/unknown_001/circuit-summary").status_code == 404
+
+
+def test_layout_reference_is_served_only_when_bundled(tmp_path):
+    paths = api_paths(tmp_path)
+    reference = paths.problems_dir / "practice_001" / "layout-reference.png"
+    reference.write_bytes(b"\x89PNG\r\n\x1a\nreference")
+    settings = Settings(paths=paths)
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/api/problems/practice_001/layout-reference")
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("image/png")
+        assert client.get("/api/problems/unknown/layout-reference").status_code == 404

@@ -61,6 +61,76 @@ def test_basic_board_x1_self_hold_stop_and_timer_lamp():
     assert after.indicators["GL"] == "on"
 
 
+def test_common_pushbutton_nc_no_and_timer_boundary_states():
+    _, runtime = runtime_definition()
+    no_engine = make_engine(runtime, [
+        ("PWR-L", "PB1-1", "yellow"), ("PB1-2", "GL-1", "yellow"),
+        ("GL-2", "PWR-N", "yellow"),
+    ])
+    assert no_engine.apply(OperationAction(action="set_power", value=True)).indicators["GL"] == "off"
+    assert no_engine.apply(OperationAction(action="press_control", control_id="PB1")).indicators["GL"] == "on"
+    assert no_engine.apply(OperationAction(action="release_control", control_id="PB1")).indicators["GL"] == "off"
+
+    nc_engine = make_engine(runtime, [
+        ("PWR-L", "PB0-1", "yellow"), ("PB0-2", "GL-1", "yellow"),
+        ("GL-2", "PWR-N", "yellow"),
+    ])
+    assert nc_engine.apply(OperationAction(action="set_power", value=True)).indicators["GL"] == "on"
+    assert nc_engine.apply(OperationAction(action="press_control", control_id="PB0")).indicators["GL"] == "off"
+
+    timer = make_engine(runtime, timer_connections())
+    timer.apply(OperationAction(action="set_power", value=True))
+    before = timer.apply(OperationAction(action="advance_time", milliseconds=999))
+    assert before.timers["T1-TIMER"].status == "timing"
+    assert before.indicators["GL"] == "off"
+    completed = timer.apply(OperationAction(action="advance_time", milliseconds=1))
+    assert completed.timers["T1-TIMER"].status == "completed"
+    assert completed.indicators["GL"] == "on"
+    reset = timer.apply(OperationAction(action="set_power", value=False))
+    assert reset.timers["T1-TIMER"].status == "stopped"
+    assert reset.timers["T1-TIMER"].elapsed_ms == 0
+
+
+def test_common_8p_changeover_groups_switch_com_nc_no_as_a_unit():
+    _, runtime = runtime_definition()
+    for common, nc, no in (("X1-1", "X1-4", "X1-3"), ("X1-8", "X1-5", "X1-6")):
+        item = make_engine(runtime, [
+            ("PWR-L", "PB1-1", "yellow"), ("PB1-2", "X1-2", "yellow"),
+            ("X1-7", "PWR-N", "yellow"), ("PWR-L", common, "yellow"),
+            (nc, "GL-1", "yellow"), ("GL-2", "PWR-N", "yellow"),
+            (no, "RL-1", "yellow"), ("RL-2", "PWR-N", "yellow"),
+        ])
+        normal = item.apply(OperationAction(action="set_power", value=True))
+        assert normal.indicators["GL"] == "on"
+        assert normal.indicators["RL"] == "off"
+        energized = item.apply(OperationAction(action="press_control", control_id="PB1"))
+        assert energized.coils["X1-COIL"] is True
+        assert energized.indicators["GL"] == "off"
+        assert energized.indicators["RL"] == "on"
+
+
+def test_common_dual_fuse_channels_open_independently():
+    _, runtime = runtime_definition()
+    item = make_engine(runtime, [
+        ("PWR-L", "F-1", "yellow"), ("F-2", "GL-1", "yellow"),
+        ("GL-2", "PWR-N", "yellow"), ("PWR-L", "F-3", "yellow"),
+        ("F-4", "RL-1", "yellow"), ("RL-2", "PWR-N", "yellow"),
+    ])
+    normal = item.apply(OperationAction(action="set_power", value=True))
+    assert normal.indicators["GL"] == normal.indicators["RL"] == "on"
+    channel_1_open = item.apply(OperationAction(
+        action="set_fuse_state", target_id="F-CH1", value=False
+    ))
+    assert channel_1_open.fuses["F-CH1"].status == "open"
+    assert channel_1_open.fuses["F-CH2"].status == "normal"
+    assert channel_1_open.indicators["GL"] == "off"
+    assert channel_1_open.indicators["RL"] == "on"
+    both_open = item.apply(OperationAction(
+        action="set_fuse_state", target_id="F-CH2", value=False
+    ))
+    assert both_open.indicators["GL"] == both_open.indicators["RL"] == "off"
+
+
 def test_basic_board_motor_phases_interlock_and_eocr_are_actual_wiring():
     _, runtime = runtime_definition()
     assert power_and_start(make_engine(runtime, motor_connections())).motors["M1"] == "forward"

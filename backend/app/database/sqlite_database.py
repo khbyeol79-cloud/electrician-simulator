@@ -4,7 +4,7 @@ import sqlite3
 from pathlib import Path
 
 
-SCHEMA_VERSION = "9"
+SCHEMA_VERSION = "12"
 
 
 class _ClosingSQLiteConnection(sqlite3.Connection):
@@ -93,6 +93,48 @@ class SQLiteDatabase:
                     connections_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
+
+                CREATE TABLE IF NOT EXISTS circuit_analysis_drafts (
+                    problem_id TEXT PRIMARY KEY,
+                    problem_version INTEGER NOT NULL,
+                    memo TEXT NOT NULL DEFAULT '',
+                    selected_device_ids_json TEXT NOT NULL DEFAULT '[]',
+                    selected_socket_ids_json TEXT NOT NULL DEFAULT '[]',
+                    selected_terminal_ids_json TEXT NOT NULL DEFAULT '[]',
+                    annotations_json TEXT NOT NULL DEFAULT '{}',
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TABLE IF NOT EXISTS practice_wiring_drafts (
+                    problem_id TEXT NOT NULL,
+                    workspace_id TEXT NOT NULL,
+                    problem_version INTEGER NOT NULL,
+                    mode TEXT NOT NULL,
+                    connections_json TEXT NOT NULL,
+                    source TEXT NOT NULL DEFAULT 'user_practice_draft',
+                    verified_answer INTEGER NOT NULL DEFAULT 0,
+                    gradable INTEGER NOT NULL DEFAULT 0,
+                    workspace_name TEXT NOT NULL DEFAULT '기본 작업공간',
+                    warnings_json TEXT NOT NULL DEFAULT '[]',
+                    created_at TEXT,
+                    latest_snapshot_id TEXT,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY(problem_id, workspace_id)
+                );
+
+                CREATE TABLE IF NOT EXISTS practice_wiring_snapshots (
+                    snapshot_id TEXT PRIMARY KEY,
+                    problem_id TEXT NOT NULL,
+                    workspace_id TEXT NOT NULL,
+                    problem_version INTEGER NOT NULL,
+                    label TEXT,
+                    connections_json TEXT NOT NULL,
+                    warnings_json TEXT NOT NULL DEFAULT '[]',
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_practice_wiring_snapshots_workspace
+                ON practice_wiring_snapshots(problem_id, workspace_id, created_at DESC);
 
                 CREATE TABLE IF NOT EXISTS wiring_attempts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,6 +227,22 @@ class SQLiteDatabase:
             for column, statement in migrations.items():
                 if column not in columns:
                     connection.execute(statement)
+            practice_columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(practice_wiring_drafts)").fetchall()
+            }
+            practice_migrations = {
+                "workspace_name": "ALTER TABLE practice_wiring_drafts ADD COLUMN workspace_name TEXT NOT NULL DEFAULT '기본 작업공간'",
+                "warnings_json": "ALTER TABLE practice_wiring_drafts ADD COLUMN warnings_json TEXT NOT NULL DEFAULT '[]'",
+                "created_at": "ALTER TABLE practice_wiring_drafts ADD COLUMN created_at TEXT",
+                "latest_snapshot_id": "ALTER TABLE practice_wiring_drafts ADD COLUMN latest_snapshot_id TEXT",
+            }
+            for column, statement in practice_migrations.items():
+                if column not in practice_columns:
+                    connection.execute(statement)
+            connection.execute(
+                "UPDATE practice_wiring_drafts SET created_at=COALESCE(created_at, updated_at, CURRENT_TIMESTAMP)"
+            )
             connection.execute(
                 """
                 INSERT INTO app_meta(key, value) VALUES('schema_version', ?)
@@ -200,6 +258,6 @@ class SQLiteDatabase:
                     "SELECT name FROM sqlite_master WHERE type='table'"
                 ).fetchall()
             names = {row["name"] for row in rows}
-            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "wiring_drafts", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(names)
+            return {"app_meta", "user_settings", "learning_progress", "circuit_attempts", "circuit_attempt_responses", "circuit_analysis_drafts", "wiring_drafts", "practice_wiring_drafts", "practice_wiring_snapshots", "wiring_attempts", "mounting_drafts", "mounting_attempts", "operation_attempts", "operation_progress_flags", "free_circuit_workspaces"}.issubset(names)
         except sqlite3.Error:
             return False

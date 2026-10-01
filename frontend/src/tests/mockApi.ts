@@ -26,6 +26,7 @@ export const problemDetail: PublicProblemDetail = {
   tags: problemSummary.tags,
   source_type: problemSummary.source_type,
   warning_count: problemSummary.warning_count,
+  capabilities: { board_visible: true, wiring_editable: true, wiring_gradable: true, operation_previewable: true, operation_gradable: true },
   source_name: '자체 제작 구조 확인용 예제',
   description: '구조 확인용 예제입니다.',
   instructions: ['문제 정보를 확인하세요.'],
@@ -122,16 +123,19 @@ function response(data: unknown, status = 200): Response {
     ok: status >= 200 && status < 300,
     status,
     json: async () => data,
+    blob: async () => new Blob([JSON.stringify(data)], { type: 'application/json' }),
   } as Response
 }
 
-export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number; actualOperation?: boolean; freeCircuitSaveFailures?: number }) {
+export function installApiMock(options?: { problems?: ProblemSummary[]; failProblems?: boolean; board?: BoardDefinition; wiringDraft?: WiringConnection[]; wiringResult?: WiringAttemptResult; operationSetup?: Partial<OperationSetup>; mountingDraft?: MountingPlacement[]; mountingDraftVersion?: number; actualOperation?: boolean; freeCircuitSaveFailures?: number; analysisDraft?: { problem_id: string; problem_version: number; memo: string; selected_device_ids: string[]; selected_socket_ids: string[]; selected_terminal_ids: string[]; annotations: Record<string, string>; updated_at: string | null } }) {
   const problems = options?.problems ?? [problemSummary]
   let operationState: OperationSessionState = {
     session_id: 'session-test', problem_id: 'training_socket_demo_001', wiring_attempt_id: 7,
     powered: false, power_state: 'off',
     simulation_mode: 'actual_wiring',
     catalog_composed: Boolean(options?.actualOperation),
+    session_type: 'verified_operation_session', wiring_snapshot_id: 7, workspace_id: null,
+    gradable: true, safety_status: 'not_checked', power_permitted: true, safety_issues: [],
     controls: {
       PB0: { label: 'PB0 정지', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NC', active: false },
       PB1: { label: 'PB1 기동', control_type: 'pushbutton', mode: 'momentary', contact_type: 'NO', active: false },
@@ -240,8 +244,22 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       ],
       conductors: [{ conductor_id: 'control_top', section_id: 'control', points: [{ x: 540, y: 150 }, { x: 1500, y: 150 }], line_style: 'control', junctions: [{ x: 860, y: 150 }] }],
     })
+    if (url.startsWith('/api/problems/qnet_electrician_practical_') && url.endsWith('/diagram')) return response({ schema_version: '1.0', view_box: { x: 0, y: 0, width: 1200, height: 700 }, sections: [], elements: [], conductors: [] })
+    if (url.endsWith('/analysis-draft') && (!init?.method || init.method === 'GET')) return response(options?.analysisDraft ?? null)
+    if (url.endsWith('/analysis-draft') && init?.method === 'PUT') {
+      const body = JSON.parse(String(init.body)); return response({ problem_id: url.includes('qnet_') ? 'qnet_electrician_practical_010' : 'practice_001', ...body, updated_at: '2026-08-25T00:00:00' })
+    }
     if (url === '/api/problems/training_socket_demo_001/circuit-progress') return response({ problem_id: 'training_socket_demo_001', attempt_count: 0, last_submitted_at: null, last_overall_correct: null, last_correct_count: 0, total_count: 1 })
     if (url.endsWith('/board')) return response(options?.board ?? wiringBoard)
+    if (url.endsWith('/practice-workspaces') && (!init?.method || init.method === 'GET')) return response([])
+    if (url.endsWith('/practice-workspaces') && init?.method === 'POST') return response({ problem_id: 'qnet_electrician_practical_010', workspace_id: 'qws_test', workspace_name: '사용자 답안 1', problem_version: 1, mode: 'graphic', connections: [], created_at: '2026-08-28T00:00:00', updated_at: '2026-08-28T00:00:00', latest_snapshot_id: null, source: 'user_practice_draft', verified_answer: false, gradable: false, structural_warnings: [] }, 201)
+    if (url.endsWith('/snapshots') && init?.method === 'POST') return response({ snapshot_id: 'qsn_test', problem_id: 'qnet_electrician_practical_010', workspace_id: 'main', problem_version: 1, label: '버전 1', created_at: '2026-08-28T00:00:00', connections: options?.wiringDraft ?? [], structural_warnings: [] }, 201)
+    if (url.endsWith('/snapshots') && (!init?.method || init.method === 'GET')) return response([{ snapshot_id: 'qsn_test', problem_id: 'qnet_electrician_practical_010', workspace_id: 'main', problem_version: 1, label: '버전 1', created_at: '2026-08-28T00:00:00', connections: options?.wiringDraft ?? [], structural_warnings: [] }])
+    if (url.includes('/practice-drafts/') && (!init?.method || init.method === 'GET')) return response(options?.wiringDraft ? { problem_id: 'qnet_electrician_practical_010', workspace_id: 'main', workspace_name: '기본 작업공간', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, created_at: null, updated_at: null, latest_snapshot_id: null, source: 'user_practice_draft', verified_answer: false, gradable: false, structural_warnings: [] } : null)
+    if (url.includes('/practice-drafts/') && init?.method === 'PUT') {
+      const body = JSON.parse(String(init.body)); return response({ problem_id: 'qnet_electrician_practical_010', workspace_id: 'main', workspace_name: body.workspace_name ?? '기본 작업공간', ...body, created_at: '2026-08-24T00:00:00', updated_at: '2026-08-24T00:00:00', latest_snapshot_id: null, source: 'user_practice_draft', verified_answer: false, gradable: false, structural_warnings: [] })
+    }
+    if (url.includes('/practice-drafts/') && init?.method === 'DELETE') return response(undefined, 204)
     if (url.endsWith('/wiring-draft') && (!init?.method || init.method === 'GET')) return response(options?.wiringDraft ? { problem_id: 'training_socket_demo_001', problem_version: 1, mode: 'graphic', connections: options.wiringDraft, updated_at: null } : null)
     if (url.endsWith('/wiring-draft') && init?.method === 'PUT') {
       const body = JSON.parse(String(init.body))
@@ -262,6 +280,7 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       message: '이 문제에는 실제 동작 데이터가 없어 읽기 전용 미리보기만 제공합니다.', operation: null,
       ...options?.operationSetup,
     })
+    if (url.endsWith('/practice-sessions') && init?.method === 'POST') return response({ ...operationState, session_type: 'practice_preview_session', wiring_attempt_id: 0, wiring_snapshot_id: null, workspace_id: 'main', gradable: false, safety_status: 'safe' }, 201)
     if (url.endsWith('/operation-sessions') && init?.method === 'POST') return response(operationState, 201)
     if (url.endsWith('/actions') && init?.method === 'POST') {
       const body = JSON.parse(String(init.body)) as { action: string; value?: boolean; control_id?: string; milliseconds?: number; target_id?: string; fault_type?: string }
@@ -275,6 +294,16 @@ export function installApiMock(options?: { problems?: ProblemSummary[]; failProb
       return response(operationState)
     }
     if (url.endsWith('/run-check') && init?.method === 'POST') return response({ gradable: true, overall_passed: true, passed_count: 2, total_count: 2, results: [{ test_id: 'A', label: '자기유지', passed: true, message: '정상' }, { test_id: 'B', label: '타이머', passed: true, message: '정상' }], message: '모든 시험 조건이 정상적으로 작동했습니다.' })
+    if (url.endsWith('/run-requirements') && init?.method === 'POST') return response({
+      gradable: false,
+      results: [{ requirement_id: 'B_X1_START', label: 'PB1을 누르면 X1이 여자되는가', status: 'satisfied', message: '공개 요구 동작이 확인되었습니다.' }],
+      scenarios: ['PB1 계통', 'PB2 계통', 'STOP', 'EOCR', '전원 차단·복귀'].map((label, index) => ({
+        scenario_id: `SCENARIO_${index + 1}`, label, status: 'satisfied',
+        current_observation: '세부 동작이 확인되었습니다.', missing_conditions: [],
+        next_action: '시험 초기화 후 다른 요구사항을 확인할 수 있습니다.',
+      })),
+      message: '공개 동작사항 확인을 마쳤습니다. 공식 점수나 합격 판정은 제공하지 않습니다.',
+    })
     if (url.endsWith('/reset') && init?.method === 'POST') { operationState = { ...operationState, powered: false, power_state: 'off', coils: { 'MC1-COIL': false, 'T1-COIL': false }, indicators: { GL: 'off' }, motors: { M1: 'stopped' }, events: ['동작시험 초기화'] }; return response(operationState) }
     if (url.includes('/api/operation-sessions/') && init?.method === 'DELETE') return response(undefined, 204)
     if (url === '/api/problems/training_socket_demo_001/mounting') return response(mountingDefinition)

@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .board_definition import BoardDefinition
-from .operation_definition import OperationDefinition
+from .operation_definition import BehaviorRequirementSummary, OperationDefinition
 from .wiring_attempt import WiringConnection, WiringDraftResponse, WiringProgress
 
 
@@ -37,7 +37,7 @@ class OperationSetupResponse(BaseModel):
     board: BoardDefinition
     device_layout: DeviceLayoutDefinition | None
     wiring_draft: WiringDraftResponse | None
-    wiring_source: Literal["accepted_submission", "draft_preview", "none"]
+    wiring_source: Literal["accepted_submission", "draft_preview", "practice_draft", "none"]
     wiring_snapshot: "AcceptedWiringSnapshot | None"
     wiring_submission: WiringProgress
     wiring_exists: bool
@@ -45,6 +45,7 @@ class OperationSetupResponse(BaseModel):
     preview_allowed: bool
     message: str
     operation: OperationDefinition | None
+    behavior_requirements: list[BehaviorRequirementSummary] = Field(default_factory=list)
 
 
 class AcceptedWiringSnapshot(BaseModel):

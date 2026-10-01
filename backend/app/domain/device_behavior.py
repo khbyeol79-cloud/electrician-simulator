@@ -5,9 +5,13 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from .operation_definition import (
+    OperationAudibleOutput,
     OperationContactor,
     OperationControl,
+    OperationFlasher,
+    OperationFuseChannel,
     OperationIndicator,
+    OperationLevelRelay,
     OperationTimer,
     TerminalPair,
 )
@@ -33,13 +37,16 @@ DeviceCapability = Literal[
     "coil",
     "relay_contacts",
     "timed_contacts",
+    "flashing_contacts",
+    "level_control",
     "contactor",
     "overload_protection",
     "indicator",
+    "audible_output",
     "three_phase_load",
     "socket",
 ]
-ContactActuation = Literal["coil", "timer", "manual", "protection"]
+ContactActuation = Literal["coil", "timer", "manual", "protection", "flasher", "level"]
 SettingValue = bool | int | float | str
 
 
@@ -107,6 +114,7 @@ class BehaviorControl(BaseModel):
     control_type: Literal["pushbutton", "limit_switch", "selector"]
     mode: Literal["momentary", "maintained"]
     contact_key: str
+    alternate_contact_key: str | None = None
     initial_active: bool = False
 
 
@@ -120,6 +128,34 @@ class BehaviorTimer(BaseModel):
     delay_property_key: str
     timed_contact_keys: list[str] = Field(min_length=1, max_length=20)
     retentive: bool = False
+
+
+class BehaviorFlasher(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    flasher_key: str = Field(pattern=r"^[a-z][a-z0-9_]*$", max_length=50)
+    id_suffix: str = Field(pattern=r"^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$", max_length=30)
+    coil_key: str
+    interval_property_key: str
+    contact_keys: list[str] = Field(min_length=1, max_length=20)
+
+
+class BehaviorLevelRelay(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    level_relay_key: str = Field(pattern=r"^[a-z][a-z0-9_]*$", max_length=50)
+    id_suffix: str = Field(pattern=r"^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$", max_length=30)
+    supply_terminal_a_key: str
+    supply_terminal_b_key: str
+    electrode_terminal_keys: list[str] = Field(min_length=3, max_length=3)
+    contact_keys: list[str] = Field(min_length=1, max_length=20)
+
+
+class BehaviorAudibleOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    terminal_a_key: str
+    terminal_b_key: str
 
 
 class BehaviorIndicator(BaseModel):
@@ -169,7 +205,10 @@ class DeviceBehaviorModel(BaseModel):
     )
     control: BehaviorControl | None = None
     timer: BehaviorTimer | None = None
+    flasher: BehaviorFlasher | None = None
+    level_relay: BehaviorLevelRelay | None = None
     indicator: BehaviorIndicator | None = None
+    audible_output: BehaviorAudibleOutput | None = None
     motor: BehaviorMotor | None = None
     protection: BehaviorProtection | None = None
 
@@ -194,8 +233,12 @@ class DeviceInstanceDefinition(BaseModel):
     contacts: list[CircuitContact]
     controls: list[OperationControl] = Field(default_factory=list)
     timers: list[OperationTimer] = Field(default_factory=list)
+    flashers: list[OperationFlasher] = Field(default_factory=list)
+    level_relays: list[OperationLevelRelay] = Field(default_factory=list)
     indicators: list[OperationIndicator] = Field(default_factory=list)
+    audible_outputs: list[OperationAudibleOutput] = Field(default_factory=list)
     contactors: list[OperationContactor] = Field(default_factory=list)
+    fuse_channels: list[OperationFuseChannel] = Field(default_factory=list)
     intrinsic_connections: list[TerminalPair] = Field(default_factory=list)
     terminal_ids: dict[str, str]
     coil_ids: dict[str, str]

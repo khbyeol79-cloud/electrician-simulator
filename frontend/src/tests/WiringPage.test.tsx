@@ -16,6 +16,27 @@ afterEach(() => {
 })
 
 describe('제어함 결선', () => {
+  it('shows saved paired analysis on the official schematic and switches to layout reference', async () => {
+    const qnet = { ...trainingDetail, problem_id: 'qnet_electrician_practical_001', problem_type: 'official' as const,
+      capabilities: { ...trainingDetail.capabilities, wiring_gradable: false, operation_gradable: false } }
+    installApiMock({ analysisDraft: { problem_id: qnet.problem_id, problem_version: 1, memo: '접점 확인 메모',
+      selected_device_ids: [], selected_socket_ids: [], selected_terminal_ids: [], updated_at: null,
+      annotations: { 'contact:test': JSON.stringify({ x: 300, y: 200, orientation: 'horizontal', label: '10', second: '4' }) } } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={qnet} /></MemoryRouter>)
+    const ref = await screen.findByRole('region', { name: '회로도 분석 참고' })
+    await within(ref).findByText('접점 확인 메모')
+    expect(ref.querySelector('image')).toHaveAttribute('href', '/api/problems/qnet_electrician_practical_001/schematic')
+    expect(within(ref).getByText('10')).toBeInTheDocument()
+    expect(within(ref).getByText('4')).toBeInTheDocument()
+    expect(within(ref).queryByRole('button', { name: /슬롯번호/ })).not.toBeInTheDocument()
+    await user.click(within(ref).getByRole('button', { name: '배관·배치도' }))
+    expect(ref.querySelector('image')).toHaveAttribute('href', '/api/problems/qnet_electrician_practical_001/layout-reference')
+    expect(ref.querySelector('.paired-annotation')).toBeNull()
+    await user.click(within(ref).getByRole('button', { name: '시퀀스 회로도' }))
+    expect(ref.querySelector('.paired-annotation')).not.toBeNull()
+  })
+
   it('renders the four-terminal dual fuse from source with two visible cartridges', () => {
     const fuse = {
       item_id: 'F', label: 'F', item_type: 'component' as const, socket_type_id: null, row: 1,
@@ -66,13 +87,16 @@ describe('제어함 결선', () => {
     await user.click(screen.getByRole('button', { name: 'MC1-4 단자' }))
     expect(screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '요약 모드' }))
+    expect(screen.queryByText('경로 규칙')).not.toBeInTheDocument()
+    expect(screen.queryByText(/이동·새로고침·로그아웃 전에/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/단자를 누르면 직접 연결된 모든 전선을/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'X1-1에서 MC1-4로 연결된 전선' })).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'X1-1에서 MC1-4로 연결된 요약 표시' }))
     expect(screen.getByText('1번째 연결')).toBeInTheDocument()
     expect(screen.getByLabelText('X1-1 상대 단자 목록')).toHaveTextContent('MC1-4')
   })
 
-  it('connects an external device lead to a freely selected TB terminal', async () => {
+  it.each(['PB0-1', 'PWR-PE', 'M1-PE', 'M2-PE', 'FLS-PE'])('connects external lead %s in the left panel to a selected TB', async (lead) => {
     const tbPin = { terminal_id: 'TB5-01', label: '1', number: 1, side: 'bottom' as const, x: 80, y: 100, max_connections: 2, enabled: true, terminal_role: 'free_junction' as const }
     const board: BoardDefinition = {
       ...wiringBoard,
@@ -80,17 +104,52 @@ describe('제어함 결선', () => {
     }
     const detail = {
       ...trainingDetail,
-      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [{ device_id: 'PB0', label: 'PB0 정지', placement: 'top' as const, terminals: [{ terminal_id: 'PB0-1', label: '1', terminal_role: 'external' as const, operation_terminal_id: 'TB5-05', max_connections: 1 as const, wire_color: 'yellow' as const }] }] },
+      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [{ device_id: 'PB0', label: 'PB0 정지', placement: 'top' as const, terminals: [{ terminal_id: lead, label: '1', terminal_role: 'external' as const, operation_terminal_id: 'TB5-05', max_connections: 1 as const, wire_color: 'yellow' as const }] }] },
     }
     installApiMock({ board })
     const user = userEvent.setup()
     render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
     const externalTray = await screen.findByRole('region', { name: '외부 기구선' })
-    expect(externalTray.parentElement).toHaveClass('has-external-wiring')
-    await user.click(screen.getByRole('button', { name: /PB0-1 외부 기구선/ }))
+    expect(externalTray.parentElement).toHaveClass('work-left-sidebar')
+    if (lead.endsWith('-PE')) expect(screen.getByRole('button', { name: new RegExp(`${lead} 외부 기구선`) }).querySelector('.green')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: new RegExp(`${lead} 외부 기구선`) }))
     await user.click(screen.getByRole('button', { name: 'TB5-01 단자' }))
-    expect(screen.getByRole('button', { name: 'PB0-1에서 TB5-01로 연결된 전선' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /PB0-1 외부 기구선/ })).toHaveTextContent('TB5-01')
+    expect(screen.getByRole('button', { name: `${lead}에서 TB5-01로 연결된 전선` })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: new RegExp(`${lead} 외부 기구선`) })).toHaveTextContent('TB5-01')
+    if (lead.endsWith('-PE')) {
+      const wire = screen.getByRole('button', { name: `${lead}에서 TB5-01로 연결된 전선` })
+      expect(wire.querySelector('.wire-visible')).toHaveStyle({ stroke: '#15803d' })
+      await user.click(wire)
+      expect(screen.getByText('PE 보호접지선 · 녹색')).toBeInTheDocument()
+      expect(screen.queryByLabelText('물리 전선 색상')).not.toBeInTheDocument()
+    }
+  })
+
+  it('shows metadata-driven NO/NC badges without hiding terminal numbers or blocking clicks', async () => {
+    const externalDevice = (device_id: string, label: string, contact_type?: 'NO' | 'NC') => ({
+      device_id, label, placement: 'top' as const, contact_type,
+      terminals: [1, 2].map((number) => ({ terminal_id: `${device_id}-${number}`, label: String(number), terminal_role: 'external' as const, operation_terminal_id: null, max_connections: 1 as const, wire_color: 'yellow' as const })),
+    })
+    const detail = {
+      ...trainingDetail,
+      wiring_semantics: { schema_version: '1.0' as const, extra_jumper_policy: 'warning' as const, external_devices: [
+        externalDevice('PB0', 'PB0 정지', 'NC'), externalDevice('PB1', 'PB1 기동', 'NO'), externalDevice('PB2', 'PB2 기동', 'NO'), externalDevice('UNMARKED', '메타데이터 없음'),
+      ] },
+    }
+    installApiMock()
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={detail} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+
+    expect(screen.getByRole('article', { name: 'PB0 정지, 평상시 닫힘(NC)' })).toHaveTextContent('NC')
+    expect(screen.getByRole('article', { name: 'PB1 기동, 평상시 열림(NO)' })).toHaveTextContent('NO')
+    expect(screen.getByRole('article', { name: 'PB2 기동, 평상시 열림(NO)' })).toHaveTextContent('NO')
+    expect(screen.getByRole('article', { name: '메타데이터 없음' }).querySelector('.contact-type-badge')).toBeNull()
+    const pb0Terminal = screen.getByRole('button', { name: /PB0-1 외부 기구선/ })
+    expect(pb0Terminal).toHaveTextContent('PB0-1')
+    expect(screen.getByRole('button', { name: /PB0-2 외부 기구선/ })).toHaveTextContent('PB0-2')
+    await user.click(pb0Terminal)
+    expect(pb0Terminal).toHaveClass('selected')
   })
 
   it('separates two external TB leads and recenters the remaining lead after deletion', async () => {
@@ -147,13 +206,10 @@ describe('제어함 결선', () => {
     expect(single.points.startsWith(`${tb5Pin.x},`)).toBe(true)
   })
 
-  it('maps compact diagram pointer motion to viewBox units without changing the main default', () => {
-    const compact = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 2.4, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: true })
-    const previous = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 2.4, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: false })
-    expect(compact.x).toBe(previous.x * 4)
-    expect(compact.y).toBe(previous.y * 4)
-    const main = calculatePanDelta({ dx: 20, dy: 10, zoom: 2, panSpeed: 1, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800, mapClientToViewBox: false })
-    expect(main).toEqual({ x: 10, y: 5 })
+  it('maps pointer motion one-to-one with the screen including letterboxed diagrams', () => {
+    expect(calculatePanDelta({ dx: 20, dy: 10, clientWidth: 300, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800 })).toEqual({ x: 80, y: 40 })
+    expect(calculatePanDelta({ dx: 20, dy: 10, clientWidth: 300, clientHeight: 400, viewBoxWidth: 1200, viewBoxHeight: 800 })).toEqual({ x: 80, y: 40 })
+    expect(calculatePanDelta({ dx: 20, dy: 10, clientWidth: 600, clientHeight: 200, viewBoxWidth: 1200, viewBoxHeight: 800 })).toEqual({ x: 80, y: 40 })
   })
 
   it('counts two external and two internal TB wires in separate physical banks', () => {
@@ -342,7 +398,7 @@ describe('제어함 결선', () => {
     expect(routes[1].points[0]).toEqual({ x: 817.5, y: 370 })
   })
 
-  it('shows +1 for two wires on one summary slot and lists both relative terminals', async () => {
+  it('shows + without a count for multiple wires and lists both relative terminals', async () => {
     installApiMock()
     const user = userEvent.setup()
     render(<MemoryRouter><WiringPage problem={trainingDetail} /></MemoryRouter>)
@@ -352,7 +408,7 @@ describe('제어함 결선', () => {
     await user.click(screen.getByRole('button', { name: 'X1-1 단자' }))
     await user.click(screen.getByRole('button', { name: 'MC1-5 단자' }))
     await user.click(screen.getByRole('button', { name: '요약 모드' }))
-    expect(screen.getByText('+1')).toBeInTheDocument()
+    expect(screen.getByText('+')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'X1-1에서 MC1-4, MC1-5로 연결된 요약 표시' }))
     const list = screen.getByLabelText('X1-1 상대 단자 목록')
     expect(within(list).getByText('MC1-4')).toBeInTheDocument()
@@ -441,4 +497,81 @@ describe('제어함 결선', () => {
     expect(await screen.findByRole('button', { name: '동작시험 화면 미리보기' })).toBeInTheDocument()
     expect(screen.getByText('이 문제의 배선 정답은 아직 검증되지 않아 채점할 수 없습니다.')).toBeInTheDocument()
   })
+
+  it('opens the explicit Q-Net practice mode without a grading submit button', async () => {
+    const fetchMock = installApiMock()
+    const qnetPractice = { ...trainingDetail, problem_id: 'qnet_electrician_practical_010', problem_type: 'official' as const, status: 'draft' as const, capabilities: { board_visible: true, wiring_editable: true, wiring_gradable: false, operation_previewable: true, operation_gradable: false } }
+    const user = userEvent.setup()
+    render(<MemoryRouter initialEntries={['/wiring']}><Routes><Route path="/wiring" element={<WiringPage problem={qnetPractice} />} /><Route path="/operation" element={<h2>무채점 동작시험 이동</h2>} /></Routes></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    expect(screen.queryByRole('dialog', { name: '작업공간' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '작업공간' }))
+    expect(screen.getByRole('dialog', { name: '작업공간' })).toBeInTheDocument()
+    expect(screen.getByLabelText('사용자 답안 작업공간 도구')).toBeInTheDocument()
+    expect(screen.getByLabelText('사용자 답안 작업공간 도구').closest('.wiring-workspace')).toHaveClass('practice-capture-workspace')
+    expect(screen.getByLabelText('작업공간 선택')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '새 버전 저장' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'JSON 내보내기' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'JSON 가져오기' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '결선 제출' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '새 버전 저장' }))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/practice-drafts/main/snapshots'), expect.objectContaining({ method: 'POST' })))
+    await user.click(screen.getByRole('button', { name: '작업공간 닫기' }))
+    expect(screen.queryByRole('dialog', { name: '작업공간' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '저장 후 동작시험' }))
+    expect(await screen.findByRole('heading', { name: '무채점 동작시험 이동' })).toBeInTheDocument()
+  })
+
+  it('starts a JSON file download and reports the result', async () => {
+    const fetchMock = installApiMock()
+    const qnetPractice = { ...trainingDetail, problem_id: 'qnet_electrician_practical_010', problem_type: 'official' as const, status: 'draft' as const, capabilities: { board_visible: true, wiring_editable: true, wiring_gradable: false, operation_previewable: true, operation_gradable: false } }
+    const createObjectURL = vi.fn(() => 'blob:test-export')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL })
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
+    const user = userEvent.setup()
+    render(<MemoryRouter><WiringPage problem={qnetPractice} /></MemoryRouter>)
+
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    await user.click(screen.getByRole('button', { name: '작업공간' }))
+    await user.click(screen.getByRole('button', { name: 'JSON 내보내기' }))
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/practice-drafts/main/export'), expect.anything()))
+    expect(createObjectURL).toHaveBeenCalledOnce()
+    expect(anchorClick).toHaveBeenCalledOnce()
+    expect(await screen.findByRole('alert')).toHaveTextContent('JSON 다운로드가 시작되었습니다')
+  })
+
+  it('keeps capture available while an unverified Q-Net operation engine waits', async () => {
+    installApiMock()
+    const waiting = { ...trainingDetail, problem_id: 'qnet_electrician_practical_001', problem_type: 'official' as const, status: 'draft' as const, capabilities: { board_visible: true, wiring_editable: true, wiring_gradable: false, operation_previewable: false, operation_gradable: false } }
+    render(<MemoryRouter><WiringPage problem={waiting} /></MemoryRouter>)
+    await screen.findByRole('img', { name: '제어함 결선판' })
+    expect(screen.queryByRole('dialog', { name: '작업공간' })).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '작업공간' }))
+    expect(screen.getByRole('dialog', { name: '작업공간' })).toBeInTheDocument()
+    expect(screen.getByLabelText('사용자 답안 작업공간 도구')).toBeInTheDocument()
+    expect(screen.getByText('결선 저장 완료 · 동작 엔진 검증 대기')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '저장 후 동작시험' })).not.toBeInTheDocument()
+  })
+})
+it.each([false, true])('workspace deletion requires confirmation (%s) and never saves the deleted workspace again', async (confirmed) => {
+  const fetchMock = installApiMock()
+  const nativeConfirm = vi.spyOn(window, 'confirm')
+  const user = userEvent.setup()
+  const problem = { ...trainingDetail, problem_id: 'qnet_electrician_practical_010', capabilities: { ...trainingDetail.capabilities, wiring_gradable: false } }
+  render(<MemoryRouter><WiringPage problem={problem} /></MemoryRouter>)
+  await screen.findByRole('img', { name: '제어함 결선판' })
+  await user.click(screen.getByRole('button', { name: '작업공간' }))
+  await user.click(screen.getByRole('button', { name: '작업공간 삭제' }))
+  expect(screen.getByText('작업공간을 삭제할까요?')).toBeInTheDocument()
+  expect(nativeConfirm).not.toHaveBeenCalled()
+  await user.click(screen.getByRole('button', { name: confirmed ? '삭제하기' : '취소' }))
+  if (confirmed) {
+    await waitFor(() => expect(screen.getByRole('dialog')).toHaveTextContent('작업공간과 저장된 버전을 삭제했습니다.'))
+    const deletedIndex = fetchMock.mock.calls.findIndex(([url, init]) => String(url).endsWith('/practice-drafts/main') && init?.method === 'DELETE')
+    expect(deletedIndex).toBeGreaterThan(-1)
+    await new Promise(resolve => setTimeout(resolve, 750))
+    expect(fetchMock.mock.calls.slice(deletedIndex + 1).some(([url, init]) => String(url).endsWith('/practice-drafts/main') && init?.method === 'PUT')).toBe(false)
+  } else expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'DELETE')).toBe(false)
 })

@@ -17,7 +17,10 @@ it('switches between the three exam stages', async () => {
   const user = userEvent.setup()
   render(<MemoryRouter initialEntries={['/circuit']}><App /></MemoryRouter>)
 
-  expect(screen.getByText('0 / 3 완료')).toBeInTheDocument()
+  expect(screen.queryByText('0 / 3 완료')).not.toBeInTheDocument()
+  expect(screen.getByRole('navigation', { name: '실습 단계' }).closest('header')).not.toBeNull()
+  expect(screen.getByText('해당 프로그램은 동작 여부만 판별합니다')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: '설정' })).not.toBeInTheDocument()
   expect(screen.queryByRole('link', { name: /기구 장착/ })).not.toBeInTheDocument()
   for (const label of ['제어함 결선', '동작시험', '회로도 분석']) {
     await user.click(screen.getByRole('link', { name: new RegExp(label) }))

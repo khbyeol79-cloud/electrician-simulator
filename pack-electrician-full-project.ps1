@@ -85,29 +85,48 @@ $excludedNames = @(
     ".DS_Store"
 )
 
+$excludedPrivatePaths = @(
+    "docs\private",
+    "docs\qnet-010-verification-0.14.0-dev4.md",
+    "scripts\audit_qnet_010_user_candidate.py",
+    "scripts\build_qnet_010_private_definition.py",
+    "scripts\check_qnet_010_readiness.py",
+    "backend\tests\test_qnet_010_user_candidate_audit.py",
+    "backend\tests\test_qnet_010_private_validation.py",
+    "backend\tests\test_qnet_008_018_private_candidates.py"
+)
+
 Write-Host ""
 Write-Host "[파일 수집 중]" -ForegroundColor Cyan
 
-$files = Get-ChildItem -LiteralPath $root -Recurse -Force -File | Where-Object {
-    $full = $_.FullName
-    $relative = $full.Substring($root.Length).TrimStart('\','/')
-
-    $parts = $relative -split '[\\/]'
-
-    $dirExcluded = $false
-    foreach ($part in $parts) {
-        if ($excludedDirs -contains $part) {
-            $dirExcluded = $true
-            break
+function Test-PrivatePath([string]$relative) {
+    $normalizedRelative = $relative.Replace('/', '\')
+    foreach ($privatePath in $excludedPrivatePaths) {
+        if ($normalizedRelative.Equals($privatePath, [System.StringComparison]::OrdinalIgnoreCase) -or
+            $normalizedRelative.StartsWith($privatePath + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+            return $true
         }
     }
-
-    if ($dirExcluded) { return $false }
-    if ($excludedExtensions -contains $_.Extension.ToLowerInvariant()) { return $false }
-    if ($excludedNames -contains $_.Name) { return $false }
-
-    return $true
+    return $false
 }
+
+function Get-IncludedFiles([string]$directory, [string]$relativePrefix = "") {
+    foreach ($item in Get-ChildItem -LiteralPath $directory -Force) {
+        $relative = if ($relativePrefix) { Join-Path $relativePrefix $item.Name } else { $item.Name }
+        if ($item.PSIsContainer) {
+            if ($excludedDirs -contains $item.Name) { continue }
+            if (Test-PrivatePath $relative) { continue }
+            Get-IncludedFiles $item.FullName $relative
+            continue
+        }
+        if ($excludedExtensions -contains $item.Extension.ToLowerInvariant()) { continue }
+        if ($excludedNames -contains $item.Name) { continue }
+        if (Test-PrivatePath $relative) { continue }
+        $item
+    }
+}
+
+$files = @(Get-IncludedFiles $root)
 
 foreach ($file in $files) {
     $relative = $file.FullName.Substring($root.Length).TrimStart('\','/')
@@ -117,6 +136,28 @@ foreach ($file in $files) {
     Copy-Item -LiteralPath $file.FullName -Destination $dest -Force
 }
 
+# 실행 가능한 공개 연습본에는 어느 Q-Net 문제의 내부 정답 Net이나 동작 채점
+# 시나리오도 싣지 않는다. 원본 저장소의 answer.json은 건드리지 않고 임시
+# 수집본만 비식별화하므로 이후 다른 문제에 비공개 답안이 추가되어도 안전하다.
+$qnetAnswers = @(Get-ChildItem -LiteralPath (Join-Path $stage "problems") -Directory -Filter "qnet_electrician_practical_*" | ForEach-Object {
+    Get-Item -LiteralPath (Join-Path $_.FullName "answer.json") -ErrorAction SilentlyContinue
+})
+foreach ($qnetAnswer in $qnetAnswers) {
+    $answerText = [System.IO.File]::ReadAllText($qnetAnswer.FullName, [System.Text.Encoding]::UTF8)
+    $answer = $answerText | ConvertFrom-Json
+    $answer.expected_nets = @()
+    $answer.allowed_alternatives = @()
+    $answer.wiring_connections = @()
+    $answer.wiring_forbidden_connections = @()
+    $answer.operation_tests = @()
+    $answer.verification.status = "unverified"
+    $answer.verification.verified_by = $null
+    $answer.verification.verified_at = $null
+    $answer.verification.notes = "공개 실행 ZIP용 무채점 정의. 비공개 후보와 정답 Net은 포함하지 않습니다."
+    $serializedAnswer = $answer | ConvertTo-Json -Depth 100
+    [System.IO.File]::WriteAllText($qnetAnswer.FullName, $serializedAnswer + [Environment]::NewLine, [System.Text.UTF8Encoding]::new($false))
+}
+
 # 어떤 핵심 파일이 들어갔는지 간단한 수집 보고서를 같이 넣는다.
 $report = @()
 $report += "# Electrician Simulator Full Source Collection"
@@ -124,6 +165,8 @@ $report += ""
 $report += "Project root: $root"
 $report += "Collected at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss K')"
 $report += "File count: $($files.Count)"
+$report += "Private Q-Net 010 candidate/audit files: EXCLUDED"
+$report += "Q-Net 001-018 answer Nets and operation tests: REMOVED FROM DISTRIBUTION COPY"
 $report += ""
 $report += "## Important paths"
 $checkPaths = @(

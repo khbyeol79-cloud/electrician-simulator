@@ -113,6 +113,9 @@ def test_basic_board_definition_is_independent_actual_wiring_without_answer(tmp_
         assert "expected_nets" not in response.text
         device_ids = {item["device_id"] for item in template["circuit"]["devices"]}
         assert {"MCCB", "F", "X1", "X2", "T1", "T2", "MC1", "MC2", "EOCR"} <= device_ids
+        fuse = next(item for item in template["board"]["items"] if item["item_id"] == "F")
+        assert {pin["terminal_id"] for pin in fuse["pins"]} == {"F-1", "F-2", "F-3", "F-4"}
+        assert next(item for item in template["circuit"]["devices"] if item["device_id"] == "F")["behavior_model_id"] == "fuse_dual_4terminal_training"
         assert all(item["behavior_model_id"] for item in template["circuit"]["devices"])
         external_ids = {
             item["device_id"] for item in template["wiring_semantics"]["external_devices"]
@@ -129,8 +132,10 @@ def test_empty_board_palette_install_move_delete_and_power_gate(tmp_path):
         palette = client.get("/api/free-circuits/palette", headers=headers)
         assert palette.status_code == 200
         assert {item["palette_id"] for item in palette.json()["items"]} >= {
-            "relay_8p", "timer_8p", "contactor_12p", "power", "pb_no", "motor"
-        }
+            "relay_8p", "timer_8p", "flasher_8p", "level_relay_8p", "contactor_12p",
+            "power", "pb_no", "selector_auto_manual", "buzzer", "motor", "dual_fuse"
+            }
+        assert "fuse" not in {item["palette_id"] for item in palette.json()["items"]}
         assert "answer" not in palette.text
         assert "expected_nets" not in palette.text
 
@@ -185,6 +190,100 @@ def test_empty_board_palette_install_move_delete_and_power_gate(tmp_path):
         )
         assert deleted.status_code == 200
         assert [item["instance_id"] for item in deleted.json()["assembly"]["installed_devices"]] == ["PWR1"]
+
+
+def test_empty_board_installs_only_four_terminal_dual_fuse(tmp_path):
+    headers = {"X-User-Id": "dual_fuse_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        workspace = client.post(
+            "/api/free-circuits/workspaces", headers=headers,
+            json={"name": "4단자 퓨즈", "template_id": "empty_board_001"},
+        ).json()
+        path = f"/api/free-circuits/{workspace['workspace_id']}/devices"
+        assert client.post(path, headers=headers, json={
+            "palette_id": "fuse", "placement": {"zone": "internal_upper", "row": 0, "column": 0},
+        }).status_code == 422
+        added = client.post(path, headers=headers, json={
+            "palette_id": "dual_fuse", "placement": {"zone": "internal_upper", "row": 0, "column": 0},
+        })
+        assert added.status_code == 201, added.text
+        fuse = next(item for item in added.json()["board"]["items"] if item["item_id"] == "F1")
+        assert {pin["terminal_id"] for pin in fuse["pins"]} == {"F1-1", "F1-2", "F1-3", "F1-4"}
+        channels = added.json()["operation"]["fuse_channels"]
+        assert {(item["terminal_a_id"], item["terminal_b_id"]) for item in channels} == {
+            ("F1-1", "F1-2"), ("F1-3", "F1-4"),
+        }
+
+
+def test_saved_single_pole_fuse_is_migrated_without_losing_existing_connections(tmp_path):
+    headers = {"X-User-Id": "removed_single_fuse_user"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        workspace = client.post(
+            "/api/free-circuits/workspaces", headers=headers,
+            json={"name": "기존 퓨즈 변환", "template_id": "empty_board_001"},
+        ).json()
+        workspace["assembly"]["installed_devices"] = [{
+            "instance_id": "F1", "palette_id": "fuse", "model_id": "fuse_single_pole_training",
+            "label": "F1", "placement": {"zone": "internal_upper", "row": 0, "column": 0},
+            "properties": {},
+        }]
+        workspace["connections"] = [{
+            "from": "F1-1", "to": "TB5-01", "wire_color": "yellow",
+            "pair_display_color": "#64748b",
+        }]
+        workspace_id = workspace.pop("workspace_id")
+        workspace.pop("updated_at")
+        saved = client.put(
+            f"/api/free-circuits/{workspace_id}", headers=headers, json=workspace,
+        )
+        assert saved.status_code == 200, saved.text
+        migrated = saved.json()
+        installed = migrated["assembly"]["installed_devices"][0]
+        assert installed["instance_id"] == "F1"
+        assert installed["palette_id"] == "dual_fuse"
+        assert installed["model_id"] == "fuse_dual_4terminal_training"
+        fuse = next(item for item in migrated["board"]["items"] if item["item_id"] == "F1")
+        assert {pin["terminal_id"] for pin in fuse["pins"]} == {"F1-1", "F1-2", "F1-3", "F1-4"}
+        assert migrated["connections"] == workspace["connections"]
+
+
+def test_empty_board_installs_qnet_008_special_devices_and_electrodes(tmp_path):
+    headers = {"X-User-Id": "q008_special_devices"}
+    with TestClient(create_app(Settings(paths=stage4_paths(tmp_path)))) as client:
+        workspace = client.post(
+            "/api/free-circuits/workspaces", headers=headers,
+            json={"name": "FLS FR SS BZ", "template_id": "empty_board_001"},
+        ).json()
+        path = f"/api/free-circuits/{workspace['workspace_id']}/devices"
+        additions = (
+            ("flasher_8p", "internal_lower", 0),
+            ("level_relay_8p", "internal_upper", 1),
+            ("selector_auto_manual", "external_top", 0),
+            ("buzzer", "external_bottom", 0),
+        )
+        latest = None
+        for palette_id, zone, column in additions:
+            response = client.post(
+                path, headers=headers,
+                json={"palette_id": palette_id, "placement": {"zone": zone, "row": 0, "column": column}},
+            )
+            assert response.status_code == 201, response.text
+            latest = response.json()
+        assert latest is not None
+        operation = latest["operation"]
+        assert operation["flashers"][0]["interval_ms"] == 1000
+        assert operation["level_relays"][0]["external_electrode_terminal_ids"] == [
+            "FLS1-E1", "FLS1-E2", "FLS1-E3"
+        ]
+        assert operation["controls"][0]["alternate_terminal_a_id"] == "SS1-M1"
+        assert operation["audible_outputs"][0]["output_id"] == "BZ1"
+        electrodes = next(
+            item for item in latest["wiring_semantics"]["external_devices"]
+            if item["device_id"] == "FLS1_ELECTRODES"
+        )
+        assert {item["terminal_id"] for item in electrodes["terminals"]} == {
+            "FLS1-E1", "FLS1-E2", "FLS1-E3"
+        }
 
 
 def test_empty_board_rejects_overlap_wrong_zone_unknown_model_and_preserves_old_workspace(tmp_path):

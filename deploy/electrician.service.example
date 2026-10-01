@@ -1,0 +1,24 @@
+[Unit]
+Description=Electrician simulator account service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=electrician
+Group=electrician
+WorkingDirectory=/opt/electrician
+ExecStart=/opt/electrician/.venv/bin/python /opt/electrician/scripts/run_service.py --env-file /etc/electrician/service.env --cert /etc/electrician/server.crt --key /etc/electrician/server.key
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+# Create this directory first and make it writable by the electrician user.
+# Keep the rest of the application tree read-only.
+ReadWritePaths=/opt/electrician/user-data
+
+[Install]
+WantedBy=multi-user.target

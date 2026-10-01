@@ -74,6 +74,7 @@ def source_definition():
         protection_devices=[OperationProtectionDevice(
             protection_device_id="EOCR", label="EOCR",
             protected_coil_ids=["MC1-COIL"], protected_motor_ids=["M1"],
+            supply_terminal_a_id="EOCR-A1", supply_terminal_b_id="EOCR-A2",
             reset_mode="manual",
         )],
     )
@@ -96,16 +97,17 @@ def actual_connections(*, swap_phases: bool = False, missing_phase: bool = False
         "PWR-L1", "PWR-L2", "PWR-L3"
     ]
     result = [
-        wire("PWR-L", "PB0-1"),
+        wire("PWR-L", "EOCR-95"),
+        wire("EOCR-96", "PB0-1"),
         wire("PB0-2", "PB1-1"),
         wire("PB1-2", "MC1-6"),
-        wire("MC1-12", "EOCR-95"),
-        wire("EOCR-96", "PWR-N"),
+        wire("MC1-12", "PWR-N"),
         wire("PB1-1", "MC1-4"),
         wire("MC1-10", "PB1-2"),
-        wire("PWR-L", "EOCR-97"),
         wire("EOCR-98", "AL-1"),
         wire("AL-2", "PWR-N"),
+        wire("PWR-L", "EOCR-A1"),
+        wire("EOCR-A2", "PWR-N"),
         wire(phase_inputs[0], "MC1-1", "brown"),
         wire(phase_inputs[1], "MC1-2", "black"),
         wire(phase_inputs[2], "MC1-3", "gray"),
@@ -119,5 +121,5 @@ def actual_connections(*, swap_phases: bool = False, missing_phase: bool = False
     if missing_phase:
         result = [item for item in result if item.key != tuple(sorted(("MC1-9", "EOCR-L3")))]
     if bypass_eocr:
-        result.append(wire("MC1-12", "PWR-N"))
+        result.append(wire("PWR-L", "PB0-1"))
     return result

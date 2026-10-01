@@ -26,7 +26,7 @@ def _model(data, model_id: str):
 
 def test_behavior_catalog_loads_and_keeps_problem_answers_out():
     catalog = CatalogService(PROJECT_ROOT / "catalog", PROJECT_ROOT / "schemas")
-    assert len(catalog.device_behaviors()) == 17
+    assert len(catalog.device_behaviors()) == 20
     serialized = json.dumps(
         [item.model_dump(mode="json") for item in catalog.device_behaviors()],
         ensure_ascii=False,
@@ -129,7 +129,7 @@ def test_behavior_catalog_rejects_missing_timed_contact(tmp_path):
 
 def test_behavior_catalog_rejects_invalid_intrinsic_connection(tmp_path):
     def mutate(data):
-        data["models"][1]["intrinsic_connections"][0]["to_terminal_key"] = "missing_terminal"
+        _model(data, "mccb_3p_training")["intrinsic_connections"][0]["to_terminal_key"] = "missing_terminal"
 
     with pytest.raises(CatalogError, match="존재하지 않는 단자 키"):
         _catalog(tmp_path, mutate)
@@ -194,7 +194,30 @@ def test_qnet_page_9_verifies_all_8p_changeover_pins():
         ("contact_1_common", "contact_1_nc", "contact_1_no"),
         ("contact_2_common", "contact_2_nc", "contact_2_no"),
     ]
-    assert all(item.contact_type == "CHANGEOVER" for item in [*relay.contacts, *timer.contacts])
+    assert all(item.contact_type == "CHANGEOVER" for item in relay.contacts)
+    instant, timed = timer.contacts
+    assert (instant.contact_type, instant.actuation, instant.nc_terminal_key) == ("NO", "coil", None)
+    assert (timed.contact_type, timed.actuation) == ("CHANGEOVER", "timer")
+    assert timer.timer.timed_contact_keys == [timed.contact_key]
+    assert next(t for t in timer.terminals if t.pin_number == 4).electrical_role == "unassigned"
+
+
+def test_qnet_008_models_keep_verified_pin_roles_and_external_terminals():
+    catalog = CatalogService(PROJECT_ROOT / "catalog", PROJECT_ROOT / "schemas")
+    flasher = catalog.get_device_behavior("flasher_relay_8p_training")
+    level = catalog.get_device_behavior("floatless_level_switch_8p_training")
+    selector = catalog.get_device_behavior("selector_switch_auto_manual")
+    buzzer = catalog.get_device_behavior("buzzer_two_terminal")
+    assert all(item is not None for item in (flasher, level, selector, buzzer))
+    assert flasher.flasher is not None
+    assert (flasher.flasher.coil_key, flasher.flasher.contact_keys) == (
+        "main_coil", ["flash_contact"]
+    )
+    level_pins = {item.terminal_key: item.pin_number for item in level.terminals}
+    assert level_pins["supply_a"] == 5 and level_pins["supply_b"] == 6
+    assert [level_pins[key] for key in level.level_relay.electrode_terminal_keys] == [7, 8, 1]
+    assert selector.control.alternate_contact_key == "manual_contact"
+    assert buzzer.audible_output is not None
 
 
 def test_qnet_010_page_9_verifies_12p_contactor_and_eocr():
@@ -245,6 +268,7 @@ def test_qnet_010_page_9_verifies_12p_contactor_and_eocr():
         ("line_1", "load_u"),
         ("line_2", "load_v"),
         ("line_3", "load_w"),
+        ("trip_common_nc", "trip_common_no"),
     }
 
 
@@ -265,12 +289,12 @@ def test_qnet_010_dual_fuse_has_four_terminals_and_two_isolated_channels():
     }
 
 
-def test_existing_single_pole_fuse_model_is_kept_for_workspace_compatibility():
+def test_single_pole_fuse_model_is_removed_from_catalog():
     catalog = CatalogService(PROJECT_ROOT / "catalog", PROJECT_ROOT / "schemas")
     legacy = catalog.get_device_behavior("fuse_single_pole_training")
     dual = catalog.get_device_behavior("fuse_dual_4terminal_training")
-    assert legacy is not None and dual is not None
-    assert {item.terminal_suffix for item in legacy.terminals} == {"1", "2"}
+    assert legacy is None
+    assert dual is not None
     assert {item.terminal_suffix for item in dual.terminals} == {"1", "2", "3", "4"}
 
 

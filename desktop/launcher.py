@@ -18,6 +18,11 @@ from app.core.logging_config import configure_logging
 from desktop.local_server import LocalServer, find_free_port
 
 
+def configure_webview_downloads(webview_module) -> None:
+    """Allow attachment downloads and let WebView2 show its save dialog."""
+    webview_module.settings["ALLOW_DOWNLOADS"] = True
+
+
 def show_startup_error(message: str) -> None:
     if sys.platform == "win32":
         try:
@@ -60,6 +65,7 @@ def main() -> int:
                 "pywebview가 설치되지 않았습니다. setup_windows.bat를 실행해 주세요."
             ) from exc
 
+        configure_webview_downloads(webview)
         webview.create_window(
             settings.app_name,
             server.url,

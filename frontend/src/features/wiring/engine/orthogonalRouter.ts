@@ -168,8 +168,12 @@ export function routeConnection(
     ].sort((left, right) => routeCost(left) - routeCost(right))
   }
 
+  // Wrong or deliberately shorted practice wiring must remain editable and
+  // visible. Prefer a clear route, but fall back to the shortest valid
+  // orthogonal candidate instead of crashing the whole workspace.
   const points = candidates.find((candidate) => isOrthogonal(candidate) && pathIsClear(board, candidate, endpointItemIds) && !pathHasSelfOverlap(candidate))
-  if (!points) throw new Error('겹치지 않는 직교 배선 경로를 만들 수 없습니다.')
+    ?? candidates.find((candidate) => isOrthogonal(candidate) && !pathHasSelfOverlap(candidate))
+  if (!points) throw new Error('직교 배선 경로를 만들 수 없습니다.')
   return { ...connection, points }
 }
 

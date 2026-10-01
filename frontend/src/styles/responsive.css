@@ -1,0 +1,98 @@
+/* Viewport rules shared by all study screens. Board/terminal coordinates stay unchanged. */
+.analysis-editor-scroll { min-height: 0; overflow: auto; }
+.analysis-memo-panel { grid-template-rows: minmax(0, 1fr) minmax(0, .9fr) auto; }
+.analysis-memo-panel .slot-number-example svg { max-height: 110px; margin: 5px 0; }
+.analysis-memo-panel .slot-number-example small { font-size: 10px; }
+.analysis-editor-scroll .analysis-annotation-list { max-height: 85px; overflow: auto; }
+.analysis-annotation-input.paired-slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.paired-slots > label[for="analysis-slot-number"] { grid-column: 1; grid-row: 1; }
+.paired-slots > label[for="analysis-slot-second"] { grid-column: 2; grid-row: 1; }
+.paired-slots > #analysis-slot-number { grid-column: 1; grid-row: 2; }
+.paired-slots > #analysis-slot-second { grid-column: 2; grid-row: 2; }
+.device-internal-reference { border-top: 1px solid #d7e0ea; padding-top: 8px; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 4px; }
+.device-internal-reference > strong { font-size: 13px; }
+.device-internal-reference label { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px; margin: 5px 0; font-size: 11px; }
+.device-internal-reference select { width: 100%; min-width: 0; padding: 7px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; color: #24364e; }
+.device-internal-reference p, .device-internal-reference small { color: #64748b; font-size: 11px; line-height: 1.5; }
+.device-reference-image { display: block; flex: 1; min-height: 70px; width: 100%; padding: 5px; border: 1px solid #d7e0ea; border-radius: 7px; background: #fff; cursor: zoom-in; }
+.device-reference-image img { display: block; width: 100%; height: 100%; max-height: 240px; object-fit: contain; }
+.device-reference-expanded { overflow: auto; padding: 16px; }
+.device-reference-expanded img { display: block; width: 100%; height: min(68vh, 700px); object-fit: contain; }
+.usage-help { min-height: 0; overflow: auto; padding: 16px 22px; color: #334155; font-size: 13px; line-height: 1.7; }
+.usage-help-intro { padding: 12px; background: #eff6ff; border-radius: 8px; }
+.usage-help section { margin: 14px 0; }
+.usage-help h3 { font-size: 14px; color: #164b85; margin: 0 0 5px; }
+.usage-help p { margin: 6px 0; }
+.app-shell > *, .app-header > *, .workspace-toolbar > *, .wiring-stats { min-width: 0; }
+.brand-mark { flex-shrink: 0; }
+.header-actions { min-width: 0; }
+.header-actions > *, .header-stages a { flex-shrink: 0; }
+.header-problem strong, .header-problem small { display: block; overflow-wrap: anywhere; }
+.workspace-toolbar { flex-wrap: wrap; gap: 6px 12px; padding: 8px 14px; }
+.workspace-page, .circuit-diagnostics, .mounting-workspace { grid-template-rows: auto minmax(0, 1fr); }
+.workspace-toolbar { min-height: 58px; }
+.wiring-stats { flex-wrap: wrap; justify-content: flex-end; }
+.wiring-stats span { overflow-wrap: anywhere; }
+.analysis-source-column { grid-template-rows: auto minmax(0, 1fr); }
+.analysis-source-tabs { flex-wrap: wrap; }
+.diagram-stage, .wiring-stage { grid-template-rows: auto minmax(0, 1fr); }
+.wiring-stage.has-external-wiring { grid-template-rows: auto auto minmax(0, 1fr); }
+.diagram-toolbar, .wiring-toolbar { flex-wrap: wrap; min-height: 40px; overflow: visible; }
+.diagram-toolbar button, .wiring-toolbar button { flex-shrink: 0; }
+.diagram-toolbar span, .board-auto-fit-label { white-space: normal; }
+.circuit-reference-stage { grid-template-rows: auto minmax(0, 1fr); }
+.circuit-reference-stage .diagram-toolbar { overflow: visible; }
+.circuit-reference-stage .diagram-toolbar span { white-space: normal; }
+.circuit-reference-stage.toolbarless { grid-template-rows: minmax(0, 1fr); }
+.free-create-card, .free-workspace-list, .free-create-card input, .free-create-card select { min-width: 0; max-width: 100%; }
+.free-workspace-list button { grid-template-columns: minmax(0, 1fr) auto; overflow-wrap: anywhere; }
+.connection-alert { width: min(360px, calc(100% - 32px)); right: 16px; }
+
+/* Keep every menu available at Windows 125/150% and browser zoom levels.
+   Two rows are preferable to squeezing the problem title between fixed tracks. */
+@media (min-width: 721px) and (max-width: 1799px) {
+  .app-header { grid-template-columns: 290px minmax(180px, .6fr) minmax(260px, 1fr); gap: 4px 12px; padding: 6px 12px; }
+  .header-purpose { grid-column: 2; grid-row: 1; }
+  .header-problem { grid-column: 3; grid-row: 1; padding: 4px 8px 4px 12px; }
+  .header-actions { grid-column: 1 / -1; grid-row: 2; flex-wrap: wrap; }
+  .brand-block h1 { font-size: 16px; }
+  .header-stages a { padding: 7px 9px; }
+}
+@media (min-width: 721px) and (max-width: 1100px) {
+  .app-header { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .header-purpose { grid-column: 1; grid-row: 2; }
+  .header-problem { grid-column: 2; grid-row: 1 / span 2; }
+  .header-actions { grid-row: 3; }
+}
+@media (min-width: 721px) {
+  :root { --work-left-panel-width: clamp(170px, 14vw, 240px); --work-panel-width: clamp(250px, 20vw, 340px); }
+  .analysis-memo-panel { height: auto; }
+  .main-content { padding: clamp(8px, 1vw, 16px); }
+}
+/* Short FHD viewports must not hide the editor behind the fixed example. */
+@media (min-width: 721px) and (max-height: 800px) {
+  .app-shell { grid-template-rows: auto minmax(0, 1fr) 30px; }
+  .main-content { padding: 8px; }
+  .workspace-toolbar { min-height: 48px; padding: 5px 12px; }
+  .workspace-toolbar h2 { font-size: 16px; }
+  .analysis-memo-panel { padding: 10px; gap: 8px; }
+  .slot-number-example { padding-top: 6px; }
+  .slot-number-example svg { max-height: 110px; margin: 5px 0; }
+  .slot-number-example small { font-size: 10px; line-height: 1.4; }
+  .analysis-memo-panel .slot-number-example svg { max-height: 65px; }
+  .analysis-memo-panel .slot-number-example small { display: none; }
+  .device-reference-image { min-height: 50px; }
+  .device-internal-reference > small { font-size: 10px; }
+}
+@media (max-width: 980px) {
+  .free-home-scroll { grid-template-columns: minmax(0, 1fr); padding: 12px; }
+}
+@media (max-width: 720px) {
+  .header-actions { width: 100%; }
+  .header-stages { flex: 1 1 100%; min-width: 0; flex-wrap: wrap; }
+  .workspace-toolbar { align-items: flex-start; }
+  .wiring-stats { justify-content: flex-start; }
+  .toolbar-buttons { flex-wrap: wrap; }
+  .free-workspace-list button { grid-template-columns: minmax(0, 1fr); }
+  .free-workspace-list button small { grid-column: 1; grid-row: auto; }
+}

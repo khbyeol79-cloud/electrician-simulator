@@ -39,6 +39,22 @@ class WiringDraftResponse(WiringDraftUpdate):
     updated_at: datetime | None = None
 
 
+class PracticeSafetyIssue(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    code: str
+    severity: Literal["warning", "blocking"]
+    message: str
+
+
+class PracticeWiringDraftResponse(WiringDraftResponse):
+    workspace_id: str
+    source: Literal["user_practice_draft"] = "user_practice_draft"
+    verified_answer: bool = False
+    gradable: bool = False
+    safety_status: Literal["safe", "attention", "blocked"] = "safe"
+    safety_issues: list[PracticeSafetyIssue] = Field(default_factory=list)
+
+
 class WiringAttemptSubmit(BaseModel):
     model_config = ConfigDict(extra="forbid")
     problem_version: int = Field(ge=1)

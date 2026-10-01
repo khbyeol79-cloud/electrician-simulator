@@ -97,7 +97,7 @@ class CircuitContact(BaseModel):
     switched_terminal_id: str
     nc_terminal_id: str | None = None
     no_terminal_id: str | None = None
-    controller_type: Literal["coil", "timer", "protection"] = "coil"
+    controller_type: Literal["coil", "timer", "protection", "flasher", "level"] = "coil"
     controller_id: str | None = None
     controlled_by_coil_id: str | None = None
     normal_state: Literal["open", "closed"]
@@ -117,7 +117,7 @@ class CircuitContact(BaseModel):
             self.controller_id = controller_id
             self.controlled_by_coil_id = controller_id
         elif not self.controller_id:
-            raise ValueError("타이머·보호 접점에는 controller_id가 필요합니다.")
+            raise ValueError("타이머·보호·플리커·수위 접점에는 controller_id가 필요합니다.")
         return self
 
 
@@ -178,6 +178,7 @@ class ExternalWiringDevice(BaseModel):
     device_id: str = Field(min_length=1, max_length=80)
     label: str = Field(min_length=1, max_length=120)
     placement: Literal["top", "bottom"] = "top"
+    contact_type: Literal["NO", "NC"] | None = None
     terminals: list[ExternalWiringTerminal] = Field(min_length=1, max_length=20)
 
 

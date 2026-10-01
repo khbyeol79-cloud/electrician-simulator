@@ -53,9 +53,9 @@ def self_hold_connections(include_hold: bool = True) -> list[tuple[str, str, str
 def timer_connections() -> list[tuple[str, str, str]]:
     return [
         ("PWR-L", "TB5-01", "brown"), ("T1-2", "TB5-01", "yellow"),
-        ("T1-1", "TB5-01", "yellow"), ("PWR-N", "TB6-01", "black"),
+        ("T1-8", "TB5-01", "yellow"), ("PWR-N", "TB6-01", "black"),
         ("GL-2", "TB6-01", "yellow"), ("T1-7", "TB6-01", "yellow"),
-        ("T1-3", "TB6-02", "yellow"), ("GL-1", "TB6-02", "yellow"),
+        ("T1-6", "TB6-02", "yellow"), ("GL-1", "TB6-02", "yellow"),
     ]
 
 
@@ -63,10 +63,11 @@ def motor_connections(*, swap: bool = False, missing: bool = False,
                       bypass_eocr: bool = False) -> list[tuple[str, str, str]]:
     phases = ["PWR-L1", "PWR-L3", "PWR-L2"] if swap else ["PWR-L1", "PWR-L2", "PWR-L3"]
     result = [
-        ("PWR-L", "PB0-1", "brown"), ("PB0-2", "PB1-1", "yellow"),
-        ("PB1-2", "MC1-6", "yellow"), ("MC1-12", "EOCR-95", "yellow"),
-        ("EOCR-96", "PWR-N", "yellow"), ("PB1-1", "MC1-4", "yellow"),
-        ("MC1-10", "PB1-2", "yellow"), ("PWR-L", "EOCR-97", "yellow"),
+        ("PWR-L", "EOCR-95", "brown"), ("EOCR-96", "PB0-1", "yellow"),
+        ("PB0-2", "PB1-1", "yellow"),
+        ("PB1-2", "MC1-6", "yellow"), ("MC1-12", "PWR-N", "yellow"),
+        ("PB1-1", "MC1-4", "yellow"),
+        ("MC1-10", "PB1-2", "yellow"),
         ("EOCR-98", "RL-1", "yellow"), ("RL-2", "PWR-N", "yellow"),
         (phases[0], "MC1-1", "brown"), (phases[1], "MC1-2", "black"),
         (phases[2], "MC1-3", "gray"), ("MC1-7", "EOCR-L1", "brown"),
@@ -77,7 +78,7 @@ def motor_connections(*, swap: bool = False, missing: bool = False,
     if missing:
         result = [item for item in result if set(item[:2]) != {"MC1-9", "EOCR-L3"}]
     if bypass_eocr:
-        result.append(("MC1-12", "PWR-N", "yellow"))
+        result.append(("PWR-L", "PB0-1", "yellow"))
     return result
 
 

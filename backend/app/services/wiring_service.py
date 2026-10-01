@@ -5,7 +5,7 @@ from collections import Counter
 from app.domain import WiringAttemptResult, WiringAttemptSubmit, WiringDraftUpdate
 from app.repositories.problem_repository import ProblemRepository
 from app.repositories.wiring_repository import WiringRepository
-from app.services.wiring_network_service import build_network_components, compare_networks
+from app.services.wiring_network_service import build_network_components, compare_network_candidates
 from app.simulation import passes_operation_requirements
 
 
@@ -117,7 +117,9 @@ class WiringService:
                 return result.model_copy(update={"attempt_id": attempt_id})
             components = build_network_components(submitted, roles)
             expected = {item.net_id: frozenset(item.terminals) for item in package.answer.expected_nets}
-            comparison = compare_networks(components, expected)
+            comparison = compare_network_candidates(
+                components, expected, package.answer.allowed_alternatives
+            )
             forbidden = sorted(
                 rule for rule in forbidden_rules
                 if any(set(rule).issubset(component.terminals) for component in components)
@@ -128,6 +130,8 @@ class WiringService:
                 warnings.append(f"동작에 사용되지 않는 TB 점퍼 네트워크가 {comparison.isolated_junction_count}개 있습니다.")
             if comparison.loop_count:
                 warnings.append(f"불필요한 TB 결선 루프가 {comparison.loop_count}개 있습니다.")
+            if comparison.alternative_ids:
+                warnings.append("동등한 8P 전환접점 교환 결선을 인정했습니다.")
             policy_rejects = policy == "reject" and bool(comparison.isolated_junction_count or comparison.loop_count)
             equivalent = comparison.electrically_equivalent and not forbidden
             overall = equivalent and not policy_rejects
